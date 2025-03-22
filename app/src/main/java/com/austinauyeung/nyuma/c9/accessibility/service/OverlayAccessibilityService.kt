@@ -42,7 +42,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
 
     private lateinit var serviceJob: Job
-    private lateinit var serviceScope: CoroutineScope
+    private lateinit var backgroundScope: CoroutineScope
+    private lateinit var mainScope: CoroutineScope
+    private lateinit var ioScope: CoroutineScope
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
@@ -85,11 +87,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 
             serviceJob = SupervisorJob()
-            val backgroundScope =
-                CoroutineScope(Dispatchers.Default + serviceJob + coroutineExceptionHandler)
-            val mainScope =
-                CoroutineScope(Dispatchers.Main + serviceJob + coroutineExceptionHandler)
-            val ioScope = CoroutineScope(Dispatchers.IO + serviceJob + coroutineExceptionHandler)
+            backgroundScope = CoroutineScope(Dispatchers.Default + serviceJob + coroutineExceptionHandler)
+            mainScope = CoroutineScope(Dispatchers.Main + serviceJob + coroutineExceptionHandler)
+            ioScope = CoroutineScope(Dispatchers.IO + serviceJob + coroutineExceptionHandler)
 
             val settingsFlow = C9.getInstance().settingsRepository.getSettings().stateIn(
                 scope = ioScope,
@@ -133,7 +133,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             Logger.e("Error initializing service", e)
             if (!::serviceJob.isInitialized) {
                 serviceJob = SupervisorJob()
-                serviceScope = CoroutineScope(Dispatchers.Default + serviceJob)
             }
         }
     }
@@ -159,8 +158,16 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     override fun onDestroy() {
         instance = null
         try {
-            if (::serviceScope.isInitialized) {
-                serviceScope.cancel("Service destroyed")
+            if (::backgroundScope.isInitialized) {
+                backgroundScope.cancel("Service destroyed")
+            }
+
+            if (::mainScope.isInitialized) {
+                mainScope.cancel("Service destroyed")
+            }
+
+            if (::ioScope.isInitialized) {
+                ioScope.cancel("Service destroyed")
             }
 
             if (::serviceManager.isInitialized) {
