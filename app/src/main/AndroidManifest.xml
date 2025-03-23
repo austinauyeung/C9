@@ -30,6 +30,11 @@
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
+        <activity
+            android:name=".shortcuts.ActivationActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <activity-alias
             android:name=".LauncherAlias"
             android:enabled="true"
@@ -39,6 +44,36 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".shortcuts.GridCursorShortcut"
+            android:enabled="true"
+            android:exported="true"
+            android:targetActivity=".shortcuts.ActivationActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:label="Grid Cursor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+            <meta-data
+                android:name="cursorMode"
+                android:value="grid" />
+        </activity-alias>
+
+        <activity-alias
+            android:name=".shortcuts.StandardCursorShortcut"
+            android:enabled="true"
+            android:exported="true"
+            android:targetActivity=".shortcuts.ActivationActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:label="Standard Cursor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+            <meta-data
+                android:name="cursorMode"
+                android:value="standard" />
         </activity-alias>
 
         <!--        <activity-->

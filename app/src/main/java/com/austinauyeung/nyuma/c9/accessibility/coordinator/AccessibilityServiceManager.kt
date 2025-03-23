@@ -105,6 +105,32 @@ class AccessibilityServiceManager(
         }
     }
 
+    fun activateGridMode(): Boolean {
+        try {
+            if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
+                gridStateManager.toggleGridVisibility()
+                return gridStateManager.isGridVisible()
+            }
+            return false
+        } catch (e: Exception) {
+            Logger.e("Error activating grid mode", e)
+            return false
+        }
+    }
+
+    fun activateCursorMode(): Boolean {
+        try {
+            if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
+                cursorStateManager.toggleCursorVisibility()
+                return cursorStateManager.isCursorVisible()
+            }
+            return false
+        } catch (e: Exception) {
+            Logger.e("Error activating cursor mode", e)
+            return false
+        }
+    }
+
     fun handleKeyEvent(event: KeyEvent?): Boolean {
         Logger.d("Key event: $event")
         try {
