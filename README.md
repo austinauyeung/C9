@@ -18,7 +18,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🌎 Universal Android 11 compatibility via Shizuku as needed
 - ⚡ Introduction of a grid cursor focused on efficiency
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
-- ⚙️ Remappable cursor activation keys
+- ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
 
 ## Overview
@@ -41,7 +41,7 @@ Because of their different navigation paradigms, each cursor mode maps gestures 
 
 <br />
 
-The grid cursor trades precision for efficiency. `n` grid levels produce `9^n` points onscreen that can be reached with at most `n` numpad clicks. The visualizations below show the points that can be reached with two grid levels/clicks (81 points), three grid levels/clicks (729 points), and four grid levels/clicks (6561 points).
+The grid cursor trades precision for efficiency, taking advantage of the fact that many interactions with UI elements do not require pixel-by-pixel precision. `n` grid levels produce `9^n` points onscreen that can be reached with at most `n` numpad clicks. The visualizations below show the points that can be reached with two grid levels/clicks (81 points), three grid levels/clicks (729 points), and four grid levels/clicks (6561 points).
 
 <br />
 
@@ -60,6 +60,17 @@ The following options can be configured:
 - Grid opacity
 - Hide grid numbers
 
+#### Instructions
+- The default activation key is the pound (#) key.
+- To activate the grid cursor:
+    - Hold the activation key.
+    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut.
+- When activated, press the activation key to quickly reset any grid back to the main grid.
+- When activated, press any number to advance to the next subgrid.
+- See the table below for gesture dispatch.
+- To deactivate, hold the activation key.
+    - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
+
 #### Usage
 | Gesture | Mapped buttons | Dispatch location | Advances grid |
 | --- | --- | --- | --- |
@@ -69,10 +80,6 @@ The following options can be configured:
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Scroll | Click D-pad directions. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Zoom | Click star (*) and pound (#). | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-
-#### Instructions
-- Hold activation key to activate/deactivate (default key: #).
-- When activated, press the activation key to quickly reset any grid back to the main grid.
 
 ### Standard Cursor
 
@@ -97,6 +104,17 @@ The following options can be configured:
 - Cursor acceleration: accelerated cursor speed when held
 - Cursor size
 
+#### Instructions
+- The default activation key is the star (*) key.
+- To activate the standard cursor:
+    - Hold the activation key.
+    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut.
+- See the table below for gesture dispatch.
+- When activated, either D-pad center or numpad 5 can be used to long press. For example, in the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
+- When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
+- To deactivate, hold the activation key.
+    - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
+
 #### Usage
 All gestures are dispatched at the cursor's current location:
 
@@ -108,11 +126,6 @@ All gestures are dispatched at the cursor's current location:
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). |
 | Zoom | Numpad 1 and 3. |
-
-#### Instructions
-- Hold activation key to activate/deactivate (default key: *).
-- When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
-- Either D-pad center or numpad 5 can be used to long press. For example, in the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases).
@@ -136,11 +149,8 @@ Note that unless your device is rooted, you will need to restart the Shizuku ser
 ### What is Shizuku?
 Shizuku allows applications in general to perform actions that require elevated privileges. In C9, it is required to dispatch gestures on Android 11 using [InputManager](https://developer.android.com/reference/android/hardware/input/InputManager) instead of the standard dispatch using [AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService).
 
-### Where can I report bugs?
-Thanks for using and testing C9! If possible, provide logs from `adb logcat C9App:V *:S` and use the [issues](https://github.com/austinauyeung/C9/issues) tab on GitHub. Otherwise, please post on the forum on which you discovered this app.
-
-### How can I contribute?
-Aside from bug reports, please feel free to make feature suggestions or pull requests.
+### Where can I make feature suggestions or report bugs?
+Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs from `adb logcat C9App:V *:S` if possible.
 
 ## License
 [Apache License Version 2.0](./LICENSE)
