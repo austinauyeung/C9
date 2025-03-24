@@ -16,7 +16,12 @@
         <activity
             android:name=".settings.ui.SettingsActivity"
             android:exported="true"
-            android:theme="@style/Theme.C9" />
+            android:theme="@style/Theme.C9">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".settings.ui.GridSettingsActivity"
@@ -31,50 +36,24 @@
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".shortcuts.ActivationActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <activity-alias
-            android:name=".LauncherAlias"
-            android:enabled="true"
+            android:name=".shortcuts.GridCursorActivity"
             android:exported="true"
-            android:targetActivity=".settings.ui.SettingsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name=".shortcuts.GridCursorShortcut"
-            android:enabled="true"
-            android:exported="true"
-            android:targetActivity=".shortcuts.ActivationActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:theme="@android:style/Theme.NoDisplay"
             android:label="Grid Cursor">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data
-                android:name="cursorMode"
-                android:value="grid" />
-        </activity-alias>
+        </activity>
 
-        <activity-alias
-            android:name=".shortcuts.StandardCursorShortcut"
-            android:enabled="true"
-            android:exported="true"
-            android:targetActivity=".shortcuts.ActivationActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="Standard Cursor">
+        <activity
+            android:name=".shortcuts.StandardCursorActivity"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data
-                android:name="cursorMode"
-                android:value="standard" />
-        </activity-alias>
+        </activity>
 
         <!--        <activity-->
         <!--            android:name=".grid.debug.GridVisualizationActivity"-->
