@@ -162,7 +162,7 @@ fun GridSettingsScreen(
                     valueRange = GridConstants.MIN_OPACITY.toFloat()..GridConstants.MAX_OPACITY.toFloat(),
                     valueText = "${uiState.overlayOpacity}%",
                     onValueChange = { viewModel.updateOverlayOpacity(it.toInt()) },
-                    steps = 6,
+                    steps = 7,
                 )
 
                 SwitchPreferenceItem(

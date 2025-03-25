@@ -14,7 +14,7 @@ object GridConstants {
         arrayOf(7, 8, 9),
     )
 
-    const val MIN_OPACITY = 10
+    const val MIN_OPACITY = 0
     const val MAX_OPACITY = 80
     const val DEFAULT_OPACITY = 20
     const val GRID_FONT_SIZE = 0.5f // Percentage of cell dimensions
