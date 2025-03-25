@@ -119,7 +119,7 @@ All gestures are dispatched at the cursor's current location:
 | Zoom | Numpad 1 and 3. |
 
 ### Common
-Because of their different navigation paradigms, each cursor mode maps gestures uniquely as shown in the above tables. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <ins>the entire numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
+Because of their different navigation paradigms, each cursor mode maps gestures uniquely as shown in the above tables. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
 
 The following options can be configured, which affects scrolls and zooms in both modes:
 - Natural scrolling
