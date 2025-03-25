@@ -35,6 +35,7 @@ class SettingsRepositoryImpl(
         private val CURSOR_SPEED = intPreferencesKey("cursor_speed")
         private val CURSOR_ACCELERATION = intPreferencesKey("cursor_acceleration")
         private val CURSOR_SIZE = intPreferencesKey("cursor_size")
+        private val CURSOR_ACCELERATION_THRESHOLD = longPreferencesKey("cursor_acceleration_threshold")
         private val GRID_ACTIVATION_KEY = intPreferencesKey("grid_activation_key")
         private val CURSOR_ACTIVATION_KEY = intPreferencesKey("cursor_activation_key")
         private val CONTROL_SCHEME = stringPreferencesKey("control_scheme")
@@ -108,6 +109,8 @@ class SettingsRepositoryImpl(
                     cursorAcceleration = preferences[CURSOR_ACCELERATION]
                         ?: OverlaySettings.DEFAULT.cursorAcceleration,
                     cursorSize = preferences[CURSOR_SIZE] ?: OverlaySettings.DEFAULT.cursorSize,
+                    cursorAccelerationThreshold = preferences[CURSOR_ACCELERATION_THRESHOLD]
+                        ?: OverlaySettings.DEFAULT.cursorAccelerationThreshold,
                     gridActivationKey = preferences[GRID_ACTIVATION_KEY]
                         ?: OverlaySettings.DEFAULT.gridActivationKey,
                     cursorActivationKey = preferences[CURSOR_ACTIVATION_KEY]
@@ -140,6 +143,7 @@ class SettingsRepositoryImpl(
                 preferences[CURSOR_SPEED] = settings.cursorSpeed
                 preferences[CURSOR_ACCELERATION] = settings.cursorAcceleration
                 preferences[CURSOR_SIZE] = settings.cursorSize
+                preferences[CURSOR_ACCELERATION_THRESHOLD] = settings.cursorAccelerationThreshold
                 preferences[GRID_ACTIVATION_KEY] = settings.gridActivationKey
                 preferences[CURSOR_ACTIVATION_KEY] = settings.cursorActivationKey
                 preferences[CONTROL_SCHEME] = settings.controlScheme.name

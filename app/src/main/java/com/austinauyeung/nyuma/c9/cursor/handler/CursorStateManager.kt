@@ -119,7 +119,7 @@ class CursorStateManager(
         val totalPixels = screenDimensions.width * screenDimensions.height
         val screenScaleFactor = sqrt(totalPixels.toFloat()) / 1000f
 
-        val speed = if (timeHeld > CursorConstants.ACCELERATION_THRESHOLD) {
+        val speed = if (timeHeld > settings.cursorAccelerationThreshold) {
             baseSpeed + (maxExponent * CursorConstants.DEFAULT_ACCELERATION_MULTIPLIER - currentExponent * CursorConstants.DEFAULT_SPEED_MULTIPLIER) * (settings.cursorAcceleration - 1) / (CursorConstants.MAX_ACCELERATION - CursorConstants.MIN_ACCELERATION)
         } else {
             baseSpeed

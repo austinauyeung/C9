@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.util.Logger
@@ -241,7 +242,7 @@ class CursorActionHandler(
                 }
                 activationHandler.postDelayed(
                     activationRunnable!!,
-                    GestureConstants.ACTIVATION_HOLD_DURATION
+                    ApplicationConstants.ACTIVATION_HOLD_DURATION
                 )
 
                 // Do not intercept if cursor not visible yet
@@ -260,7 +261,7 @@ class CursorActionHandler(
 
                 if (cursorStateManager.isCursorVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < GestureConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
                         if (settings.controlScheme == ControlScheme.TOGGLE_MODE) {
                             cursorStateManager.toggleScrollMode()
 

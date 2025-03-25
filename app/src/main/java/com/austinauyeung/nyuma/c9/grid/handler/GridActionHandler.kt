@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.util.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
@@ -163,7 +164,7 @@ class GridActionHandler(
                 }
                 activationHandler.postDelayed(
                     activationRunnable!!,
-                    GestureConstants.ACTIVATION_HOLD_DURATION
+                    ApplicationConstants.ACTIVATION_HOLD_DURATION
                 )
 
                 // Do not intercept if grid not visible yet
@@ -182,7 +183,7 @@ class GridActionHandler(
 
                 if (gridStateManager.isGridVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < GestureConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
                         gridStateManager.resetToMainGrid()
                     }
                     return true

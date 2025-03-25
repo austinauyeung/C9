@@ -2,7 +2,6 @@ package com.austinauyeung.nyuma.c9.core.constants
 
 object GestureConstants {
     // Timing
-    const val ACTIVATION_HOLD_DURATION = 300L
     const val TAP_DURATION = 50L
     const val DRAG_SEGMENT_DURATION = 10L
     private const val FRAMES_PER_SECOND = 60

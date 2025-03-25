@@ -251,6 +251,23 @@ fun CursorSettingsScreen(
                 )
 
                 SliderPreferenceItem(
+                    title = "Cursor Acceleration Threshold",
+                    value = uiState.cursorAccelerationThreshold.toFloat(),
+                    valueRange = CursorConstants.MIN_ACCELERATION_THRESHOLD.toFloat()..CursorConstants.MAX_ACCELERATION_THRESHOLD.toFloat(),
+                    valueText =
+                    when (uiState.cursorAccelerationThreshold) {
+                        100L -> "Fastest"
+                        200L -> "Fast"
+                        300L -> "Medium"
+                        400L -> "Slow"
+                        500L -> "Slowest"
+                        else -> ""
+                    },
+                    onValueChange = { viewModel.updateCursorAccelerationThreshold(it.toLong()) },
+                    steps = 3,
+                )
+
+                SliderPreferenceItem(
                     title = "Cursor Size",
                     value = uiState.cursorSize.toFloat(),
                     valueRange = CursorConstants.MIN_SIZE.toFloat()..CursorConstants.MAX_SIZE.toFloat(),

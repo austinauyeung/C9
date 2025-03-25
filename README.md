@@ -50,6 +50,7 @@ The following options can be configured:
 - Grid persistence after clicking in the final grid
 - Grid opacity
 - Hide grid numbers
+- Adjust grid line visibility
 
 #### Instructions
 - The default activation key is the pound (#) key.
@@ -93,6 +94,7 @@ The following options can be configured:
 - Enable cursor wrap around
 - Cursor speed
 - Cursor acceleration: accelerated cursor speed when held
+- Cursor acceleration threshold: duration after which cursor speed is accelerated
 - Cursor size
 
 #### Instructions
@@ -147,6 +149,10 @@ Install using adb:
 If you are on Android 11, you will see an additional "Shizuku Service" banner. Please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) before using this application.
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
+
+## Known Issues
+- On the Vortex V3, the numpad backlight may not function when the cursor is active.
+    - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?

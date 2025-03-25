@@ -59,6 +59,7 @@ class SettingsViewModel(
                             cursorSpeed = settings.cursorSpeed,
                             cursorAcceleration = settings.cursorAcceleration,
                             cursorSize = settings.cursorSize,
+                            cursorAccelerationThreshold = settings.cursorAccelerationThreshold,
                             gridActivationKey = settings.gridActivationKey,
                             cursorActivationKey = settings.cursorActivationKey,
                             controlScheme = settings.controlScheme,
@@ -111,6 +112,7 @@ class SettingsViewModel(
             cursorSpeed = _uiState.value.cursorSpeed,
             cursorAcceleration = _uiState.value.cursorAcceleration,
             cursorSize = _uiState.value.cursorSize,
+            cursorAccelerationThreshold = _uiState.value.cursorAccelerationThreshold,
             gridActivationKey = _uiState.value.gridActivationKey,
             cursorActivationKey = _uiState.value.cursorActivationKey,
             controlScheme = _uiState.value.controlScheme,
@@ -161,6 +163,10 @@ class SettingsViewModel(
 
     fun updateCursorSize(size: Int) {
         updateSettings { it.copy(cursorSize = size) }
+    }
+
+    fun updateCursorAccelerationThreshold(threshold: Long) {
+        updateSettings { it.copy(cursorAccelerationThreshold = threshold) }
     }
 
     fun updateGridActivationKey(keyCode: Int) {
@@ -237,6 +243,7 @@ data class SettingsUiState(
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,
     val cursorAcceleration: Int = Defaults.Settings.CURSOR_ACCELERATION,
     val cursorSize: Int = Defaults.Settings.CURSOR_SIZE,
+    val cursorAccelerationThreshold: Long = Defaults.Settings.CURSOR_ACCELERATION_THRESHOLD,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,

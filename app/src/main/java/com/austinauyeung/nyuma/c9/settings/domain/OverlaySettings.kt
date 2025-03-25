@@ -20,6 +20,7 @@ data class OverlaySettings(
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,
     val cursorAcceleration: Int = Defaults.Settings.CURSOR_ACCELERATION,
     val cursorSize: Int = Defaults.Settings.CURSOR_SIZE,
+    val cursorAccelerationThreshold: Long = Defaults.Settings.CURSOR_ACCELERATION_THRESHOLD,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
@@ -46,22 +47,6 @@ data class OverlaySettings(
             buildList {
                 if (gridLevels !in GridConstants.MIN_LEVELS..GridConstants.MAX_LEVELS) {
                     add("Grid levels must be between ${GridConstants.MIN_LEVELS} and ${GridConstants.MAX_LEVELS}")
-                }
-
-                if (overlayOpacity !in GridConstants.MIN_OPACITY..GridConstants.MAX_OPACITY) {
-                    add("Overlay opacity must be between ${GridConstants.MIN_OPACITY} and ${GridConstants.MAX_OPACITY}")
-                }
-
-                if (cursorSpeed !in CursorConstants.MIN_SPEED..CursorConstants.MAX_SPEED) {
-                    add("Cursor speed must be between ${CursorConstants.MIN_SPEED} and ${CursorConstants.MAX_SPEED}")
-                }
-
-                if (cursorAcceleration !in CursorConstants.MIN_ACCELERATION..CursorConstants.MAX_ACCELERATION) {
-                    add("Cursor speed must be between ${CursorConstants.MIN_ACCELERATION} and ${CursorConstants.MAX_ACCELERATION}")
-                }
-
-                if (cursorSize !in CursorConstants.MIN_SIZE..CursorConstants.MAX_SIZE) {
-                    add("Cursor size must be between ${CursorConstants.MIN_SIZE} and ${CursorConstants.MAX_SIZE}")
                 }
 
                 if (!isValidRemappableKey(gridActivationKey)) {

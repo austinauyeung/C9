@@ -24,6 +24,7 @@ object Defaults {
         const val CURSOR_SPEED = CursorConstants.DEFAULT_SPEED
         const val CURSOR_ACCELERATION = CursorConstants.DEFAULT_ACCELERATION
         const val CURSOR_SIZE = CursorConstants.DEFAULT_SIZE
+        const val CURSOR_ACCELERATION_THRESHOLD = CursorConstants.DEFAULT_ACCELERATION_THRESHOLD
         const val GRID_ACTIVATION_KEY = KeyEvent.KEYCODE_POUND
         const val CURSOR_ACTIVATION_KEY = KeyEvent.KEYCODE_STAR
         const val CURSOR_WRAP_AROUND = CursorConstants.CURSOR_WRAP_AROUND
