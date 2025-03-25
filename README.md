@@ -22,15 +22,6 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
 
 ## Overview
-Because of their different navigation paradigms, each cursor mode maps gestures uniquely. While both modes can be enabled simultaneously, only one cursor can be active at a time. The following options can be configured, which affects scrolls and zooms in both modes:
-- Natural scrolling
-- Gesture visualizations
-- Gesture style
-  - Fixed: gestures are controlled and fixed distance
-  - Inertia: gestures resemble touchscreen flicks
-- Gesture duration
-- Scroll distance
-
 ### Grid Cursor
 
 <br />
@@ -64,7 +55,7 @@ The following options can be configured:
 - The default activation key is the pound (#) key.
 - To activate the grid cursor:
     - Hold the activation key.
-    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut.
+    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
 - When activated, press the activation key to quickly reset any grid back to the main grid.
 - When activated, press any number to advance to the next subgrid.
 - See the table below for gesture dispatch.
@@ -108,7 +99,7 @@ The following options can be configured:
 - The default activation key is the star (*) key.
 - To activate the standard cursor:
     - Hold the activation key.
-    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut.
+    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
 - See the table below for gesture dispatch.
 - When activated, either D-pad center or numpad 5 can be used to long press. For example, in the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
 - When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
@@ -126,6 +117,18 @@ All gestures are dispatched at the cursor's current location:
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). |
 | Zoom | Numpad 1 and 3. |
+
+### Common
+Because of their different navigation paradigms, each cursor mode maps gestures uniquely as shown in the above tables. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <u>the entire numpad and D-pad are generally reserved/intercepted while the cursor is active</u>.
+
+The following options can be configured, which affects scrolls and zooms in both modes:
+- Natural scrolling
+- Gesture visualizations
+- Gesture style
+  - Fixed: gestures are controlled and fixed distance
+  - Inertia: gestures resemble touchscreen flicks
+- Gesture duration
+- Scroll distance
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases).
@@ -146,11 +149,14 @@ If you are on Android 11, you will see an additional "Shizuku Service" banner. P
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
 
 ## FAQs
+### Where can I make feature suggestions or report bugs?
+Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs from `adb logcat C9App:V *:S` if possible.
+
 ### What is Shizuku?
 Shizuku allows applications in general to perform actions that require elevated privileges. In C9, it is required to dispatch gestures on Android 11 using [InputManager](https://developer.android.com/reference/android/hardware/input/InputManager) instead of the standard dispatch using [AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService).
 
-### Where can I make feature suggestions or report bugs?
-Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs from `adb logcat C9App:V *:S` if possible.
+### What does it mean for the cursor to intercept button presses?
+The cursors sit between your button presses and the underlying application. If a button is used by the cursor, the cursor will consume it and prevent the underlying application from receiving the button press.
 
 ## License
 [Apache License Version 2.0](./LICENSE)
