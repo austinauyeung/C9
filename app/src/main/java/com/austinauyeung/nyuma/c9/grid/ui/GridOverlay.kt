@@ -26,6 +26,7 @@ import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.domain.GridCell
+import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
 /**
  * Renders the grid cursor overlay.
@@ -35,7 +36,7 @@ fun GridOverlay(
     grid: Grid,
     opacity: Int = 0,
     hideNumbers: Boolean = false,
-    modifier: Modifier = Modifier,
+    gridLineVisibility: GridLineVisibility = GridLineVisibility.SHOW_ALL
 ) {
     val textMeasurer = rememberTextMeasurer()
     val gridBackground = colorResource(id = R.color.grid_background)
@@ -71,9 +72,14 @@ fun GridOverlay(
     val gridStrokeWidth = dimensionResource(R.dimen.grid_stroke_width).value
     val borderStrokeWidth = dimensionResource(R.dimen.grid_border_width).value
 
+    val shouldShowGridLines = when (gridLineVisibility) {
+        GridLineVisibility.SHOW_ALL -> true
+        GridLineVisibility.FINAL_LEVEL_ONLY -> grid.level == grid.maxLevels
+        GridLineVisibility.HIDE_ALL -> false
+    }
+
     Canvas(
-        modifier =
-        modifier
+        modifier = Modifier
             .fillMaxSize()
             .onSizeChanged { newSize ->
                 layoutState.value = newSize
@@ -95,12 +101,20 @@ fun GridOverlay(
             }
         }
 
-        drawGridLines(
-            dimensions = dimensions,
-            gridBorderColor = gridBorderColor,
-            gridStrokeWidth = gridStrokeWidth,
-            borderStrokeWidth = borderStrokeWidth,
+        drawRect(
+            color = Color.White,
+            topLeft = Offset(dimensions.x, dimensions.y),
+            size = Size(dimensions.width, dimensions.height),
+            style = Stroke(width = borderStrokeWidth),
         )
+
+        if (shouldShowGridLines) {
+            drawGridLines(
+                dimensions = dimensions,
+                gridBorderColor = gridBorderColor,
+                gridStrokeWidth = gridStrokeWidth,
+            )
+        }
     }
 }
 
@@ -185,16 +199,8 @@ private fun DrawScope.drawCell(
 private fun DrawScope.drawGridLines(
     dimensions: GridDimensions,
     gridBorderColor: Color,
-    gridStrokeWidth: Float,
-    borderStrokeWidth: Float,
+    gridStrokeWidth: Float
 ) {
-    drawRect(
-        color = Color.White,
-        topLeft = Offset(dimensions.x, dimensions.y),
-        size = Size(dimensions.width, dimensions.height),
-        style = Stroke(width = borderStrokeWidth),
-    )
-
     for (i in 1 until GridConstants.DIMENSION) {
         drawLine(
             color = gridBorderColor,

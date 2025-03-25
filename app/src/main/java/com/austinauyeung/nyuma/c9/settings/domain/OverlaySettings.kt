@@ -4,6 +4,7 @@ import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
 /**
  * Represents default user preferences.
@@ -13,6 +14,7 @@ data class OverlaySettings(
     val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,
     val hideNumbers: Boolean = Defaults.Settings.HIDE_NUMBERS,
+    val gridLineVisibility: GridLineVisibility = Defaults.Settings.GRID_LINE_VISIBILITY,
     val useNaturalScrolling: Boolean = Defaults.Settings.USE_NATURAL_SCROLLING,
     val showGestureVisualization: Boolean = Defaults.Settings.SHOW_GESTURE_VISUAL,
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,

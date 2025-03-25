@@ -140,6 +140,7 @@ class OverlayUIManager(
                                 grid = activeGrid,
                                 opacity = currentSettings.overlayOpacity,
                                 hideNumbers = currentSettings.hideNumbers,
+                                gridLineVisibility = currentSettings.gridLineVisibility
                             )
                         }
 

@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,7 @@ class SettingsRepositoryImpl(
         private val OVERLAY_OPACITY = intPreferencesKey("overlay_opacity")
         private val PERSIST_OVERLAY = booleanPreferencesKey("persist_overlay")
         private val HIDE_NUMBERS = booleanPreferencesKey("hide_numbers")
+        private val GRID_LINE_VISIBILITY = stringPreferencesKey("grid_line_visibility")
         private val USE_NATURAL_SCROLLING = booleanPreferencesKey("use_natural_scrolling")
         private val SHOW_GESTURE_VISUAL = booleanPreferencesKey("show_gesture_visual")
         private val CURSOR_SPEED = intPreferencesKey("cursor_speed")
@@ -77,6 +79,19 @@ class SettingsRepositoryImpl(
                         OverlaySettings.DEFAULT.gestureStyle
                     }
 
+                val gridLineVisibilityStr = preferences[GRID_LINE_VISIBILITY]
+                val gridLineVisibility =
+                    if (gridLineVisibilityStr != null) {
+                        try {
+                            GridLineVisibility.valueOf(gridLineVisibilityStr)
+                        } catch (e: Exception) {
+                            Logger.w("Invalid grid line visibility value: $gridLineVisibilityStr", e)
+                            OverlaySettings.DEFAULT.gridLineVisibility
+                        }
+                    } else {
+                        OverlaySettings.DEFAULT.gridLineVisibility
+                    }
+
                 OverlaySettings(
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
                     overlayOpacity = preferences[OVERLAY_OPACITY]
@@ -84,6 +99,7 @@ class SettingsRepositoryImpl(
                     persistOverlay = preferences[PERSIST_OVERLAY]
                         ?: OverlaySettings.DEFAULT.persistOverlay,
                     hideNumbers = preferences[HIDE_NUMBERS] ?: OverlaySettings.DEFAULT.hideNumbers,
+                    gridLineVisibility = gridLineVisibility,
                     useNaturalScrolling = preferences[USE_NATURAL_SCROLLING]
                         ?: OverlaySettings.DEFAULT.useNaturalScrolling,
                     showGestureVisualization = preferences[SHOW_GESTURE_VISUAL]
@@ -118,6 +134,7 @@ class SettingsRepositoryImpl(
                 preferences[OVERLAY_OPACITY] = settings.overlayOpacity
                 preferences[PERSIST_OVERLAY] = settings.persistOverlay
                 preferences[HIDE_NUMBERS] = settings.hideNumbers
+                preferences[GRID_LINE_VISIBILITY] = settings.gridLineVisibility.name
                 preferences[USE_NATURAL_SCROLLING] = settings.useNaturalScrolling
                 preferences[SHOW_GESTURE_VISUAL] = settings.showGestureVisualization
                 preferences[CURSOR_SPEED] = settings.cursorSpeed

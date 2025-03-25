@@ -10,7 +10,7 @@
     <string name="notification_channel_description">Shows when the C9 overlay service is running</string>
 
     <!-- Settings -->
-    <string name="settings_title">C9 Settings</string>
+    <string name="settings_title">C9: Click on 9 keys</string>
     <string name="settings_service_status">Service Status</string>
     <string name="settings_service_enabled">Enabled</string>
     <string name="settings_service_disabled">Tap to enable accessibility service</string>

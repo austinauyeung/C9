@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 
 /**
@@ -169,6 +170,22 @@ fun GridSettingsScreen(
                     subtitle = "Hide cell numbers in the grid",
                     checked = uiState.hideNumbers,
                     onCheckedChange = { viewModel.updateHideNumbers(it) },
+                )
+
+                DropdownPreferenceItem(
+                    title = "Grid Lines",
+                    subtitle = when (uiState.gridLineVisibility) {
+                        GridLineVisibility.SHOW_ALL -> "Show all grid lines"
+                        GridLineVisibility.FINAL_LEVEL_ONLY -> "Show grid lines in final subgrid only"
+                        GridLineVisibility.HIDE_ALL -> "Hide all grid lines"
+                    },
+                    selectedOption = uiState.gridLineVisibility,
+                    options = listOf(
+                        GridLineVisibility.SHOW_ALL to "Show",
+                        GridLineVisibility.FINAL_LEVEL_ONLY to "Final",
+                        GridLineVisibility.HIDE_ALL to "Hide"
+                    ),
+                    onOptionSelected = { viewModel.updateGridLineVisibility(it) },
                 )
             }
         }

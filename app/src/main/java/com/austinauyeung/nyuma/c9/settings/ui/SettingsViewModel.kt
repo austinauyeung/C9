@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.Defaults
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -52,6 +53,7 @@ class SettingsViewModel(
                             overlayOpacity = settings.overlayOpacity,
                             persistOverlay = settings.persistOverlay,
                             hideNumbers = settings.hideNumbers,
+                            gridLineVisibility = settings.gridLineVisibility,
                             useNaturalScrolling = settings.useNaturalScrolling,
                             showGestureVisualization = settings.showGestureVisualization,
                             cursorSpeed = settings.cursorSpeed,
@@ -103,6 +105,7 @@ class SettingsViewModel(
             overlayOpacity = _uiState.value.overlayOpacity,
             persistOverlay = _uiState.value.persistOverlay,
             hideNumbers = _uiState.value.hideNumbers,
+            gridLineVisibility = _uiState.value.gridLineVisibility,
             useNaturalScrolling = _uiState.value.useNaturalScrolling,
             showGestureVisualization = _uiState.value.showGestureVisualization,
             cursorSpeed = _uiState.value.cursorSpeed,
@@ -201,6 +204,10 @@ class SettingsViewModel(
         updateSettings { it.copy(allowPassthrough = allow) }
     }
 
+    fun updateGridLineVisibility(visibility: GridLineVisibility) {
+        updateSettings { it.copy(gridLineVisibility = visibility) }
+    }
+
     class Factory(
         private val settingsRepository: SettingsRepository,
     ) : ViewModelProvider.Factory {
@@ -222,6 +229,7 @@ data class SettingsUiState(
     val showInvalidSettingError: Boolean = false,
     val isServiceRunning: Boolean = false,
     val hideNumbers: Boolean = Defaults.Settings.HIDE_NUMBERS,
+    val gridLineVisibility: GridLineVisibility = Defaults.Settings.GRID_LINE_VISIBILITY,
     val useNaturalScrolling: Boolean = Defaults.Settings.USE_NATURAL_SCROLLING,
     val showGestureVisualization: Boolean = Defaults.Settings.SHOW_GESTURE_VISUAL,
     val showError: Boolean = false,
