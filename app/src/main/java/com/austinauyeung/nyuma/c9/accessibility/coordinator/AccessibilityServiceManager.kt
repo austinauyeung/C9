@@ -133,13 +133,19 @@ class AccessibilityServiceManager(
 
     fun handleKeyEvent(event: KeyEvent?): Boolean {
         Logger.d("Key event: $event")
+        val settings = settingsFlow.value
+
         try {
             // Check grid mode first
-            if (gridActionHandler.handleKeyEvent(event)) {
-                return true
+            val gridHandled = gridActionHandler.handleKeyEvent(event)
+            val cursorHandled = if (!gridHandled) cursorActionHandler.handleKeyEvent(event) else false
+            val eventHandled = gridHandled || cursorHandled
+
+            if (settings.allowPassthrough) {
+                Logger.d("Allowing key event to pass through")
             }
 
-            return cursorActionHandler.handleKeyEvent(event)
+            return !settings.allowPassthrough && eventHandled
         } catch (e: Exception) {
             Logger.e("Error processing key event", e)
             return false

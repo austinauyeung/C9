@@ -64,7 +64,8 @@ class SettingsViewModel(
                             gestureStyle = settings.gestureStyle,
                             toggleHold = settings.toggleHold,
                             gestureDuration = settings.gestureDuration,
-                            scrollMultiplier = settings.scrollMultiplier
+                            scrollMultiplier = settings.scrollMultiplier,
+                            allowPassthrough = settings.allowPassthrough
                         )
                     }
                 }
@@ -114,7 +115,8 @@ class SettingsViewModel(
             gestureStyle = _uiState.value.gestureStyle,
             toggleHold = _uiState.value.toggleHold,
             gestureDuration = _uiState.value.gestureDuration,
-            scrollMultiplier = _uiState.value.scrollMultiplier
+            scrollMultiplier = _uiState.value.scrollMultiplier,
+            allowPassthrough = _uiState.value.allowPassthrough
         )
     }
 
@@ -195,6 +197,10 @@ class SettingsViewModel(
         updateSettings { it.copy(scrollMultiplier = mult) }
     }
 
+    fun updateAllowPassthrough(allow: Boolean) {
+        updateSettings { it.copy(allowPassthrough = allow) }
+    }
+
     class Factory(
         private val settingsRepository: SettingsRepository,
     ) : ViewModelProvider.Factory {
@@ -230,5 +236,6 @@ data class SettingsUiState(
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
     val toggleHold: Boolean = Defaults.Settings.TOGGLE_HOLD,
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,
-    val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER
+    val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
+    val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH
 )

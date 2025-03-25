@@ -25,7 +25,8 @@ data class OverlaySettings(
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
     val toggleHold: Boolean = Defaults.Settings.TOGGLE_HOLD,
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,
-    val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER
+    val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
+    val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

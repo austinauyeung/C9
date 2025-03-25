@@ -9,6 +9,8 @@ import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 /**
  * Contains default values that can be modified by the user.
  */
+
+// Maybe reference constants file directly
 object Defaults {
     object Settings {
         const val GRID_LEVELS = GridConstants.DEFAULT_LEVELS
@@ -28,5 +30,6 @@ object Defaults {
         const val TOGGLE_HOLD = CursorConstants.TOGGLE_HOLD
         const val GESTURE_DURATION = GestureConstants.DEFAULT_GESTURE_DURATION
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
+        const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
     }
 }

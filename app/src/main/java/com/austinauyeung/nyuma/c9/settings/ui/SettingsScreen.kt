@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -70,6 +72,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var showExperimentalDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -199,6 +202,48 @@ fun SettingsScreen(
                     },
                     onValueChange = { viewModel.updateScrollMultiplier(it) },
                     steps = 3,
+                )
+            }
+
+            PreferenceCategory(title = "Experimental") {
+                SwitchPreferenceItem(
+                    title = "Allow Passthrough",
+                    subtitle = "Disable key press interception",
+                    checked = uiState.allowPassthrough,
+                    onCheckedChange = { newValue ->
+                        if (newValue && !uiState.allowPassthrough) {
+                            showExperimentalDialog = true
+                        } else {
+                            viewModel.updateAllowPassthrough(newValue)
+                        }
+                    },
+                )
+            }
+
+            if (showExperimentalDialog) {
+                AlertDialog(
+                    onDismissRequest = { showExperimentalDialog = false },
+                    title = { Text("Allow Passthrough") },
+                    text = {
+                        Text("All button presses will be forwarded to the underlying app. This may fix numpad backlight issues but cause unintended behavior with the underlying application.")
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.updateAllowPassthrough(true)
+                                showExperimentalDialog = false
+                            }
+                        ) {
+                            Text("Enable")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showExperimentalDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
                 )
             }
 

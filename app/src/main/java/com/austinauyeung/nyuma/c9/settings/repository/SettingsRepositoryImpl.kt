@@ -41,6 +41,7 @@ class SettingsRepositoryImpl(
         private val TOGGLE_HOLD = booleanPreferencesKey("toggle_hold")
         private val GESTURE_DURATION = longPreferencesKey("gesture_duration")
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
+        private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -103,7 +104,9 @@ class SettingsRepositoryImpl(
                     gestureDuration = preferences[GESTURE_DURATION]
                         ?: OverlaySettings.DEFAULT.gestureDuration,
                     scrollMultiplier = preferences[SCROLL_MULTIPLIER]
-                        ?: OverlaySettings.DEFAULT.scrollMultiplier
+                        ?: OverlaySettings.DEFAULT.scrollMultiplier,
+                    allowPassthrough = preferences[ALLOW_PASSTHROUGH]
+                        ?: OverlaySettings.DEFAULT.allowPassthrough
                 )
             }
     }
@@ -128,6 +131,7 @@ class SettingsRepositoryImpl(
                 preferences[TOGGLE_HOLD] = settings.toggleHold
                 preferences[GESTURE_DURATION] = settings.gestureDuration
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
+                preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

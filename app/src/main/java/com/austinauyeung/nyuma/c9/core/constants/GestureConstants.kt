@@ -30,6 +30,9 @@ object GestureConstants {
     // Visualization
     const val SHOW_GESTURE_VISUAL = true
 
+    // Intercept
+    const val ALLOW_PASSTHROUGH = false
+
     // Steps needed to maintain frame rate
     fun calculateSteps(duration: Long): Int {
         return ((duration / FRAME_DURATION_MS).toInt()).coerceAtLeast(1)
