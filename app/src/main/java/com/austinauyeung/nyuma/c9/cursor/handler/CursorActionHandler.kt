@@ -307,8 +307,8 @@ class CursorActionHandler(
 
     private fun handleScrollKey(event: KeyEvent): Boolean {
         val settings = settingsFlow.value
-        val gestureInterval = (settings.gestureDuration * 1.2).toLong()
-        val initialDelay = (GestureConstants.MAX_GESTURE_DURATION * 1.2).toLong()
+        val gestureInterval = (settings.gestureDuration * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
+        val initialDelay = (GestureConstants.MAX_GESTURE_DURATION * GestureConstants.CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {

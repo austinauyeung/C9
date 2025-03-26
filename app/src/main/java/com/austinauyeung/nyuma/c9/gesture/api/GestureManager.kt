@@ -13,9 +13,12 @@ import com.austinauyeung.nyuma.c9.gesture.ui.animateGesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.showStationaryGesture
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /**
  * Translates inputs from either cursor mode into gestures, using Shizuku if necessary.
@@ -29,24 +32,38 @@ class GestureManager(
 ) {
     private val _gesturePaths = MutableStateFlow<List<GesturePath>>(emptyList())
     val gesturePaths: StateFlow<List<GesturePath>> = _gesturePaths.asStateFlow()
-    private val strategy = getStrategy()
 
-    private var shouldShowGestures = false
-        private set
+    private var currentStrategy: GestureStrategy = standardStrategy
+    private var shizukuObserverJob: Job? = null
 
-    private fun getStrategy(): GestureStrategy {
+    init {
+        evaluateStrategy()
+
+        shizukuObserverJob = ShizukuServiceConnection.observeStatus { status ->
+            Logger.d("Shizuku status changed to: $status, re-evaluating gesture strategy")
+            serviceScope.launch {
+                delay(1000)
+                evaluateStrategy()
+            }
+        }
+    }
+
+    private fun evaluateStrategy() {
         Logger.d(
-            "Selecting gesture strategy - Shizuku available: ${ShizukuServiceConnection.isReady()}, " +
+            "Evaluating gesture strategy - Shizuku available: ${ShizukuServiceConnection.isReady()}, " +
                     "is Android 11: ${VersionUtil.isAndroid11()}"
         )
-        return if (shouldUseShizuku()) {
-            Logger.d("Using Shizuku gesture")
+
+        currentStrategy = if (shouldUseShizuku()) {
+            Logger.d("Switching to Shizuku gesture strategy")
             shizukuStrategy
         } else {
-            Logger.d("Using standard gesture")
+            Logger.d("Switching to standard gesture strategy")
             standardStrategy
         }
     }
+
+    private var shouldShowGestures = false
 
     private fun shouldUseShizuku(): Boolean {
         if (!VersionUtil.isAndroid11()) return false
@@ -90,7 +107,7 @@ class GestureManager(
                 visualizeScroll(direction, startX, startY, endX, endY)
             }
 
-            return strategy.performScroll(direction, startX, startY, endX, endY)
+            return currentStrategy.performScroll(direction, startX, startY, endX, endY)
         } catch (e: Exception) {
             Logger.e("Error performing scroll gesture", e)
             return false
@@ -135,7 +152,7 @@ class GestureManager(
                 )
             }
 
-            return strategy.performZoom(
+            return currentStrategy.performZoom(
                 isZoomIn,
                 startX1, startY1,
                 startX2, startY2,
@@ -155,7 +172,7 @@ class GestureManager(
                 visualizeTap(x, y)
             }
 
-            return strategy.startTap(x, y)
+            return currentStrategy.startTap(x, y)
         } catch (e: Exception) {
             Logger.e("Error starting tap gesture", e)
             cancelTap()
@@ -166,7 +183,7 @@ class GestureManager(
     fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
         try {
             Logger.d("Dragging from ($fromX, $fromY) to ($toX, $toY)")
-            return strategy.dragTap(fromX, fromY, toX, toY)
+            return currentStrategy.dragTap(fromX, fromY, toX, toY)
         } catch (e: Exception) {
             Logger.e("Error during drag tap", e)
             cancelTap()
@@ -177,7 +194,7 @@ class GestureManager(
     fun endTap(x: Float, y: Float): Boolean {
         try {
             Logger.d("Ending tap at ($x, $y)")
-            return strategy.endTap(x, y)
+            return currentStrategy.endTap(x, y)
         } catch (e: Exception) {
             Logger.e("Error ending tap gesture", e)
             cancelTap()
@@ -188,7 +205,7 @@ class GestureManager(
     private fun cancelTap(): Boolean {
         try {
             Logger.d("Cancelling tap gesture")
-            return strategy.cancelTap()
+            return currentStrategy.cancelTap()
         } catch (e: Exception) {
             Logger.e("Error cancelling tap gesture", e)
             return false
@@ -262,5 +279,10 @@ class GestureManager(
 
     fun updateGestureVisibility(showGestures: Boolean) {
         shouldShowGestures = showGestures
+    }
+
+    fun cleanup() {
+        shizukuObserverJob?.cancel()
+        shizukuObserverJob = null
     }
 }

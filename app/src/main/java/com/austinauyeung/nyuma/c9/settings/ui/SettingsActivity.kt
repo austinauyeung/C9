@@ -13,7 +13,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.common.ui.C9Theme
-import com.austinauyeung.nyuma.c9.core.logs.ui.LogActivity
 
 /**
  * Main settings screen.

@@ -10,11 +10,9 @@ object GestureConstants {
     const val MIN_GESTURE_DURATION = 100L
     const val MAX_GESTURE_DURATION = 500L
     const val DEFAULT_GESTURE_DURATION = 300L
-    const val ZOOM_DURATION = 300L
-    const val SCROLL_DURATION = 150L
     const val SCROLL_END_PAUSE = 150L
-    const val CONTINUOUS_INITIAL_DELAY = 500L
-    const val CONTINUOUS_REPEAT_INTERVAL = 100L
+    const val CONTINUOUS_INITIAL_DELAY_FACTOR = 1.2
+    const val CONTINUOUS_REPEAT_INTERVAL_FACTOR = 1.2
 
     // Scroll
     const val MIN_SCROLL_MULTIPLIER = 0.3f

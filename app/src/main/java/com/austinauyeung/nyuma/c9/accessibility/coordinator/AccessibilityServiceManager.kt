@@ -194,5 +194,6 @@ class AccessibilityServiceManager(
     fun cleanup() {
         gridActionHandler.cleanup()
         cursorActionHandler.cleanup()
+        gestureManager.cleanup()
     }
 }
