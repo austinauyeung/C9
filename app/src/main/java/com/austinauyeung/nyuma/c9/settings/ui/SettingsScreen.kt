@@ -69,11 +69,10 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateToGridSettings: () -> Unit,
     onNavigateToCursorSettings: () -> Unit,
-    onNavigateToLogScreen: () -> Unit
+    onNavigateToDebugOptions: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var showExperimentalDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -206,53 +205,11 @@ fun SettingsScreen(
                 )
             }
 
-            PreferenceCategory(title = "Debug") {
+            PreferenceCategory(title = "Miscellaneous") {
                 NavigationItem(
-                    title = "Log Screen",
-                    subtitle = "View application logs",
-                    onClick = onNavigateToLogScreen,
-                )
-            }
-
-            PreferenceCategory(title = "Experimental") {
-                SwitchPreferenceItem(
-                    title = "Allow Passthrough",
-                    subtitle = "Disable key press interception",
-                    checked = uiState.allowPassthrough,
-                    onCheckedChange = { newValue ->
-                        if (newValue && !uiState.allowPassthrough) {
-                            showExperimentalDialog = true
-                        } else {
-                            viewModel.updateAllowPassthrough(newValue)
-                        }
-                    },
-                )
-            }
-
-            if (showExperimentalDialog) {
-                AlertDialog(
-                    onDismissRequest = { showExperimentalDialog = false },
-                    title = { Text("Allow Passthrough") },
-                    text = {
-                        Text("All button presses will be forwarded to the underlying app. This may fix numpad backlight issues but cause unintended behavior with the underlying application.")
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                viewModel.updateAllowPassthrough(true)
-                                showExperimentalDialog = false
-                            }
-                        ) {
-                            Text("Enable")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showExperimentalDialog = false }
-                        ) {
-                            Text("Cancel")
-                        }
-                    }
+                    title = "Debug Options",
+                    subtitle = "Logging and experimental features",
+                    onClick = onNavigateToDebugOptions
                 )
             }
 
@@ -291,29 +248,6 @@ fun SettingsScreen(
                             )
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun InstructionItem(instructions: List<String>) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_standard)),
-        ) {
-            instructions.forEach { instruction ->
-                Row(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = instruction,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
                 }
             }
         }

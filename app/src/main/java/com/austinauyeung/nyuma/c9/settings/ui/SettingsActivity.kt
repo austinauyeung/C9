@@ -51,8 +51,8 @@ class SettingsActivity : ComponentActivity() {
                         val options = ActivityOptionsCompat.makeBasic()
                         startActivity(intent, options.toBundle())
                     },
-                    onNavigateToLogScreen = {
-                        val intent = Intent(this, LogActivity::class.java)
+                    onNavigateToDebugOptions = {
+                        val intent = Intent(this, DebugOptionsActivity::class.java)
                         val options = ActivityOptionsCompat.makeBasic()
                         startActivity(intent, options.toBundle())
                     }

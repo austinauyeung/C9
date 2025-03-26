@@ -36,10 +36,16 @@
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".core.logs.ui.LogActivity"
+            android:name=".settings.ui.DebugOptionsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
+
+        <activity
+            android:name=".core.logs.ui.LogActivity"
+            android:exported="false"
+            android:theme="@style/Theme.C9"
+            android:parentActivityName=".settings.ui.DebugOptionsActivity" />
 
         <activity
             android:name=".shortcuts.GridCursorCreateShortcutActivity"
