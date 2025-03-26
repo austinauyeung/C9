@@ -9,7 +9,7 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedQueue
 
 object LogManager {
-    private const val LOG_MAX_SIZE = 500
+    private const val LOG_MAX_SIZE = 1000
     private val logQueue = ConcurrentLinkedQueue<LogEntry>()
     private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 
