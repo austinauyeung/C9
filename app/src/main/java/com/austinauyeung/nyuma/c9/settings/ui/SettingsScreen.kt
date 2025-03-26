@@ -56,7 +56,6 @@ import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
-import com.austinauyeung.nyuma.c9.core.util.VersionUtils
 import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlin.math.round
@@ -70,6 +69,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateToGridSettings: () -> Unit,
     onNavigateToCursorSettings: () -> Unit,
+    onNavigateToLogScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -101,7 +101,6 @@ fun SettingsScreen(
                 },
             )
 
-            if (VersionUtils.isAndroid11()) {
             if (VersionUtil.isAndroid11()) {
                 val shizukuStatus = ShizukuServiceConnection.statusFlow.collectAsState().value
                 PermissionStatusBanner(
@@ -204,6 +203,14 @@ fun SettingsScreen(
                     },
                     onValueChange = { viewModel.updateScrollMultiplier(it) },
                     steps = 3,
+                )
+            }
+
+            PreferenceCategory(title = "Debug") {
+                NavigationItem(
+                    title = "Log Screen",
+                    subtitle = "View application logs",
+                    onClick = onNavigateToLogScreen,
                 )
             }
 
