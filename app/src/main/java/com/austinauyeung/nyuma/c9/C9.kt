@@ -8,10 +8,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
-import com.austinauyeung.nyuma.c9.core.util.Logger
-import com.austinauyeung.nyuma.c9.core.util.VersionUtils
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepository
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepositoryImpl
@@ -43,7 +43,7 @@ class C9 : Application() {
         super.onCreate()
         instance = this
 
-        if (VersionUtils.isAndroid11()) {
+        if (VersionUtil.isAndroid11()) {
             initializeShizuku()
         }
 
@@ -87,7 +87,7 @@ class C9 : Application() {
     override fun onTerminate() {
         Logger.i("C9 application terminating")
 
-        if (VersionUtils.isAndroid11()) {
+        if (VersionUtil.isAndroid11()) {
             shizukuObserverJob?.cancel()
             _shizukuGestureStrategy?.shutdown()
             ShizukuServiceConnection.cleanup()

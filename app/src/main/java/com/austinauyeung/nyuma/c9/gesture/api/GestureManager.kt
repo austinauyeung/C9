@@ -4,9 +4,9 @@ import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
-import com.austinauyeung.nyuma.c9.core.util.Logger
-import com.austinauyeung.nyuma.c9.core.util.VersionUtils
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureType
 import com.austinauyeung.nyuma.c9.gesture.ui.animateGesturePath
@@ -37,7 +37,7 @@ class GestureManager(
     private fun getStrategy(): GestureStrategy {
         Logger.d(
             "Selecting gesture strategy - Shizuku available: ${ShizukuServiceConnection.isReady()}, " +
-                    "is Android 11: ${VersionUtils.isAndroid11()}"
+                    "is Android 11: ${VersionUtil.isAndroid11()}"
         )
         return if (shouldUseShizuku()) {
             Logger.d("Using Shizuku gesture")
@@ -49,7 +49,7 @@ class GestureManager(
     }
 
     private fun shouldUseShizuku(): Boolean {
-        if (!VersionUtils.isAndroid11()) return false
+        if (!VersionUtil.isAndroid11()) return false
 
         val isReady = ShizukuServiceConnection.isReady(forceRefresh = true)
         Logger.d("Shizuku ready status: $isReady")

@@ -2,7 +2,7 @@ package com.austinauyeung.nyuma.c9.grid.domain
 
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
-import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 
 /**
  * Navigates through grid hierarchy.

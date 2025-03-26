@@ -57,6 +57,7 @@ import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
 import com.austinauyeung.nyuma.c9.core.util.VersionUtils
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlin.math.round
 
@@ -101,6 +102,7 @@ fun SettingsScreen(
             )
 
             if (VersionUtils.isAndroid11()) {
+            if (VersionUtil.isAndroid11()) {
                 val shizukuStatus = ShizukuServiceConnection.statusFlow.collectAsState().value
                 PermissionStatusBanner(
                     title = "Shizuku Service",

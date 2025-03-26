@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
-import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.handler.CursorActionHandler
 import com.austinauyeung.nyuma.c9.cursor.handler.CursorStateManager
