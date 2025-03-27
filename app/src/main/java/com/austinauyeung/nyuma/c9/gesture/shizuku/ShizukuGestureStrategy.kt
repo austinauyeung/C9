@@ -10,7 +10,6 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +66,7 @@ class ShizukuGestureStrategy(
     private var _currentGestureY = 0f
 
     private fun isAvailable(): Boolean {
-        return VersionUtil.isAndroid11() && ShizukuServiceConnection.isReady()
+        return ShizukuServiceConnection.isReady()
     }
 
     @SuppressLint("PrivateApi")

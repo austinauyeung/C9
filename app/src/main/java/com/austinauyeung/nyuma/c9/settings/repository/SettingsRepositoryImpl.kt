@@ -45,6 +45,7 @@ class SettingsRepositoryImpl(
         private val GESTURE_DURATION = longPreferencesKey("gesture_duration")
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
+        private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -125,7 +126,9 @@ class SettingsRepositoryImpl(
                     scrollMultiplier = preferences[SCROLL_MULTIPLIER]
                         ?: OverlaySettings.DEFAULT.scrollMultiplier,
                     allowPassthrough = preferences[ALLOW_PASSTHROUGH]
-                        ?: OverlaySettings.DEFAULT.allowPassthrough
+                        ?: OverlaySettings.DEFAULT.allowPassthrough,
+                    enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
+                        ?: OverlaySettings.DEFAULT.enableShizukuIntegration
                 )
             }
     }
@@ -153,6 +156,7 @@ class SettingsRepositoryImpl(
                 preferences[GESTURE_DURATION] = settings.gestureDuration
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
+                preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

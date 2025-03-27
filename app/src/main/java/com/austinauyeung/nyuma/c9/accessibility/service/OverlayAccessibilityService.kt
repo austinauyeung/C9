@@ -30,9 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -142,11 +140,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             mainScope = CoroutineScope(Dispatchers.Main + serviceJob + coroutineExceptionHandler)
             ioScope = CoroutineScope(Dispatchers.IO + serviceJob + coroutineExceptionHandler)
 
-            val settingsFlow = C9.getInstance().settingsRepository.getSettings().stateIn(
-                scope = ioScope,
-                started = SharingStarted.Eagerly,
-                initialValue = OverlaySettings()
-            )
+            val settingsFlow = C9.getInstance().getSettingsFlow()
 
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 

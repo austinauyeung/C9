@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.austinauyeung.nyuma.c9.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +33,7 @@ fun DebugOptionsScreen(
     onNavigateToLogScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showShizukuDialog by remember { mutableStateOf(false) }
     var showExperimentalDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -54,6 +57,52 @@ fun DebugOptionsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
+            PreferenceCategory(title = "Shizuku") {
+                val switchEnabled = (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) || BuildConfig.DEBUG
+                SwitchPreferenceItem(
+                    title = "Enable Shizuku Integration",
+                    subtitle = "Required for certain Android 11 devices",
+                    checked = uiState.enableShizukuIntegration,
+                    onCheckedChange = { newValue ->
+                        if (switchEnabled) {
+                            if (newValue && !uiState.enableShizukuIntegration) {
+                                showShizukuDialog = true
+                            } else {
+                                viewModel.updateEnableShizukuIntegration(newValue)
+                            }
+                        }
+                    },
+                    enabled = switchEnabled
+                )
+            }
+
+            if (showShizukuDialog) {
+                AlertDialog(
+                    onDismissRequest = { showShizukuDialog = false },
+                    title = { Text("Enable Shizuku Integration") },
+                    text = {
+                        Text("Only enable this if gestures do not work. Shizuku will be used to dispatch gestures. After enabling this setting, use the banner on the main page to verify Shizuku authorization.")
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.updateEnableShizukuIntegration(true)
+                                showShizukuDialog = false
+                            }
+                        ) {
+                            Text("Enable")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showShizukuDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
             PreferenceCategory(title = "Logging") {
                 NavigationItem(
                     title = "Log Screen",

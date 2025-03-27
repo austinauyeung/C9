@@ -6,7 +6,6 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureType
 import com.austinauyeung.nyuma.c9.gesture.ui.animateGesturePath
@@ -46,19 +45,21 @@ class GestureManager(
                 evaluateStrategy()
             }
         }
+
+        serviceScope.launch {
+            settingsFlow.collect {
+                Logger.d("Settings changed, re-evaluating gesture strategy")
+                evaluateStrategy()
+            }
+        }
     }
 
     private fun evaluateStrategy() {
-        Logger.d(
-            "Evaluating gesture strategy - Shizuku available: ${ShizukuServiceConnection.isReady()}, " +
-                    "is Android 11: ${VersionUtil.isAndroid11()}"
-        )
-
         currentStrategy = if (shouldUseShizuku()) {
-            Logger.d("Switching to Shizuku gesture strategy")
+            Logger.d("Using Shizuku gesture strategy")
             shizukuStrategy
         } else {
-            Logger.d("Switching to standard gesture strategy")
+            Logger.d("Using standard gesture strategy")
             standardStrategy
         }
     }
@@ -66,7 +67,10 @@ class GestureManager(
     private var shouldShowGestures = false
 
     private fun shouldUseShizuku(): Boolean {
-        if (!VersionUtil.isAndroid11()) return false
+        val settings = settingsFlow.value
+        if (!settings.enableShizukuIntegration) {
+            return false
+        }
 
         val isReady = ShizukuServiceConnection.isReady(forceRefresh = true)
         Logger.d("Shizuku ready status: $isReady")

@@ -54,7 +54,6 @@ import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlin.math.round
 
@@ -98,7 +97,7 @@ fun SettingsScreen(
                 },
             )
 
-            if (VersionUtil.isAndroid11()) {
+            if (uiState.enableShizukuIntegration) {
                 val shizukuStatus = ShizukuServiceConnection.statusFlow.collectAsState().value
                 PermissionStatusBanner(
                     title = "Shizuku Service",
@@ -108,8 +107,7 @@ fun SettingsScreen(
                             ShizukuStatus.PERMISSION_REQUIRED -> ShizukuServiceConnection.requestPermission()
                             else -> {}
                         }
-                    },
-                    infoText = "Shizuku may be required on certain Android 11 devices. Please try without it first.",
+                    }
                 )
             }
 
@@ -337,6 +335,7 @@ fun SwitchPreferenceItem(
     subtitle: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
 ) {
     Surface(
         onClick = { onCheckedChange(!checked) },
@@ -360,7 +359,8 @@ fun SwitchPreferenceItem(
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
-                modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_small))
+                modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_small)),
+                enabled = enabled
             )
         }
     }

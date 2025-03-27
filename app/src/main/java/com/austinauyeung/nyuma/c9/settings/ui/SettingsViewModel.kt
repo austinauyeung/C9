@@ -68,7 +68,8 @@ class SettingsViewModel(
                             toggleHold = settings.toggleHold,
                             gestureDuration = settings.gestureDuration,
                             scrollMultiplier = settings.scrollMultiplier,
-                            allowPassthrough = settings.allowPassthrough
+                            allowPassthrough = settings.allowPassthrough,
+                            enableShizukuIntegration = settings.enableShizukuIntegration
                         )
                     }
                 }
@@ -121,7 +122,8 @@ class SettingsViewModel(
             toggleHold = _uiState.value.toggleHold,
             gestureDuration = _uiState.value.gestureDuration,
             scrollMultiplier = _uiState.value.scrollMultiplier,
-            allowPassthrough = _uiState.value.allowPassthrough
+            allowPassthrough = _uiState.value.allowPassthrough,
+            enableShizukuIntegration = _uiState.value.enableShizukuIntegration
         )
     }
 
@@ -214,6 +216,10 @@ class SettingsViewModel(
         updateSettings { it.copy(gridLineVisibility = visibility) }
     }
 
+    fun updateEnableShizukuIntegration(integrate: Boolean) {
+        updateSettings { it.copy(enableShizukuIntegration = integrate) }
+    }
+
     class Factory(
         private val settingsRepository: SettingsRepository,
     ) : ViewModelProvider.Factory {
@@ -252,5 +258,6 @@ data class SettingsUiState(
     val toggleHold: Boolean = Defaults.Settings.TOGGLE_HOLD,
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
-    val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH
+    val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
+    val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION
 )

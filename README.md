@@ -146,7 +146,7 @@ Install using adb:
 ```
 
 ### Additional installation for Android 11
-If you are on Android 11, you will see an additional "Shizuku Service" banner. Please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) before using this application.
+If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Debug Options > Enable Shizuku Integration`.
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
 

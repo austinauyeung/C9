@@ -11,15 +11,21 @@ import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityServ
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
+import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepository
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * Checks accessibility service and initializes Shizuku service on Android 11.
@@ -32,8 +38,17 @@ class C9 : Application() {
         }
     val settingsRepository: SettingsRepository by _settingsRepository
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private var shizukuObserverJob: kotlinx.coroutines.Job? = null
+    private var shizukuObserverJob: Job? = null
     private var _shizukuGestureStrategy: ShizukuGestureStrategy? = null
+    private var settingsObserverJob: Job? = null
+
+    fun getSettingsFlow(): StateFlow<OverlaySettings> {
+        return settingsRepository.getSettings().stateIn(
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            started = SharingStarted.Eagerly,
+            initialValue = OverlaySettings()
+        )
+    }
 
     fun setShizukuGestureStrategy(strategy: ShizukuGestureStrategy) {
         _shizukuGestureStrategy = strategy
@@ -43,9 +58,18 @@ class C9 : Application() {
         super.onCreate()
         instance = this
 
-        if (VersionUtil.isAndroid11()) {
-            initializeShizuku()
-        }
+        settingsObserverJob = getSettingsFlow()
+            .onEach { settings ->
+                if (settings.enableShizukuIntegration) {
+                    if (shizukuObserverJob == null) {
+                        initializeShizuku()
+                    }
+                } else {
+                    cleanupShizuku()
+                }
+            }
+            .flowOn(Dispatchers.IO)
+            .launchIn(applicationScope)
 
         Logger.i("C9 application initialized")
     }
@@ -59,10 +83,8 @@ class C9 : Application() {
 
                 when (status) {
                     ShizukuStatus.PERMISSION_REQUIRED -> {
-                        applicationScope.launch {
-                            Logger.d("Auto-requesting Shizuku permission")
-                            ShizukuServiceConnection.requestPermission()
-                        }
+                        Logger.d("Auto-requesting Shizuku permission")
+                        ShizukuServiceConnection.requestPermission()
                     }
 
                     ShizukuStatus.NOT_AVAILABLE -> {
@@ -84,16 +106,20 @@ class C9 : Application() {
             }
     }
 
+    private fun cleanupShizuku() {
+        shizukuObserverJob?.cancel()
+        _shizukuGestureStrategy?.shutdown()
+        ShizukuServiceConnection.cleanup()
+        shizukuObserverJob?.cancel()
+    }
+
     override fun onTerminate() {
         Logger.i("C9 application terminating")
 
-        if (VersionUtil.isAndroid11()) {
-            shizukuObserverJob?.cancel()
-            _shizukuGestureStrategy?.shutdown()
-            ShizukuServiceConnection.cleanup()
-        }
-
+        settingsObserverJob?.cancel()
         applicationScope.cancel()
+        cleanupShizuku()
+
         super.onTerminate()
     }
 

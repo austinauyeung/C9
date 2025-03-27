@@ -34,5 +34,6 @@ object Defaults {
         const val GESTURE_DURATION = GestureConstants.DEFAULT_GESTURE_DURATION
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
+        const val ENABLE_SHIZUKU_INTEGRATION = false
     }
 }
