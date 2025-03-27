@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
@@ -304,8 +305,9 @@ class CursorActionHandler(
 
     private fun handleScrollKey(event: KeyEvent): Boolean {
         val settings = settingsFlow.value
-        val gestureInterval = (settings.gestureDuration * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
-        val initialDelay = (GestureConstants.MAX_GESTURE_DURATION * GestureConstants.CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
+        val offset = if (settings.gestureStyle == GestureStyle.FIXED) GestureConstants.SCROLL_END_PAUSE else 0
+        val gestureInterval = ((settings.gestureDuration + offset) * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
+        val initialDelay = ((GestureConstants.MAX_GESTURE_DURATION + offset) * GestureConstants.CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
