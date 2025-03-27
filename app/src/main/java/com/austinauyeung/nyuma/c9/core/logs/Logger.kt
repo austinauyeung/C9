@@ -14,7 +14,7 @@ object Logger {
         ERROR,
     }
 
-    private val minLogLevel = if (BuildConfig.DEBUG) Level.VERBOSE else Level.WARNING
+    private val minLogLevel = if (BuildConfig.DEBUG) Level.VERBOSE else Level.VERBOSE
 
     fun v(
         message: String,
@@ -22,8 +22,8 @@ object Logger {
     ) {
         if (minLogLevel.ordinal <= Level.VERBOSE.ordinal) {
             Log.v(tag ?: TAG, message)
-            LogManager.addLog(Level.VERBOSE, message, tag)
         }
+        LogManager.addLog(Level.VERBOSE, message, tag)
     }
 
     fun d(
@@ -32,8 +32,8 @@ object Logger {
     ) {
         if (minLogLevel.ordinal <= Level.DEBUG.ordinal) {
             Log.d(tag ?: TAG, message)
-            LogManager.addLog(Level.DEBUG, message, tag)
         }
+        LogManager.addLog(Level.DEBUG, message, tag)
     }
 
     fun i(
@@ -42,8 +42,8 @@ object Logger {
     ) {
         if (minLogLevel.ordinal <= Level.INFO.ordinal) {
             Log.i(tag ?: TAG, message)
-            LogManager.addLog(Level.INFO, message, tag)
         }
+        LogManager.addLog(Level.INFO, message, tag)
     }
 
     fun w(
@@ -51,14 +51,16 @@ object Logger {
         throwable: Throwable? = null,
         tag: String? = null,
     ) {
-        if (minLogLevel.ordinal <= Level.WARNING.ordinal) {
-            if (throwable != null) {
+        if (throwable != null) {
+            if (minLogLevel.ordinal <= Level.WARNING.ordinal) {
                 Log.w(tag ?: TAG, message, throwable)
-                LogManager.addLog(Level.WARNING, "$message: ${throwable.message}", tag)
-            } else {
-                Log.w(tag ?: TAG, message)
-                LogManager.addLog(Level.WARNING, message, tag)
             }
+            LogManager.addLog(Level.WARNING, "$message: ${throwable.message}", tag)
+        } else {
+            if (minLogLevel.ordinal <= Level.WARNING.ordinal) {
+                Log.w(tag ?: TAG, message)
+            }
+            LogManager.addLog(Level.WARNING, message, tag)
         }
     }
 
@@ -67,14 +69,16 @@ object Logger {
         throwable: Throwable? = null,
         tag: String? = null,
     ) {
-        if (minLogLevel.ordinal <= Level.ERROR.ordinal) {
-            if (throwable != null) {
+        if (throwable != null) {
+            if (minLogLevel.ordinal <= Level.ERROR.ordinal) {
                 Log.e(tag ?: TAG, message, throwable)
-                LogManager.addLog(Level.ERROR, "$message: ${throwable.message}", tag)
-            } else {
-                Log.e(tag ?: TAG, message)
-                LogManager.addLog(Level.ERROR, message, tag)
             }
+            LogManager.addLog(Level.ERROR, "$message: ${throwable.message}", tag)
+        } else {
+            if (minLogLevel.ordinal <= Level.ERROR.ordinal) {
+                Log.e(tag ?: TAG, message)
+            }
+            LogManager.addLog(Level.ERROR, message, tag)
         }
     }
 }
