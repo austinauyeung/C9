@@ -156,13 +156,19 @@ Note that unless your device is rooted, you will need to restart the Shizuku ser
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
-Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs from `adb logcat C9App:V *:S` if possible.
+Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs using the built-in logger or `adb logcat C9App:V *:S`.
+
+### How else can I contribute?
+Please feel free to submit a pull request, create a video walkthrough, or provide anything else you think would be helpful!
 
 ### What is Shizuku?
 Shizuku allows applications in general to perform actions that require elevated privileges. In C9, it is required to dispatch gestures on Android 11 using [InputManager](https://developer.android.com/reference/android/hardware/input/InputManager) instead of the standard dispatch using [AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService).
 
 ### What does it mean for the cursor to intercept button presses?
 The cursors sit between your button presses and the underlying application. If a button is used by the cursor, the cursor will consume it and prevent the underlying application from receiving the button press.
+
+### Why are button mappers allowed for activation but not deactivation?
+As a result of the cursors' interception, there is no guarantee that there will not be conflict with your button mapper shortcut. Because of this, and for now, deactivation must be performed through the cursor.
 
 ## License
 [Apache License Version 2.0](./LICENSE)

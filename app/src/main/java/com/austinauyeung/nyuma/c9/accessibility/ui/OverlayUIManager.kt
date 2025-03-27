@@ -20,7 +20,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
 import com.austinauyeung.nyuma.c9.common.ui.C9Theme
-import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.ui.CursorOverlay
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
 import com.austinauyeung.nyuma.c9.grid.ui.GridOverlay

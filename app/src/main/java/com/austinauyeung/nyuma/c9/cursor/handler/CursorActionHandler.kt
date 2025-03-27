@@ -10,7 +10,7 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
-import com.austinauyeung.nyuma.c9.core.util.Logger
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -304,8 +304,8 @@ class CursorActionHandler(
 
     private fun handleScrollKey(event: KeyEvent): Boolean {
         val settings = settingsFlow.value
-        val gestureInterval = (settings.gestureDuration * 1.2).toLong()
-        val initialDelay = (GestureConstants.MAX_GESTURE_DURATION * 1.2).toLong()
+        val gestureInterval = (settings.gestureDuration * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
+        val initialDelay = (GestureConstants.MAX_GESTURE_DURATION * GestureConstants.CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
