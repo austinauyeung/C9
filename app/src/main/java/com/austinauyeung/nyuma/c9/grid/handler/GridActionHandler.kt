@@ -104,32 +104,29 @@ class GridActionHandler(
                 }
             }
 
-            val actionKeys = buildSet {
-                add(KeyEvent.KEYCODE_DPAD_CENTER)
+            val actionKeys = setOf(
+                KeyEvent.KEYCODE_DPAD_CENTER,
+                KeyEvent.KEYCODE_ENTER
+            )
 
-                if (BuildConfig.DEBUG) {
-                    add(KeyEvent.KEYCODE_ENTER)
-                }
-            }
-
-            when {
-                event.keyCode in numKeys -> {
-                    return handleNumberKey(event)
+            return when (event.keyCode) {
+                in numKeys -> {
+                    handleNumberKey(event)
                 }
 
-                event.keyCode in scrollKeys -> {
-                    return handleScrollKey(event)
+                in scrollKeys -> {
+                    handleScrollKey(event)
                 }
 
-                event.keyCode in zoomKeys -> {
-                    return handleZoomKey(event)
+                in zoomKeys -> {
+                    handleZoomKey(event)
                 }
 
-                event.keyCode in actionKeys -> {
-                    return handleActionKey(event)
+                in actionKeys -> {
+                    handleActionKey(event)
                 }
 
-                else -> return false
+                else -> false
             }
         } catch (e: Exception) {
             Logger.e("Error processing grid key event", e)

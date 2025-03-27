@@ -159,15 +159,11 @@ class CursorActionHandler(
                     }
                 }
 
-            val actionKeys = buildSet {
-                add(KeyEvent.KEYCODE_DPAD_CENTER)
-                add(KeyEvent.KEYCODE_ENTER)
-                add(KeyEvent.KEYCODE_5)
-
-                if (BuildConfig.DEBUG) {
-                    add(KeyEvent.KEYCODE_ENTER)
-                }
-            }
+            val actionKeys = setOf(
+                KeyEvent.KEYCODE_DPAD_CENTER,
+                KeyEvent.KEYCODE_ENTER,
+                KeyEvent.KEYCODE_5
+            )
 
             val zoomKeys = buildSet {
                 add(KeyEvent.KEYCODE_1)
@@ -187,28 +183,28 @@ class CursorActionHandler(
                 KeyEvent.KEYCODE_STAR
             )
 
-            when (event.keyCode) {
+            return when (event.keyCode) {
                 in movementKeys -> {
-                    return handleMovementKey(event)
+                    handleMovementKey(event)
                 }
 
                 in scrollKeys -> {
-                    return handleScrollKey(event)
+                    handleScrollKey(event)
                 }
 
                 in zoomKeys -> {
-                    return handleZoomKey(event)
+                    handleZoomKey(event)
                 }
 
                 in actionKeys -> {
-                    return handleActionKey(event)
+                    handleActionKey(event)
                 }
 
                 in disableKeys -> {
-                    return true
+                    true
                 }
 
-                else -> return false
+                else -> false
             }
         } catch (e: Exception) {
             Logger.e("Error processing cursor key event", e)
