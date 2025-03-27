@@ -161,6 +161,7 @@ class CursorActionHandler(
 
             val actionKeys = buildSet {
                 add(KeyEvent.KEYCODE_DPAD_CENTER)
+                add(KeyEvent.KEYCODE_ENTER)
                 add(KeyEvent.KEYCODE_5)
 
                 if (BuildConfig.DEBUG) {
