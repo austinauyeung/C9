@@ -21,6 +21,16 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
 
+## Table of Contents
+- [Overview](#overview)
+  - [Grid Cursor](#grid-cursor)
+  - [Standard Cursor](#standard-cursor)
+- [Installation](#installation)
+- [Known Issues](#known-issues)
+- [FAQs](#faqs)
+- [License](#license)
+- [Acknowledgment](#acknowledgments)
+
 ## Overview
 ### Grid Cursor
 
@@ -70,7 +80,7 @@ The following options can be configured:
 | Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True |
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-| Scroll | Click D-pad directions. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
+| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Zoom | Click star (*) and pound (#). | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 
 ### Standard Cursor
@@ -117,7 +127,7 @@ All gestures are dispatched at the cursor's current location:
 | Tap | Click D-pad center or numpad 5. |
 | Double Tap | Double click D-pad center or numpad 5. |
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. |
-| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). |
+| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. |
 | Zoom | Numpad 1 and 3. |
 
 ### Common
@@ -127,13 +137,13 @@ The following options can be configured, which affects scrolls and zooms in both
 - Natural scrolling
 - Gesture visualizations
 - Gesture style
-  - Fixed: gestures are controlled and fixed distance
-  - Inertia: gestures resemble touchscreen flicks
+  - `Fixed`: gestures are controlled and fixed distance
+  - `Inertia`: gestures resemble touchscreen flicks
 - Gesture duration
 - Scroll distance
 
 ## Installation
-The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases).
+The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
 
 ### Option 1
 Install using the standard package installer. Allow the accessibility service using the banner in the application.
@@ -152,7 +162,11 @@ Note that unless your device is rooted, you will need to restart the Shizuku ser
 
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
-    - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
+  - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
+- Scrolling inconsistencies between applications (currently being investigated):
+  - When using a gesture style of `Fixed`, some applications stutter at the end of the scroll.
+  - When using a gesture style of `Inertia`, some applications show unexpected behavior when scrolling continuously.
+- The cursor does not adapt to landscape orientation (a fix is planned for v1.3).
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
@@ -173,7 +187,7 @@ As a result of the cursors' interception, there is no guarantee that there will 
 ## License
 [Apache License Version 2.0](./LICENSE)
 
-## Acknowledgements
+## Acknowledgments
 - Allegra, [Arlie](./docs/imgs/IMG_4194.jpg), and [Nyuma](./docs/imgs/IMG_3226.jpg) for their support
 - `sam-club` for extensive testing
 - `Dev-in-the-BM` for testing and the Shizuku suggestion
