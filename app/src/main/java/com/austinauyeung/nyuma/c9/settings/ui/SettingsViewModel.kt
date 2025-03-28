@@ -69,7 +69,8 @@ class SettingsViewModel(
                             gestureDuration = settings.gestureDuration,
                             scrollMultiplier = settings.scrollMultiplier,
                             allowPassthrough = settings.allowPassthrough,
-                            enableShizukuIntegration = settings.enableShizukuIntegration
+                            enableShizukuIntegration = settings.enableShizukuIntegration,
+                            hideOnTextField = settings.hideOnTextField
                         )
                     }
                 }
@@ -123,7 +124,8 @@ class SettingsViewModel(
             gestureDuration = _uiState.value.gestureDuration,
             scrollMultiplier = _uiState.value.scrollMultiplier,
             allowPassthrough = _uiState.value.allowPassthrough,
-            enableShizukuIntegration = _uiState.value.enableShizukuIntegration
+            enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
+            hideOnTextField = _uiState.value.hideOnTextField
         )
     }
 
@@ -220,6 +222,10 @@ class SettingsViewModel(
         updateSettings { it.copy(enableShizukuIntegration = integrate) }
     }
 
+    fun updateHideOnTextField(hide: Boolean) {
+        updateSettings { it.copy(hideOnTextField = hide) }
+    }
+
     class Factory(
         private val settingsRepository: SettingsRepository,
     ) : ViewModelProvider.Factory {
@@ -259,5 +265,6 @@ data class SettingsUiState(
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
-    val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION
+    val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
+    val hideOnTextField: Boolean = Defaults.Settings.HIDE_ON_TEXT_FIELD
 )

@@ -201,6 +201,15 @@ fun SettingsScreen(
                 )
             }
 
+            PreferenceCategory(title = "Behavior") {
+                SwitchPreferenceItem(
+                    title = "Auto-Hide in Text Fields",
+                    subtitle = "Attempt to detect text fields and hide cursor",
+                    checked = uiState.hideOnTextField,
+                    onCheckedChange = { viewModel.updateHideOnTextField(it) },
+                )
+            }
+
             PreferenceCategory(title = "Miscellaneous") {
                 NavigationItem(
                     title = "Debug Options",

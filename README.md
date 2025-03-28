@@ -63,8 +63,8 @@ The following options can be configured:
 - Number of grid levels
 - Grid persistence after clicking in the final grid
 - Grid opacity
-- Hide grid numbers
-- Adjust grid line visibility
+- Grid number visibility
+- Grid line visibility
 
 #### Instructions
 - The default activation key is the pound (#) key.
@@ -85,7 +85,7 @@ The following options can be configured:
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 | Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-| Zoom | Click star (*) and pound (#). | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
+| Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
 
 ### Standard Cursor
 
@@ -146,6 +146,10 @@ The following options can be configured, which affects scrolls and zooms in both
 - Gesture duration
 - Scroll distance
 
+Additionally, the following options can be configured to adjust the behavior of the cursors:
+- Auto-hide in text fields
+  - This is application-dependent and may not work reliably.
+
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
 
@@ -192,7 +196,7 @@ As a result of the cursors' interception, there is no guarantee that there will 
 [Apache License Version 2.0](./LICENSE)
 
 ## Acknowledgments
-- Allegra, [Arlie](./docs/imgs/IMG_4194.jpg), and [Nyuma](./docs/imgs/IMG_3226.jpg) for their support
+- Allegra, [Arlie](./docs/imgs/IMG_5199.jpg), and [Nyuma](./docs/imgs/IMG_3226.jpg) for their support
 - `sam-club` for extensive testing
 - `Dev-in-the-BM` for testing and the Shizuku suggestion
 - `anonymousfliphones` for testing

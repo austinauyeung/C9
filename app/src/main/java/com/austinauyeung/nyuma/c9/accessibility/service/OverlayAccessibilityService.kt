@@ -193,8 +193,34 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        val settingsFlow = C9.getInstance().getSettingsFlow()
+
+        if (settingsFlow.value.hideOnTextField) {
+            event?.let{
+                when (event.eventType) {
+                    AccessibilityEvent.TYPE_VIEW_FOCUSED,
+                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                        val source = event.source
+                        if (source != null) {
+                            try {
+                                val isTextField = source.className?.contains("EditText") == true || source.isEditable
+
+                                if (isTextField) {
+                                    Logger.d("Text field focused, hiding cursor overlays")
+                                    forceHideAllOverlays()
+                                }
+                            } finally {}
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
     // Required by AccessibilityService interface
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
     override fun onInterrupt() {}
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {

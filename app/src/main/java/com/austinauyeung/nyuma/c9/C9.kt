@@ -41,13 +41,17 @@ class C9 : Application() {
     private var shizukuObserverJob: Job? = null
     private var _shizukuGestureStrategy: ShizukuGestureStrategy? = null
     private var settingsObserverJob: Job? = null
+    private lateinit var _settingsFlow: StateFlow<OverlaySettings>
 
     fun getSettingsFlow(): StateFlow<OverlaySettings> {
-        return settingsRepository.getSettings().stateIn(
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            started = SharingStarted.Eagerly,
-            initialValue = OverlaySettings()
-        )
+        if (!::_settingsFlow.isInitialized) {
+            _settingsFlow = settingsRepository.getSettings().stateIn(
+                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+                started = SharingStarted.Eagerly,
+                initialValue = OverlaySettings()
+            )
+        }
+        return _settingsFlow
     }
 
     fun setShizukuGestureStrategy(strategy: ShizukuGestureStrategy) {

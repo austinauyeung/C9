@@ -35,5 +35,6 @@ object Defaults {
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
+        const val HIDE_ON_TEXT_FIELD = false
     }
 }

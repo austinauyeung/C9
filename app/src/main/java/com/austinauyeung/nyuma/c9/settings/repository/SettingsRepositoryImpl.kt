@@ -46,6 +46,7 @@ class SettingsRepositoryImpl(
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
+        private val HIDE_ON_TEXT_FIELD = booleanPreferencesKey("hide_on_text_field")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -128,7 +129,9 @@ class SettingsRepositoryImpl(
                     allowPassthrough = preferences[ALLOW_PASSTHROUGH]
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
-                        ?: OverlaySettings.DEFAULT.enableShizukuIntegration
+                        ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
+                    hideOnTextField = preferences[HIDE_ON_TEXT_FIELD]
+                        ?: OverlaySettings.DEFAULT.hideOnTextField
                 )
             }
     }
@@ -157,6 +160,7 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
+                preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)
