@@ -199,8 +199,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         if (settingsFlow.value.hideOnTextField) {
             event?.let{
                 when (event.eventType) {
-                    AccessibilityEvent.TYPE_VIEW_FOCUSED,
-                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                    AccessibilityEvent.TYPE_VIEW_FOCUSED -> {
                         val source = event.source
                         if (source != null) {
                             try {
