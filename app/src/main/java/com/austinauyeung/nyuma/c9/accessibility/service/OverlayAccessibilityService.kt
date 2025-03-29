@@ -18,7 +18,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
 import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -55,6 +55,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private lateinit var serviceManager: AccessibilityServiceManager
     private lateinit var uiManager: OverlayUIManager
+    private lateinit var orientationHandler: OrientationHandler
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -124,17 +125,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val settingsFlow = C9.getInstance().getSettingsFlow()
 
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-
-            val displayMetrics = resources.displayMetrics
-            val screenDimensions = ScreenDimensions(
-                width = displayMetrics.widthPixels,
-                height = displayMetrics.heightPixels
-            )
+            orientationHandler = OrientationHandler(this)
 
             serviceManager = AccessibilityServiceManager(
                 service = this,
                 settingsFlow = settingsFlow,
-                screenDimensions = screenDimensions,
+                orientationHandler = orientationHandler,
                 backgroundScope = backgroundScope,
                 mainScope = mainScope,
             )
@@ -146,6 +142,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 mainScope = mainScope,
                 windowManager = windowManager!!,
                 settingsFlow = settingsFlow,
+                orientationHandler = orientationHandler,
                 accessibilityManager = serviceManager,
                 lifecycleOwner = this,
                 savedStateRegistryOwner = this
@@ -238,6 +235,10 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             if (::uiManager.isInitialized) {
                 uiManager.cleanup()
+            }
+
+            if (::orientationHandler.isInitialized) {
+                orientationHandler.cleanup()
             }
 
             try {

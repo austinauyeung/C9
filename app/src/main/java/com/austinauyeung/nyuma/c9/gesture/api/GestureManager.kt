@@ -26,7 +26,7 @@ class GestureManager(
     private val standardStrategy: GestureStrategy,
     private val shizukuStrategy: GestureStrategy,
     private val settingsFlow: StateFlow<OverlaySettings>,
-    private val screenDimensions: ScreenDimensions,
+    private val dimensionsFlow: StateFlow<ScreenDimensions>,
     private val serviceScope: CoroutineScope
 ) {
     private val _gesturePaths = MutableStateFlow<List<GesturePath>>(emptyList())
@@ -78,6 +78,7 @@ class GestureManager(
     }
 
     suspend fun performScroll(direction: ScrollDirection, startX: Float, startY: Float): Boolean {
+        val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing scroll gesture in direction $direction at position ($startX, $startY)")
             val settings = settingsFlow.value
@@ -95,7 +96,7 @@ class GestureManager(
             }
 
             val distanceFactor = settings.scrollMultiplier
-            val distance = screenDimensions.percentOfSmallerDimension(distanceFactor)
+            val distance = dimensions.percentOfSmallerDimension(distanceFactor)
 
             var (endX, endY) = when (motionDirection) {
                 ScrollDirection.UP -> Pair(startX, startY - distance)
@@ -104,8 +105,8 @@ class GestureManager(
                 ScrollDirection.RIGHT -> Pair(startX + distance, startY)
             }
 
-            endX = endX.coerceIn(0f, screenDimensions.width.toFloat())
-            endY = endY.coerceIn(0f, screenDimensions.height.toFloat())
+            endX = endX.coerceIn(0f, dimensions.width.toFloat())
+            endY = endY.coerceIn(0f, dimensions.height.toFloat())
 
             if (shouldShowGestures) {
                 visualizeScroll(direction, startX, startY, endX, endY)
@@ -119,13 +120,14 @@ class GestureManager(
     }
 
     suspend fun performZoom(isZoomIn: Boolean, startX: Float, startY: Float): Boolean {
+        val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
             val randomness = 1
             val zoomDistance =
-                screenDimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR) * randomness
+                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR) * randomness
             val zoomOffset =
-                screenDimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET) * randomness
+                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET) * randomness
 
             var startX1 = startX * randomness - if (isZoomIn) zoomOffset else zoomDistance
             var startY1 = startY * randomness + if (isZoomIn) zoomOffset else zoomDistance
@@ -137,14 +139,14 @@ class GestureManager(
             var endX2 = startX * randomness + if (isZoomIn) zoomDistance else zoomOffset
             var endY2 = startY * randomness - if (isZoomIn) zoomDistance else zoomOffset
 
-            startX1 = startX1.coerceIn(0f, screenDimensions.width.toFloat())
-            startY1 = startY1.coerceIn(0f, screenDimensions.height.toFloat())
-            startX2 = startX2.coerceIn(0f, screenDimensions.width.toFloat())
-            startY2 = startY2.coerceIn(0f, screenDimensions.height.toFloat())
-            endX1 = endX1.coerceIn(0f, screenDimensions.width.toFloat())
-            endY1 = endY1.coerceIn(0f, screenDimensions.height.toFloat())
-            endX2 = endX2.coerceIn(0f, screenDimensions.width.toFloat())
-            endY2 = endY2.coerceIn(0f, screenDimensions.height.toFloat())
+            startX1 = startX1.coerceIn(0f, dimensions.width.toFloat())
+            startY1 = startY1.coerceIn(0f, dimensions.height.toFloat())
+            startX2 = startX2.coerceIn(0f, dimensions.width.toFloat())
+            startY2 = startY2.coerceIn(0f, dimensions.height.toFloat())
+            endX1 = endX1.coerceIn(0f, dimensions.width.toFloat())
+            endY1 = endY1.coerceIn(0f, dimensions.height.toFloat())
+            endX2 = endX2.coerceIn(0f, dimensions.width.toFloat())
+            endY2 = endY2.coerceIn(0f, dimensions.height.toFloat())
 
             if (shouldShowGestures) {
                 visualizeZoomGesture(

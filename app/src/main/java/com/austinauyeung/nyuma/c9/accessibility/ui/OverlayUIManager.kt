@@ -18,6 +18,8 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
+import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
+import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.ui.C9Theme
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.ui.CursorOverlay
@@ -39,12 +41,14 @@ class OverlayUIManager(
     private val mainScope: CoroutineScope,
     private val windowManager: WindowManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
+    private val orientationHandler: OrientationHandler,
     private val accessibilityManager: AccessibilityServiceManager,
     private val lifecycleOwner: LifecycleOwner,
     private val savedStateRegistryOwner: SavedStateRegistryOwner
 ) {
     private var overlayView: ComposeView? = null
     private var currentPaths: Int? = null
+    private var isOrientationChanging = false
 
     fun initialize() {
         try {
@@ -95,6 +99,33 @@ class OverlayUIManager(
                 }
             }
             .launchIn(backgroundScope)
+
+        // Listen for orientation changes
+        orientationHandler.screenDimensions
+            .onEach { newDimensions ->
+                handleOrientationChange(newDimensions)
+            }
+            .launchIn(backgroundScope)
+    }
+
+    private fun handleOrientationChange(newDimensions: ScreenDimensions) {
+        try {
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                mainScope.launch { handleOrientationChange(newDimensions) }
+                return
+            }
+
+            isOrientationChanging = true
+
+            mainScope.launch{
+                updateOverlayUI()
+                isOrientationChanging = false
+            }
+
+        } catch (e: Exception) {
+            Logger.e("Error handling orientation change", e)
+            isOrientationChanging = false
+        }
     }
 
     fun updateOverlayUI() {
@@ -102,6 +133,11 @@ class OverlayUIManager(
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 Logger.e("updateOverlayUI was called from a non-main thread")
                 mainScope.launch { updateOverlayUI() }
+                return
+            }
+
+            if (isOrientationChanging) {
+                Logger.d("Skipping overlay update during orientation change handling")
                 return
             }
 

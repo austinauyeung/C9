@@ -3,13 +3,14 @@ package com.austinauyeung.nyuma.c9.grid.domain
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Navigates through grid hierarchy.
  */
-class GridNavigator(private val screenDimensions: ScreenDimensions) {
+class GridNavigator(private val dimensionsFlow: StateFlow<ScreenDimensions>) {
 
-    private fun getCellIndexFromKey(grid: Grid, key: Int): Int {
+    private fun getCellIndexFromKey(key: Int): Int {
         if (key !in 1..9) {
             Logger.e("Invalid key: $key, must be 1-9")
             return -1
@@ -50,17 +51,18 @@ class GridNavigator(private val screenDimensions: ScreenDimensions) {
         selectedCellIndex: Int
     ): Pair<Float, Float> {
         val selectedCell = grid.cells.getOrNull(selectedCellIndex)
+        val dimensions = dimensionsFlow.value
 
         if (selectedCell == null) {
             Logger.e("Invalid cell index for click: $selectedCellIndex")
-            return Pair(screenDimensions.width / 2f, screenDimensions.height / 2f)
+            return Pair(dimensions.width / 2f, dimensions.height / 2f)
         }
 
         try {
             val gridHierarchy = buildGridHierarchy(grid)
 
-            var currentWidth = screenDimensions.width.toFloat()
-            var currentHeight = screenDimensions.height.toFloat()
+            var currentWidth = dimensions.width.toFloat()
+            var currentHeight = dimensions.height.toFloat()
             var currentX = 0f
             var currentY = 0f
 
@@ -89,7 +91,7 @@ class GridNavigator(private val screenDimensions: ScreenDimensions) {
             return Pair(x, y)
         } catch (e: Exception) {
             Logger.e("Error calculating click coordinates: ${e.message}", e)
-            return Pair(screenDimensions.width / 2f, screenDimensions.height / 2f)
+            return Pair(dimensions.width / 2f, dimensions.height / 2f)
         }
     }
 
@@ -115,7 +117,7 @@ class GridNavigator(private val screenDimensions: ScreenDimensions) {
             return Triple(false, false, -1)
         }
 
-        val cellIndex = getCellIndexFromKey(currentGrid, keyNumber)
+        val cellIndex = getCellIndexFromKey(keyNumber)
         if (cellIndex < 0) {
             Logger.e("Invalid cell index calculated from key: $keyNumber")
             return Triple(false, false, -1)
