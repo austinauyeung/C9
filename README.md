@@ -216,8 +216,8 @@ Screen: 720 x 1232 pixels (density 2.0)
 ### Verifying Shizuku authorization
 A green banner on the main page indicates that Shizuku authorization has been granted to C9. Only the third screenshot below indicates successful authorization.
 <div align="center">
-<img style="opacity:0.5;" src='./docs/imgs/Screenshot_20250328_194724.png' width=200>
-<img style="opacity:0.5;" src='./docs/imgs/Screenshot_20250328_194745.png' width=200>
+<img src='./docs/imgs/Screenshot_20250328_194724.png' width=200>
+<img src='./docs/imgs/Screenshot_20250328_194745.png' width=200>
 <img src='./docs/imgs/Screenshot_20250328_194815.png' width=200>
 </div>
 
