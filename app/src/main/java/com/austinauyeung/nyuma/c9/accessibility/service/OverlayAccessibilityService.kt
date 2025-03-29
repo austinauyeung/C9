@@ -6,12 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -56,8 +53,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             Logger.e("Coroutine error in service", exception)
         }
 
-    private val mainHandler = Handler(Looper.getMainLooper())
-
     private lateinit var serviceManager: AccessibilityServiceManager
     private lateinit var uiManager: OverlayUIManager
 
@@ -89,10 +84,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             return instance
         }
 
-        fun showToast(message: String) {
-            instance?.showToastInternal(message)
-        }
-
         const val ACTION_ACTIVATE_GRID = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_GRID"
         const val ACTION_ACTIVATE_CURSOR = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_CURSOR"
 
@@ -114,16 +105,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             } else {
                 context.sendBroadcast(intent)
             }
-        }
-    }
-
-    private fun showToastInternal(message: String) {
-        mainHandler.post {
-            Toast.makeText(
-                applicationContext,
-                message,
-                Toast.LENGTH_SHORT,
-            ).show()
         }
     }
 
@@ -265,7 +246,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 Logger.e("Error unregistering receiver", e)
             }
 
-            mainHandler.removeCallbacksAndMessages(null)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
             Logger.i("Overlay accessibility service destroyed")

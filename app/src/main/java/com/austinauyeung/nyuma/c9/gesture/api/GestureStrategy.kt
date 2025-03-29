@@ -6,7 +6,7 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
  * Strategy interface for gesture implementations.
  */
 interface GestureStrategy {
-    fun performScroll(
+    suspend fun performScroll(
         direction: ScrollDirection,
         startX: Float,
         startY: Float,
@@ -14,7 +14,7 @@ interface GestureStrategy {
         endY: Float
     ): Boolean
 
-    fun performZoom(
+    suspend fun performZoom(
         isZoomIn: Boolean,
         startX1: Float, startY1: Float,
         startX2: Float, startY2: Float,
@@ -22,11 +22,11 @@ interface GestureStrategy {
         endX2: Float, endY2: Float
     ): Boolean
 
-    fun startTap(x: Float, y: Float): Boolean
+    suspend fun startTap(x: Float, y: Float): Boolean
 
-    fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean
+    suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean
 
-    fun endTap(finalX: Float, finalY: Float): Boolean
+    suspend fun endTap(finalX: Float, finalY: Float): Boolean
 
     fun cancelTap(): Boolean
 }

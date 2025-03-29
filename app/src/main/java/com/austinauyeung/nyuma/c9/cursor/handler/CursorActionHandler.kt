@@ -1,7 +1,5 @@
 package com.austinauyeung.nyuma.c9.cursor.handler
 
-import android.os.Handler
-import android.os.Looper
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
@@ -17,6 +15,8 @@ import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.sqrt
@@ -34,50 +34,40 @@ class CursorActionHandler(
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
     private var wasActivated: Boolean = false
-    private var activationHandler: Handler = Handler(Looper.getMainLooper())
-    private var activationRunnable: Runnable? = null
-
-    private var continuousScrollHandler = Handler(Looper.getMainLooper())
-    private var continuousScrollRunnable: Runnable? = null
     private var currentScrollDirection: ScrollDirection? = null
+    private var activationJob: Job? = null
+    private var continuousScrollJob: Job? = null
+    private var movementJob: Job? = null
 
     private val activeDirections = mutableSetOf<CursorDirection>()
-    private var movementRunnable: Runnable? = null
     private var lastMovementTime = 0L
-    private val mainHandler = Handler(Looper.getMainLooper())
 
     private var isGestureActive = false
     private var lastDragPosition: Offset? = null
 
     private var actionKeysPressed = 0
 
-    private fun cancelActivationRunnable() {
-        if (activationRunnable != null) {
-            activationHandler.removeCallbacks(activationRunnable!!)
-            activationRunnable = null
-        }
+    private fun cancelActivationJob() {
+        activationJob?.cancel()
+        activationJob = null
     }
 
     private fun cancelContinuousScrolling() {
         currentScrollDirection = null
-        if (continuousScrollRunnable != null) {
-            continuousScrollHandler.removeCallbacks(continuousScrollRunnable!!)
-            continuousScrollRunnable = null
-        }
+        continuousScrollJob?.cancel()
+        continuousScrollJob = null
     }
 
-    private fun cancelMovementRunnable() {
-        movementRunnable?.let {
-            mainHandler.removeCallbacks(it)
-            movementRunnable = null
-        }
+    private fun cancelMovementJob() {
+        movementJob?.cancel()
+        movementJob = null
         activeDirections.clear()
     }
 
     fun cleanup() {
-        cancelActivationRunnable()
+        cancelActivationJob()
         cancelContinuousScrolling()
-        cancelMovementRunnable()
+        cancelMovementJob()
     }
 
     fun handleKeyEvent(event: KeyEvent?): Boolean {
@@ -220,13 +210,14 @@ class CursorActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
-                cancelActivationRunnable()
+                cancelActivationJob()
 
                 activationKeyPressStartTime = System.currentTimeMillis()
                 isActivationKeyPressed = true
                 wasActivated = false
 
-                activationRunnable = Runnable {
+                activationJob = backgroundScope.launch {
+                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                             cursorStateManager.toggleCursorVisibility()
@@ -238,10 +229,6 @@ class CursorActionHandler(
                         }
                     }
                 }
-                activationHandler.postDelayed(
-                    activationRunnable!!,
-                    ApplicationConstants.ACTIVATION_HOLD_DURATION
-                )
 
                 // Do not intercept if cursor not visible yet
                 return cursorStateManager.isCursorVisible()
@@ -249,7 +236,7 @@ class CursorActionHandler(
 
             KeyEvent.ACTION_UP -> {
                 isActivationKeyPressed = false
-                cancelActivationRunnable()
+                cancelActivationJob()
 
                 // Do not intercept if cursor just activated
                 if (wasActivated) {
@@ -323,17 +310,17 @@ class CursorActionHandler(
 
                 if (direction != null) {
                     currentScrollDirection = direction
-                    performScroll(direction)
+                    backgroundScope.launch {
+                        performScroll(direction)
+                    }
 
-                    continuousScrollRunnable = object : Runnable {
-                        override fun run() {
-                            if (currentScrollDirection == direction) {
-                                performScroll(direction)
-                                continuousScrollHandler.postDelayed(this, gestureInterval)
-                            }
+                    continuousScrollJob = backgroundScope.launch {
+                        delay(initialDelay)
+                        while (currentScrollDirection == direction) {
+                            performScroll(direction)
+                            delay(gestureInterval)
                         }
                     }
-                    continuousScrollHandler.postDelayed(continuousScrollRunnable!!, initialDelay)
                 }
             }
 
@@ -346,11 +333,14 @@ class CursorActionHandler(
 
     private fun handleZoomKey(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_UP) {
-            return when (event.keyCode) {
-                KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_LEFT_BRACKET -> performZoom(false)
-                KeyEvent.KEYCODE_3, KeyEvent.KEYCODE_RIGHT_BRACKET -> performZoom(true)
-                else -> false
+            val isZoomIn = when (event.keyCode) {
+                KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_LEFT_BRACKET -> false
+                KeyEvent.KEYCODE_3, KeyEvent.KEYCODE_RIGHT_BRACKET -> true
+                else -> return false
             }
+
+            performZoom(isZoomIn)
+            return true
         }
         return true
     }
@@ -373,25 +363,24 @@ class CursorActionHandler(
         activeDirections.add(direction)
         lastMovementTime = System.currentTimeMillis()
 
-        if (movementRunnable == null) {
+        if (movementJob == null) {
             moveCursor()
 
-            movementRunnable = object : Runnable {
-                override fun run() {
-                    if (activeDirections.isNotEmpty()) {
-                        moveCursor()
-                        mainHandler.postDelayed(this, CursorConstants.FRAME_DURATION_MS.toLong())
-                    } else {
-                        movementRunnable = null
-                    }
+            movementJob = backgroundScope.launch {
+                while (activeDirections.isNotEmpty()) {
+                    moveCursor()
+                    delay(CursorConstants.FRAME_DURATION_MS.toLong())
                 }
             }
-            mainHandler.postDelayed(movementRunnable!!, CursorConstants.FRAME_DURATION_MS.toLong())
         }
     }
 
     private fun stopMovingCursor(direction: CursorDirection) {
         activeDirections.remove(direction)
+
+        if (activeDirections.isEmpty()) {
+            movementJob = null
+        }
     }
 
     private fun moveCursor() {
@@ -428,11 +417,9 @@ class CursorActionHandler(
         }
     }
 
-    private fun performScroll(direction: ScrollDirection): Boolean {
+    private suspend fun performScroll(direction: ScrollDirection): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
-        backgroundScope.launch {
-            gestureManager.performScroll(direction, cursorState.position.x, cursorState.position.y)
-        }
+        gestureManager.performScroll(direction, cursorState.position.x, cursorState.position.y)
 
         return true
     }

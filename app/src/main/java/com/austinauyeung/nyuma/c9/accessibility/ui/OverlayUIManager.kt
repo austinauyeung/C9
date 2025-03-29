@@ -2,7 +2,6 @@ package com.austinauyeung.nyuma.c9.accessibility.ui
 
 import android.content.Context
 import android.graphics.PixelFormat
-import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
 import android.view.WindowManager
@@ -45,7 +44,6 @@ class OverlayUIManager(
     private val savedStateRegistryOwner: SavedStateRegistryOwner
 ) {
     private var overlayView: ComposeView? = null
-    private val mainHandler = Handler(Looper.getMainLooper())
     private var currentPaths: Int? = null
 
     fun initialize() {
@@ -103,7 +101,7 @@ class OverlayUIManager(
         try {
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 Logger.e("updateOverlayUI was called from a non-main thread")
-                mainHandler.post { updateOverlayUI() }
+                mainScope.launch { updateOverlayUI() }
                 return
             }
 

@@ -1,7 +1,5 @@
 package com.austinauyeung.nyuma.c9.grid.handler
 
-import android.os.Handler
-import android.os.Looper
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
@@ -13,6 +11,8 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -29,34 +29,28 @@ class GridActionHandler(
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
     private var wasOverlayActivated: Boolean = false
-    private var activationHandler: Handler = Handler(Looper.getMainLooper())
-    private var activationRunnable: Runnable? = null
+    private var activationJob: Job? = null
+    private var continuousScrollJob: Job? = null
 
     private var heldNumberKey: Int? = null
     private var heldCellIndex: Int? = null
     private var gestureDispatchedDuringHold: Boolean = false
 
-    private var continuousScrollHandler = Handler(Looper.getMainLooper())
-    private var continuousScrollRunnable: Runnable? = null
     private var currentScrollDirection: ScrollDirection? = null
 
-    private fun cancelActivationRunnable() {
-        if (activationRunnable != null) {
-            activationHandler.removeCallbacks(activationRunnable!!)
-            activationRunnable = null
-        }
+    private fun cancelActivationJob() {
+        activationJob?.cancel()
+        activationJob = null
     }
 
     private fun cancelContinuousScrolling() {
         currentScrollDirection = null
-        if (continuousScrollRunnable != null) {
-            continuousScrollHandler.removeCallbacks(continuousScrollRunnable!!)
-            continuousScrollRunnable = null
-        }
+        continuousScrollJob?.cancel()
+        continuousScrollJob = null
     }
 
     fun cleanup() {
-        cancelActivationRunnable()
+        cancelActivationJob()
         cancelContinuousScrolling()
     }
 
@@ -142,13 +136,14 @@ class GridActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
-                cancelActivationRunnable()
+                cancelActivationJob()
 
                 activationKeyPressStartTime = System.currentTimeMillis()
                 isActivationKeyPressed = true
                 wasOverlayActivated = false
 
-                activationRunnable = Runnable {
+                activationJob = backgroundScope.launch {
+                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
                             gridStateManager.toggleGridVisibility()
@@ -160,10 +155,6 @@ class GridActionHandler(
                         }
                     }
                 }
-                activationHandler.postDelayed(
-                    activationRunnable!!,
-                    ApplicationConstants.ACTIVATION_HOLD_DURATION
-                )
 
                 // Do not intercept if grid not visible yet
                 return gridStateManager.isGridVisible()
@@ -171,7 +162,7 @@ class GridActionHandler(
 
             KeyEvent.ACTION_UP -> {
                 isActivationKeyPressed = false
-                cancelActivationRunnable()
+                cancelActivationJob()
 
                 // Do not intercept if grid just activated
                 if (wasOverlayActivated) {
@@ -248,23 +239,17 @@ class GridActionHandler(
 
                 if (direction != null) {
                     currentScrollDirection = direction
-
                     backgroundScope.launch {
                         gestureManager.performScroll(direction, x, y)
                     }
 
-                    continuousScrollRunnable = object : Runnable {
-                        override fun run() {
-                            if (currentScrollDirection == direction) {
-                                backgroundScope.launch {
-                                    gestureManager.performScroll(direction, x, y)
-                                }
-                                continuousScrollHandler.postDelayed(this, gestureInterval)
-                            }
+                    continuousScrollJob = backgroundScope.launch {
+                        delay(initialDelay)
+                        while (currentScrollDirection == direction) {
+                            gestureManager.performScroll(direction, x, y)
+                            delay(gestureInterval)
                         }
                     }
-
-                    continuousScrollHandler.postDelayed(continuousScrollRunnable!!, initialDelay)
                 }
             }
 

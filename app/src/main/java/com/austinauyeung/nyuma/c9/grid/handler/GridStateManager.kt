@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * Manages grid state including visibility, grid hierarchy, and state transitions.
@@ -22,6 +23,7 @@ class GridStateManager(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val screenDimensions: ScreenDimensions,
+    private val backgroundScope: CoroutineScope,
     private val onGridStateChanged: (Grid?) -> Unit
 ) {
     private val _gridState = MutableStateFlow<Grid?>(null)
@@ -88,8 +90,10 @@ class GridStateManager(
             val coordinates = gridNavigator.calculateClickCoordinates(grid, cellIndex)
             val (x, y) = coordinates
 
-            gestureManager.startTap(x, y)
-            gestureManager.endTap(x, y)
+            backgroundScope.launch {
+                gestureManager.startTap(x, y)
+                gestureManager.endTap(x, y)
+            }
         }
 
         if (!persistOverlay) {

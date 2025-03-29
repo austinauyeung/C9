@@ -74,6 +74,7 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 screenDimensions,
+                backgroundScope,
                 { grid -> onGridStateChanged(grid) }
             )
             gridActionHandler = GridActionHandler(

@@ -77,7 +77,7 @@ class GestureManager(
         return isReady
     }
 
-    fun performScroll(direction: ScrollDirection, startX: Float, startY: Float): Boolean {
+    suspend fun performScroll(direction: ScrollDirection, startX: Float, startY: Float): Boolean {
         try {
             Logger.d("Performing scroll gesture in direction $direction at position ($startX, $startY)")
             val settings = settingsFlow.value
@@ -118,7 +118,7 @@ class GestureManager(
         }
     }
 
-    fun performZoom(isZoomIn: Boolean, startX: Float, startY: Float): Boolean {
+    suspend fun performZoom(isZoomIn: Boolean, startX: Float, startY: Float): Boolean {
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
             val randomness = 1
@@ -169,7 +169,7 @@ class GestureManager(
         }
     }
 
-    fun startTap(x: Float, y: Float): Boolean {
+    suspend fun startTap(x: Float, y: Float): Boolean {
         try {
             Logger.d("Starting tap gesture at ($x, $y)")
             if (shouldShowGestures) {
@@ -184,7 +184,7 @@ class GestureManager(
         }
     }
 
-    fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+    suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
         try {
             Logger.d("Dragging from ($fromX, $fromY) to ($toX, $toY)")
             return currentStrategy.dragTap(fromX, fromY, toX, toY)
@@ -195,7 +195,7 @@ class GestureManager(
         }
     }
 
-    fun endTap(x: Float, y: Float): Boolean {
+    suspend fun endTap(x: Float, y: Float): Boolean {
         try {
             Logger.d("Ending tap at ($x, $y)")
             return currentStrategy.endTap(x, y)

@@ -104,7 +104,7 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override fun performScroll(
+    override suspend fun performScroll(
         direction: ScrollDirection,
         startX: Float,
         startY: Float,
@@ -175,7 +175,7 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override fun performZoom(
+    override suspend fun performZoom(
         isZoomIn: Boolean,
         startX1: Float, startY1: Float,
         startX2: Float, startY2: Float,
@@ -310,7 +310,7 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override fun startTap(x: Float, y: Float): Boolean {
+    override suspend fun startTap(x: Float, y: Float): Boolean {
         if (!isAvailable()) return false
 
         Logger.d("Using Shizuku to start gesture at ($x, $y)")
@@ -336,7 +336,7 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
         if (!isAvailable() || !_gestureActive || _gestureDownTime == 0L) return false
 
         Logger.d("Using Shizuku to continue gesture from ($fromX, $fromY) to ($toX, $toY)")
@@ -378,7 +378,7 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override fun endTap(finalX: Float, finalY: Float): Boolean {
+    override suspend fun endTap(finalX: Float, finalY: Float): Boolean {
         if (!isAvailable() || !_gestureActive || _gestureDownTime == 0L) return false
 
         Logger.d("Using Shizuku to end gesture at ($finalX, $finalY)")
