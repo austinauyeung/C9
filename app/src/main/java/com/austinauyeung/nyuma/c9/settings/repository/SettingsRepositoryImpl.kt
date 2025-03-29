@@ -47,6 +47,7 @@ class SettingsRepositoryImpl(
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_TEXT_FIELD = booleanPreferencesKey("hide_on_text_field")
+        private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -131,7 +132,9 @@ class SettingsRepositoryImpl(
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
                     hideOnTextField = preferences[HIDE_ON_TEXT_FIELD]
-                        ?: OverlaySettings.DEFAULT.hideOnTextField
+                        ?: OverlaySettings.DEFAULT.hideOnTextField,
+                    rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
+                        ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation
                 )
             }
     }
@@ -161,6 +164,7 @@ class SettingsRepositoryImpl(
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField
+                preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

@@ -36,5 +36,6 @@ object Defaults {
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
         const val HIDE_ON_TEXT_FIELD = false
+        const val ROTATE_BUTTONS_WITH_ORIENTATION = true
     }
 }

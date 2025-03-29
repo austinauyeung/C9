@@ -8,6 +8,7 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +25,8 @@ class GridActionHandler(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val backgroundScope: CoroutineScope,
-    private val modeCoordinator: OverlayModeCoordinator
+    private val modeCoordinator: OverlayModeCoordinator,
+    private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT }
 ) {
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
@@ -104,13 +106,25 @@ class GridActionHandler(
                 KeyEvent.KEYCODE_ENTER
             )
 
-            return when (event.keyCode) {
+            val originalKeyCode = event.keyCode
+            val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
+                val orientation = orientationProvider()
+                when (originalKeyCode) {
+                    in numKeys -> OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                    in scrollKeys -> OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                    else -> originalKeyCode
+                }
+            } else {
+                originalKeyCode
+            }
+
+            return when (effectiveKeyCode) {
                 in numKeys -> {
-                    handleNumberKey(event)
+                    handleNumberKey(event, effectiveKeyCode)
                 }
 
                 in scrollKeys -> {
-                    handleScrollKey(event)
+                    handleScrollKey(event, effectiveKeyCode)
                 }
 
                 in zoomKeys -> {
@@ -184,15 +198,15 @@ class GridActionHandler(
         }
     }
 
-    private fun handleNumberKey(event: KeyEvent): Boolean {
+    private fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 if (heldNumberKey != null) {
                     return true
                 }
 
-                heldNumberKey = event.keyCode
-                heldCellIndex = event.keyCode - KeyEvent.KEYCODE_1
+                heldNumberKey = keyCode
+                heldCellIndex = keyCode - KeyEvent.KEYCODE_1
                 gestureDispatchedDuringHold = false
                 return true
             }
@@ -200,7 +214,7 @@ class GridActionHandler(
             KeyEvent.ACTION_UP -> {
                 var result: Boolean? = null
 
-                if (heldNumberKey == event.keyCode && !gestureDispatchedDuringHold) {
+                if (heldNumberKey == keyCode && !gestureDispatchedDuringHold) {
                     result = gridStateManager.handleNumberKey(heldCellIndex!! + 1)
                 }
 
@@ -214,7 +228,7 @@ class GridActionHandler(
         }
     }
 
-    private fun handleScrollKey(event: KeyEvent): Boolean {
+    private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
         val settings = settingsFlow.value
         val offset = if (settings.gestureStyle == GestureStyle.FIXED) GestureConstants.SCROLL_END_PAUSE else 0
         val gestureInterval = ((settings.gestureDuration + offset) * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
@@ -229,7 +243,7 @@ class GridActionHandler(
                     gestureDispatchedDuringHold = true
                 }
 
-                val direction = when (event.keyCode) {
+                val direction = when (keyCode) {
                     KeyEvent.KEYCODE_DPAD_UP -> ScrollDirection.UP
                     KeyEvent.KEYCODE_DPAD_DOWN -> ScrollDirection.DOWN
                     KeyEvent.KEYCODE_DPAD_LEFT -> ScrollDirection.LEFT

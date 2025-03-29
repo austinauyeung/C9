@@ -10,6 +10,7 @@ import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -29,7 +30,8 @@ class CursorActionHandler(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val backgroundScope: CoroutineScope,
-    private val modeCoordinator: OverlayModeCoordinator
+    private val modeCoordinator: OverlayModeCoordinator,
+    private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT }
 ) {
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
@@ -174,13 +176,32 @@ class CursorActionHandler(
                 KeyEvent.KEYCODE_STAR
             )
 
+            val originalKeyCode = event.keyCode
+            val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
+                val orientation = orientationProvider()
+                if (originalKeyCode in movementKeys && OrientationUtil.isDpadDirection(originalKeyCode)) {
+                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                } else if (originalKeyCode in scrollKeys && OrientationUtil.isNumberKey(originalKeyCode)) {
+                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                } else if (originalKeyCode in scrollKeys && OrientationUtil.isDpadDirection(originalKeyCode)) {
+                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                } else if (originalKeyCode in movementKeys && OrientationUtil.isNumberKey(originalKeyCode)) {
+                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                } else {
+                    originalKeyCode
+                }
+            } else {
+                originalKeyCode
+            }
+
+
             return when (event.keyCode) {
                 in movementKeys -> {
-                    handleMovementKey(event)
+                    handleMovementKey(event, effectiveKeyCode)
                 }
 
                 in scrollKeys -> {
-                    handleScrollKey(event)
+                    handleScrollKey(event, effectiveKeyCode)
                 }
 
                 in zoomKeys -> {
@@ -266,8 +287,8 @@ class CursorActionHandler(
         }
     }
 
-    private fun handleMovementKey(event: KeyEvent): Boolean {
-        val direction = when (event.keyCode) {
+    private fun handleMovementKey(event: KeyEvent, keyCode: Int): Boolean {
+        val direction = when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2 -> CursorDirection.UP
             KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_8 -> CursorDirection.DOWN
             KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_4 -> CursorDirection.LEFT
@@ -290,7 +311,7 @@ class CursorActionHandler(
         }
     }
 
-    private fun handleScrollKey(event: KeyEvent): Boolean {
+    private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
         val settings = settingsFlow.value
         val offset = if (settings.gestureStyle == GestureStyle.FIXED) GestureConstants.SCROLL_END_PAUSE else 0
         val gestureInterval = ((settings.gestureDuration + offset) * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
@@ -300,7 +321,7 @@ class CursorActionHandler(
             KeyEvent.ACTION_DOWN -> {
                 cancelContinuousScrolling()
 
-                val direction = when (event.keyCode) {
+                val direction = when (keyCode) {
                     KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2 -> ScrollDirection.UP
                     KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_8 -> ScrollDirection.DOWN
                     KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_4 -> ScrollDirection.LEFT

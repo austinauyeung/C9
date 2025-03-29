@@ -50,7 +50,7 @@ class AccessibilityServiceManager(
     private val _currentCursor = MutableStateFlow<CursorState?>(null)
     val currentCursor: StateFlow<CursorState?> = _currentCursor.asStateFlow()
 
-    val screenDimensionsFlow = orientationHandler.screenDimensions
+    private val screenDimensionsFlow = orientationHandler.screenDimensions
 
     fun initialize() {
         try {
@@ -88,7 +88,8 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 backgroundScope,
-                modeCoordinator
+                modeCoordinator,
+                { orientationHandler.getCurrentOrientation() }
             )
 
             // Cursor components
@@ -102,7 +103,8 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 backgroundScope,
-                modeCoordinator
+                modeCoordinator,
+                { orientationHandler.getCurrentOrientation() }
             )
 
             // Listen for orientation changes

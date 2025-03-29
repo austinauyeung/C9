@@ -27,6 +27,7 @@ import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
 import com.austinauyeung.nyuma.c9.grid.ui.GridOverlay
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -118,6 +119,7 @@ class OverlayUIManager(
             isOrientationChanging = true
 
             mainScope.launch{
+                delay(250)
                 updateOverlayUI()
                 isOrientationChanging = false
             }
@@ -137,7 +139,7 @@ class OverlayUIManager(
             }
 
             if (isOrientationChanging) {
-                Logger.d("Skipping overlay update during orientation change handling")
+                Logger.d("Skipping overlay update during orientation change")
                 return
             }
 
@@ -162,6 +164,7 @@ class OverlayUIManager(
             overlayView?.setContent {
                 val currentSettings by settingsFlow.collectAsState()
                 val currentGesturePaths by accessibilityManager.getGesturePaths().collectAsState()
+                val currentOrientation by orientationHandler.currentOrientation.collectAsState()
 
                 C9Theme {
                     Surface(
@@ -174,6 +177,8 @@ class OverlayUIManager(
                                 grid = activeGrid,
                                 opacity = currentSettings.overlayOpacity,
                                 hideNumbers = currentSettings.hideNumbers,
+                                orientation = currentOrientation,
+                                useRotatedNumbers = currentSettings.rotateButtonsWithOrientation,
                                 gridLineVisibility = currentSettings.gridLineVisibility
                             )
                         }
