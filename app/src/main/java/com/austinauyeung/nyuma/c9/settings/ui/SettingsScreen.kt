@@ -210,7 +210,7 @@ fun SettingsScreen(
                 )
                 SwitchPreferenceItem(
                     title = "Rotate Buttons With Orientation",
-                    subtitle = "Rotate D-pad and numpad with the screen",
+                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
                     checked = uiState.rotateButtonsWithOrientation,
                     onCheckedChange = { viewModel.updateRotateButtons(it) },
                 )

@@ -72,9 +72,10 @@ The following options can be configured:
 - To activate the grid cursor:
     - Hold the activation key.
     - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
+- See the table below for gesture dispatch.
 - When activated, press the activation key to quickly reset any grid back to the main grid.
 - When activated, press any number to advance to the next subgrid.
-- See the table below for gesture dispatch.
+- When activated and if the device is in landscape orientation, the D-pad and numpad 1-9 can be set to rotate with the screen with the `C9 > Rotate Buttons With Orientation` setting. The overlay will update accordingly.
 - To deactivate, hold the activation key.
     - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
 
@@ -120,6 +121,7 @@ The following options can be configured:
 - See the table below for gesture dispatch.
 - When activated, either D-pad center or numpad 5 can be used to long press. For example, in the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
 - When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
+- When activated and if the device is in landscape orientation, the D-pad and numpad 2/4/6/8 can be set to rotate with the screen with the `C9 > Rotate Buttons With Orientation` setting.
 - To deactivate, hold the activation key.
     - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
 
