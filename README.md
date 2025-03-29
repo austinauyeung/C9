@@ -30,6 +30,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
     - [Instructions](#instructions-1)
     - [Usage](#usage-1)
 - [Installation](#installation)
+- [Troubleshooting](#troubleshooting)
 - [Known Issues](#known-issues)
 - [FAQs](#faqs)
 - [License](#license)
@@ -168,6 +169,58 @@ If you are on Android 11, please first try the application as-is. If gestures ca
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
 
+## Troubleshooting
+### Generating cursor logs
+<div align="center">
+<img src='./docs/gifs/Screen_recording_20250328_195409.gif' width=200>
+</div>
+
+If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Debug Options > Log Screen`, activate the cursor, and perform the corresponding gesture(s). Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
+
+```
+--- SYSTEM INFORMATION ---
+Device: Google sdk_gphone64_x86_64
+Android Version: 15 (SDK 35)
+Screen: 720 x 1232 pixels (density 2.0)
+
+--- LOG ENTRIES ---
+[19:53:58.362] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14387767052000, downTime=14387767052000, deviceId=0, source=0x301, displayId=-1 }
+[19:53:58.665] [D] Overlay mode changed: NONE -> CURSOR
+[19:53:58.669] [D] Cursor state changed: true
+[19:53:58.682] [D] Overlay view created and added to window manager
+[19:53:58.886] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14388291421000, downTime=14387767052000, deviceId=0, source=0x301, displayId=-1 }
+[19:53:59.716] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14389121655000, downTime=14389121655000, deviceId=0, source=0x301, displayId=-1 }
+[19:53:59.717] [D] Starting tap gesture at (360.0, 640.0)
+[19:53:59.718] [D] StandardGestureStrategy: starting tap at (360.0, 640.0)
+[19:53:59.718] [D] Gesture paths changed: 1 paths
+[19:53:59.746] [D] StandardGestureStrategy: start tap completed successfully
+[19:53:59.771] [D] Gesture paths changed: 0 paths
+[19:53:59.798] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14389190365000, downTime=14389121655000, deviceId=0, source=0x301, displayId=-1 }
+[19:53:59.799] [D] Ending tap at (360.0, 640.0)
+[19:53:59.799] [D] StandardGestureStrategy: ending tap at (360.0, 640.0)
+[19:53:59.808] [D] StandardGestureStrategy: end tap completed successfully
+[19:54:01.307] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14390712608000, downTime=14390712608000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:01.609] [D] Overlay mode changed: CURSOR -> NONE
+[19:54:01.612] [D] Cursor state changed: false
+[19:54:01.626] [D] Overlay view removed
+[19:54:01.875] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14391281290000, downTime=14390712608000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:02.231] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_DPAD_RIGHT, scanCode=106, metaState=0, flags=0x8, repeatCount=0, eventTime=14391636575000, downTime=14391636575000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:02.322] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_DPAD_RIGHT, scanCode=106, metaState=0, flags=0x8, repeatCount=0, eventTime=14391727695000, downTime=14391636575000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:02.869] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_DPAD_RIGHT, scanCode=106, metaState=0, flags=0x8, repeatCount=0, eventTime=14392275611000, downTime=14392275611000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:02.950] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_DPAD_RIGHT, scanCode=106, metaState=0, flags=0x8, repeatCount=0, eventTime=14392344310000, downTime=14392275611000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:03.460] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14392865662000, downTime=14392865662000, deviceId=0, source=0x301, displayId=-1 }
+[19:54:03.507] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14392912821000, downTime=14392865662000, deviceId=0, source=0x301, displayId=-1 }
+
+```
+
+### Verifying Shizuku authorization
+A green banner on the main page indicates that Shizuku authorization has been granted to C9. Only the third screenshot below indicates successful authorization.
+<div align="center">
+<img style="opacity:0.5;" src='./docs/imgs/Screenshot_20250328_194724.png' width=200>
+<img style="opacity:0.5;" src='./docs/imgs/Screenshot_20250328_194745.png' width=200>
+<img src='./docs/imgs/Screenshot_20250328_194815.png' width=200>
+</div>
+
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
   - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
@@ -178,7 +231,7 @@ Note that unless your device is rooted, you will need to restart the Shizuku ser
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
-Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs using the built-in logger under `C9 > Debug Options > Log Screen` with the cursor active or `adb logcat C9App:V *:S`.
+Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs using the built-in logger (see [Generating cursor logs](#generating-cursor-logs)) or `adb logcat C9App:V *:S`.
 
 ### How else can I contribute?
 Please feel free to submit a pull request, create a video walkthrough, or provide anything else you think would be helpful!
