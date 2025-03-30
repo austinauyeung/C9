@@ -179,16 +179,12 @@ class CursorActionHandler(
             val originalKeyCode = event.keyCode
             val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
                 val orientation = orientationProvider()
-                if (originalKeyCode in movementKeys && OrientationUtil.isDpadDirection(originalKeyCode)) {
-                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
-                } else if (originalKeyCode in scrollKeys && OrientationUtil.isNumberKey(originalKeyCode)) {
-                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
-                } else if (originalKeyCode in scrollKeys && OrientationUtil.isDpadDirection(originalKeyCode)) {
-                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
-                } else if (originalKeyCode in movementKeys && OrientationUtil.isNumberKey(originalKeyCode)) {
-                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
-                } else {
-                    originalKeyCode
+                when {
+                    OrientationUtil.isDpadDirection(originalKeyCode) ->
+                        OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                    OrientationUtil.isNumberKey(originalKeyCode) ->
+                        OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                    else -> originalKeyCode
                 }
             } else {
                 originalKeyCode
