@@ -149,10 +149,15 @@ class AccessibilityServiceManager(
         }
     }
 
-    fun activateCursorMode(): Boolean {
+    fun activateCursorMode(position: Offset? = null): Boolean {
         try {
             if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                 cursorStateManager.toggleCursorVisibility()
+
+                if (position != null) {
+                    cursorStateManager.updatePosition(position)
+                }
+
                 return cursorStateManager.isCursorVisible()
             }
             return false

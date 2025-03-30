@@ -157,6 +157,8 @@ All gestures are dispatched at the cursor's current location:
   - Grid cursor: D-pad rotates, numpad 1-9 rotates (along with the on-screen grid), zoom and activation remain unchanged
   - Standard cursor: D-pad rotates, numpad 2/4/6/8 rotates, zoom and activation remain unchanged
   - Example: If the device is rotated to the left, D-pad left becomes D-pad down.
+- If `C9 > Auto-Hide in Text Fields` is enabled, the cursors will hide when entering a text field and automatically restore upon leaving the text field (the text field is submitted, loses focus, etc.). The standard cursor's last position is saved upon restore.
+  - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
