@@ -62,6 +62,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private var lastCursorPosition: Offset? = null
     private var lastOverlayType: OverlayModeCoordinator.OverlayMode? = null
     private var hidingCursor: Boolean = false
+    private val keysPressed: MutableSet<Int> = mutableSetOf()
+    private var isTextField: Boolean = false
 
     fun setHidingCursor(hiding: Boolean) {
         hidingCursor = hiding
@@ -181,51 +183,63 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
+    private fun autoHideCursor() {
+        if (serviceManager.currentGrid.value != null) {
+            lastOverlayType = OverlayModeCoordinator.OverlayMode.GRID
+        } else if (serviceManager.currentCursor.value != null) {
+            lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
+            serviceManager.currentCursor.value?.let { cursor ->
+                lastCursorPosition = Offset(cursor.position.x, cursor.position.y)
+            }
+        }
+
+        Logger.d("Text field focused, hiding cursor overlays")
+        forceHideAllOverlays()
+        hidingCursor = true
+        keysPressed.clear()
+    }
+
+    private fun attemptCursorRestore() {
+        if (hidingCursor && keysPressed.isEmpty() && !isTextField) {
+            when (lastOverlayType) {
+                OverlayModeCoordinator.OverlayMode.GRID -> {
+                    serviceManager.activateGridMode()
+                }
+
+                OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                    serviceManager.activateCursorMode(lastCursorPosition)
+                }
+
+                else -> {}
+            }
+            lastCursorPosition = null
+            lastOverlayType = null
+            hidingCursor = false
+        }
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val settingsFlow = C9.getInstance().getSettingsFlow()
         if (settingsFlow.value.hideOnTextField) {
             event?.let{
                 if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
                     val isKeyboardActivated = event.className?.toString() == "android.inputmethodservice.SoftInputWindow"
-
                     if (isKeyboardActivated) {
-                        if (serviceManager.currentGrid.value != null) {
-                            lastOverlayType = OverlayModeCoordinator.OverlayMode.GRID
-                        } else if (serviceManager.currentCursor.value != null) {
-                            lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
-                            serviceManager.currentCursor.value?.let { cursor ->
-                                lastCursorPosition = Offset(cursor.position.x, cursor.position.y)
-                            }
-                        }
+                        // Assume text field is open (Opera does not fire off TYPE_VIEW_FOCUSED)
+                        isTextField = true
 
-                        Logger.d("Text field focused, hiding cursor overlays")
-                        forceHideAllOverlays()
-                        hidingCursor = true
+                        if (!hidingCursor) autoHideCursor()
                     }
                 }
 
-                if (hidingCursor) {
-                    if (event.eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
-                        val focusedClassName = event.className?.toString()
-                        val isTextField =
-                            focusedClassName?.contains("EditText") == true || event.source?.isEditable == true
+                if (event.eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
+                    val focusedClassName = event.className?.toString()
+                    isTextField = focusedClassName?.contains("EditText") == true || event.source?.isEditable == true
 
-                        if (!isTextField) {
-                            Logger.d("Restoring cursor overlays")
-                            when (lastOverlayType) {
-                                OverlayModeCoordinator.OverlayMode.GRID -> {
-                                    serviceManager.activateGridMode()
-                                }
-                                OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                                    serviceManager.activateCursorMode(lastCursorPosition)
-                                }
-                                else -> {}
-                            }
-
-                            lastCursorPosition = null
-                            lastOverlayType = null
-                            hidingCursor = false
-                        }
+                    if (isTextField) {
+                        if (!hidingCursor) autoHideCursor()
+                    } else {
+                        attemptCursorRestore()
                     }
                 }
             }
@@ -236,6 +250,18 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     override fun onInterrupt() {}
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
+        if (hidingCursor) {
+            if (event?.action == KeyEvent.ACTION_DOWN) {
+                keysPressed.add(event.keyCode)
+            } else if (event?.action == KeyEvent.ACTION_UP) {
+                keysPressed.remove(event.keyCode)
+                if (keysPressed.isEmpty()) {
+                    attemptCursorRestore()
+                    return false
+                }
+            }
+        }
+
         return try {
             serviceManager.handleKeyEvent(event)
         } catch (e: Exception) {
