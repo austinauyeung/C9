@@ -153,6 +153,7 @@ All gestures are dispatched at the cursor's current location:
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode with the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
+- In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5. 
 - If the device is in landscape orientation, the appropriate buttons in each mode can also rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled:
   - Grid cursor: D-pad rotates, numpad 1-9 rotates (along with the on-screen grid), zoom and activation remain unchanged
   - Standard cursor: D-pad rotates, numpad 2/4/6/8 rotates, zoom and activation remain unchanged
