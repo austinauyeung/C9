@@ -185,24 +185,32 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         val settingsFlow = C9.getInstance().getSettingsFlow()
         if (settingsFlow.value.hideOnTextField) {
             event?.let{
-                if (event.eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
-                    try {
-                        val isTextField = (event.source?.className?.contains("EditText") == true) || (event.source?.isEditable == true)
+                if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+                    val isKeyboardActivated = event.className?.toString() == "android.inputmethodservice.SoftInputWindow"
 
-                        if (isTextField) {
-                            if (serviceManager.currentGrid.value != null) {
-                                lastOverlayType = OverlayModeCoordinator.OverlayMode.GRID
-                            } else if (serviceManager.currentCursor.value != null) {
-                                lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
-                                serviceManager.currentCursor.value?.let { cursor ->
-                                    lastCursorPosition = Offset(cursor.position.x, cursor.position.y)
-                                }
+                    if (isKeyboardActivated) {
+                        if (serviceManager.currentGrid.value != null) {
+                            lastOverlayType = OverlayModeCoordinator.OverlayMode.GRID
+                        } else if (serviceManager.currentCursor.value != null) {
+                            lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
+                            serviceManager.currentCursor.value?.let { cursor ->
+                                lastCursorPosition = Offset(cursor.position.x, cursor.position.y)
                             }
+                        }
 
-                            Logger.d("Text field focused, hiding cursor overlays")
-                            forceHideAllOverlays()
-                            hidingCursor = true
-                        } else if (hidingCursor) {
+                        Logger.d("Text field focused, hiding cursor overlays")
+                        forceHideAllOverlays()
+                        hidingCursor = true
+                    }
+                }
+
+                if (hidingCursor) {
+                    if (event.eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
+                        val focusedClassName = event.className?.toString()
+                        val isTextField =
+                            focusedClassName?.contains("EditText") == true || event.source?.isEditable == true
+
+                        if (!isTextField) {
                             Logger.d("Restoring cursor overlays")
                             when (lastOverlayType) {
                                 OverlayModeCoordinator.OverlayMode.GRID -> {
@@ -218,7 +226,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                             lastOverlayType = null
                             hidingCursor = false
                         }
-                    } finally {}
+                    }
                 }
             }
         }
