@@ -62,8 +62,15 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private var lastCursorPosition: Offset? = null
     private var lastOverlayType: OverlayModeCoordinator.OverlayMode? = null
     private var hidingCursor: Boolean = false
-    private val keysPressed: MutableSet<Int> = mutableSetOf()
-    private var isTextField: Boolean = false
+
+    // Taking some guesses here and may need to revise
+    private val submissionKeys = setOf(
+        KeyEvent.KEYCODE_ENTER,
+        KeyEvent.KEYCODE_NUMPAD_ENTER,
+        KeyEvent.KEYCODE_BUTTON_START,
+        KeyEvent.KEYCODE_CALL,
+        KeyEvent.KEYCODE_SEARCH
+    )
 
     fun setHidingCursor(hiding: Boolean) {
         hidingCursor = hiding
@@ -196,26 +203,23 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         Logger.d("Text field focused, hiding cursor overlays")
         forceHideAllOverlays()
         hidingCursor = true
-        keysPressed.clear()
     }
 
-    private fun attemptCursorRestore() {
-        if (hidingCursor && keysPressed.isEmpty() && !isTextField) {
-            when (lastOverlayType) {
-                OverlayModeCoordinator.OverlayMode.GRID -> {
-                    serviceManager.activateGridMode()
-                }
-
-                OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                    serviceManager.activateCursorMode(lastCursorPosition)
-                }
-
-                else -> {}
+    private fun restoreCursor() {
+        when (lastOverlayType) {
+            OverlayModeCoordinator.OverlayMode.GRID -> {
+                serviceManager.activateGridMode()
             }
-            lastCursorPosition = null
-            lastOverlayType = null
-            hidingCursor = false
+
+            OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                serviceManager.activateCursorMode(lastCursorPosition)
+            }
+
+            else -> {}
         }
+        lastCursorPosition = null
+        lastOverlayType = null
+        hidingCursor = false
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -224,23 +228,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             event?.let{
                 if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
                     val isKeyboardActivated = event.className?.toString() == "android.inputmethodservice.SoftInputWindow"
-                    if (isKeyboardActivated) {
-                        // Assume text field is open (Opera does not fire off TYPE_VIEW_FOCUSED)
-                        isTextField = true
-
-                        if (!hidingCursor) autoHideCursor()
-                    }
-                }
-
-                if (event.eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
-                    val focusedClassName = event.className?.toString()
-                    isTextField = focusedClassName?.contains("EditText") == true || event.source?.isEditable == true
-
-                    if (isTextField) {
-                        if (!hidingCursor) autoHideCursor()
-                    } else {
-                        attemptCursorRestore()
-                    }
+                    if (isKeyboardActivated && !hidingCursor) autoHideCursor()
                 }
             }
         }
@@ -251,14 +239,10 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         if (hidingCursor) {
-            if (event?.action == KeyEvent.ACTION_DOWN) {
-                keysPressed.add(event.keyCode)
-            } else if (event?.action == KeyEvent.ACTION_UP) {
-                keysPressed.remove(event.keyCode)
-                if (keysPressed.isEmpty()) {
-                    attemptCursorRestore()
-                    return false
-                }
+            if (event?.keyCode in submissionKeys && event?.action == KeyEvent.ACTION_UP) {
+                Logger.d("Enter key pressed, assuming form submission")
+                restoreCursor()
+                return false
             }
         }
 
