@@ -6,12 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -21,7 +18,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
 import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -56,10 +53,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             Logger.e("Coroutine error in service", exception)
         }
 
-    private val mainHandler = Handler(Looper.getMainLooper())
-
     private lateinit var serviceManager: AccessibilityServiceManager
     private lateinit var uiManager: OverlayUIManager
+    private lateinit var orientationHandler: OrientationHandler
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -89,10 +85,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             return instance
         }
 
-        fun showToast(message: String) {
-            instance?.showToastInternal(message)
-        }
-
         const val ACTION_ACTIVATE_GRID = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_GRID"
         const val ACTION_ACTIVATE_CURSOR = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_CURSOR"
 
@@ -117,16 +109,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
-    private fun showToastInternal(message: String) {
-        mainHandler.post {
-            Toast.makeText(
-                applicationContext,
-                message,
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
-    }
-
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
@@ -143,17 +125,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val settingsFlow = C9.getInstance().getSettingsFlow()
 
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-
-            val displayMetrics = resources.displayMetrics
-            val screenDimensions = ScreenDimensions(
-                width = displayMetrics.widthPixels,
-                height = displayMetrics.heightPixels
-            )
+            orientationHandler = OrientationHandler(this)
 
             serviceManager = AccessibilityServiceManager(
                 service = this,
                 settingsFlow = settingsFlow,
-                screenDimensions = screenDimensions,
+                orientationHandler = orientationHandler,
                 backgroundScope = backgroundScope,
                 mainScope = mainScope,
             )
@@ -165,6 +142,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 mainScope = mainScope,
                 windowManager = windowManager!!,
                 settingsFlow = settingsFlow,
+                orientationHandler = orientationHandler,
                 accessibilityManager = serviceManager,
                 lifecycleOwner = this,
                 savedStateRegistryOwner = this
@@ -259,13 +237,16 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 uiManager.cleanup()
             }
 
+            if (::orientationHandler.isInitialized) {
+                orientationHandler.cleanup()
+            }
+
             try {
                 unregisterReceiver(receiver)
             } catch (e: Exception) {
                 Logger.e("Error unregistering receiver", e)
             }
 
-            mainHandler.removeCallbacksAndMessages(null)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
             Logger.i("Overlay accessibility service destroyed")

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * Manages grid state including visibility, grid hierarchy, and state transitions.
@@ -21,7 +22,8 @@ class GridStateManager(
     private val gridNavigator: GridNavigator,
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
-    private val screenDimensions: ScreenDimensions,
+    private val dimensionsFlow: StateFlow<ScreenDimensions>,
+    private val backgroundScope: CoroutineScope,
     private val onGridStateChanged: (Grid?) -> Unit
 ) {
     private val _gridState = MutableStateFlow<Grid?>(null)
@@ -88,8 +90,10 @@ class GridStateManager(
             val coordinates = gridNavigator.calculateClickCoordinates(grid, cellIndex)
             val (x, y) = coordinates
 
-            gestureManager.startTap(x, y)
-            gestureManager.endTap(x, y)
+            backgroundScope.launch {
+                gestureManager.startTap(x, y)
+                gestureManager.endTap(x, y)
+            }
         }
 
         if (!persistOverlay) {
@@ -99,9 +103,9 @@ class GridStateManager(
         }
     }
 
-    fun resetToMainGrid() {
+    fun resetToMainGrid(force: Boolean = false) {
         val settings = settingsFlow.value
-        if (_gridState.value?.level != null && _gridState.value?.level!! > 1) {
+        if ((_gridState.value?.level != null && _gridState.value?.level!! > 1) || force) {
             val newGrid = Grid.createGrid(settings)
             updateGrid(newGrid)
         }
@@ -109,9 +113,10 @@ class GridStateManager(
 
     fun getCellCoordinates(cellIndex: Int?): Pair<Float, Float> {
         val grid = _gridState.value
+        val dimensions = dimensionsFlow.value
         if (grid == null || !gridNavigator.isValidCellIndex(grid, cellIndex)) {
             // Default to screen center if grid or cell index is null/invalid
-            return Pair(screenDimensions.width / 2f, screenDimensions.height / 2f)
+            return Pair(dimensions.width / 2f, dimensions.height / 2f)
         }
 
         return gridNavigator.calculateClickCoordinates(grid, cellIndex!!)

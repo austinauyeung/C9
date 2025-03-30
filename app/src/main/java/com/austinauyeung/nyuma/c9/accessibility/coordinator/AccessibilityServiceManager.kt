@@ -2,7 +2,9 @@ package com.austinauyeung.nyuma.c9.accessibility.coordinator
 
 import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
+import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.C9
+import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
@@ -21,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Manages grid cursor and standard cursor modes.
@@ -28,7 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class AccessibilityServiceManager(
     private val service: AccessibilityService,
     private val settingsFlow: StateFlow<OverlaySettings>,
-    private val screenDimensions: ScreenDimensions,
+    private val orientationHandler: OrientationHandler,
     private val backgroundScope: CoroutineScope,
     private val mainScope: CoroutineScope
 ) {
@@ -45,6 +49,8 @@ class AccessibilityServiceManager(
 
     private val _currentCursor = MutableStateFlow<CursorState?>(null)
     val currentCursor: StateFlow<CursorState?> = _currentCursor.asStateFlow()
+
+    private val screenDimensionsFlow = orientationHandler.screenDimensions
 
     fun initialize() {
         try {
@@ -63,17 +69,18 @@ class AccessibilityServiceManager(
                 standardStrategy,
                 shizukuStrategy,
                 settingsFlow,
-                screenDimensions,
+                screenDimensionsFlow,
                 backgroundScope
             )
 
             // Grid components
-            gridNavigator = GridNavigator(screenDimensions)
+            gridNavigator = GridNavigator(screenDimensionsFlow)
             gridStateManager = GridStateManager(
                 gridNavigator,
                 gestureManager,
                 settingsFlow,
-                screenDimensions,
+                screenDimensionsFlow,
+                backgroundScope,
                 { grid -> onGridStateChanged(grid) }
             )
             gridActionHandler = GridActionHandler(
@@ -81,13 +88,14 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 backgroundScope,
-                modeCoordinator
+                modeCoordinator,
+                { orientationHandler.getCurrentOrientation() }
             )
 
             // Cursor components
             cursorStateManager = CursorStateManager(
                 settingsFlow,
-                screenDimensions,
+                screenDimensionsFlow,
                 { cursorState -> onCursorStateChanged(cursorState) }
             )
             cursorActionHandler = CursorActionHandler(
@@ -95,13 +103,36 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 backgroundScope,
-                modeCoordinator
+                modeCoordinator,
+                { orientationHandler.getCurrentOrientation() }
             )
+
+            // Listen for orientation changes
+            orientationHandler.screenDimensions
+                .onEach { newDimensions ->
+                    onScreenDimensionsChanged(newDimensions)
+                }
+                .launchIn(backgroundScope)
 
             Logger.i("AccessibilityServiceManager initialization complete")
         } catch (e: Exception) {
             Logger.e("Error initializing AccessibilityServiceManager", e)
             throw e
+        }
+    }
+
+    private fun onScreenDimensionsChanged(newDimensions: ScreenDimensions) {
+        try {
+            if (gridStateManager.isGridVisible()) {
+                gridStateManager.resetToMainGrid(force = true)
+            }
+
+            if (cursorStateManager.isCursorVisible()) {
+                val (centerX, centerY) = newDimensions.center()
+                cursorStateManager.updatePosition(Offset(centerX, centerY))
+            }
+        } catch (e: Exception) {
+            Logger.e("Error handling screen dimensions change", e)
         }
     }
 

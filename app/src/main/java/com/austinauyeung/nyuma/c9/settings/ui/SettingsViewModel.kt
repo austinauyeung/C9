@@ -70,7 +70,8 @@ class SettingsViewModel(
                             scrollMultiplier = settings.scrollMultiplier,
                             allowPassthrough = settings.allowPassthrough,
                             enableShizukuIntegration = settings.enableShizukuIntegration,
-                            hideOnTextField = settings.hideOnTextField
+                            hideOnTextField = settings.hideOnTextField,
+                            rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation
                         )
                     }
                 }
@@ -125,7 +126,8 @@ class SettingsViewModel(
             scrollMultiplier = _uiState.value.scrollMultiplier,
             allowPassthrough = _uiState.value.allowPassthrough,
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
-            hideOnTextField = _uiState.value.hideOnTextField
+            hideOnTextField = _uiState.value.hideOnTextField,
+            rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation
         )
     }
 
@@ -226,6 +228,10 @@ class SettingsViewModel(
         updateSettings { it.copy(hideOnTextField = hide) }
     }
 
+    fun updateRotateButtons(rotate: Boolean) {
+        updateSettings { it.copy(rotateButtonsWithOrientation = rotate) }
+    }
+
     class Factory(
         private val settingsRepository: SettingsRepository,
     ) : ViewModelProvider.Factory {
@@ -266,5 +272,6 @@ data class SettingsUiState(
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
-    val hideOnTextField: Boolean = Defaults.Settings.HIDE_ON_TEXT_FIELD
+    val hideOnTextField: Boolean = Defaults.Settings.HIDE_ON_TEXT_FIELD,
+    val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION
 )

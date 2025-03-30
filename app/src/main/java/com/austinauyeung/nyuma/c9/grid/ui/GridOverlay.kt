@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.domain.GridCell
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -36,6 +37,8 @@ fun GridOverlay(
     grid: Grid,
     opacity: Int = 0,
     hideNumbers: Boolean = false,
+    orientation: OrientationUtil.Orientation = OrientationUtil.Orientation.PORTRAIT,
+    useRotatedNumbers: Boolean = false,
     gridLineVisibility: GridLineVisibility = GridLineVisibility.SHOW_ALL
 ) {
     val textMeasurer = rememberTextMeasurer()
@@ -78,6 +81,14 @@ fun GridOverlay(
         GridLineVisibility.HIDE_ALL -> false
     }
 
+    val gridNumbers = remember(orientation, useRotatedNumbers) {
+        if (useRotatedNumbers) {
+            OrientationUtil.getRotatedGridNumbers(orientation)
+        } else {
+            GridConstants.INITIAL_NUMBERS
+        }
+    }
+
     Canvas(
         modifier = Modifier
             .fillMaxSize()
@@ -97,6 +108,8 @@ fun GridOverlay(
                     dimensions = dimensions,
                     textMeasurer = textMeasurer,
                     textStyle = textStyle,
+                    gridNumbers = gridNumbers,
+                    useRotatedNumbers = useRotatedNumbers
                 )
             }
         }
@@ -174,13 +187,21 @@ private fun DrawScope.drawCell(
     dimensions: GridDimensions,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
+    gridNumbers: Array<Array<Int>>,
+    useRotatedNumbers: Boolean
 ) {
     val left = dimensions.x + (cell.column * dimensions.cellWidth)
     val top = dimensions.y + (cell.row * dimensions.cellHeight)
 
+    val cellNumber = if (useRotatedNumbers) {
+        gridNumbers[cell.row][cell.column]
+    } else {
+        cell.number
+    }
+
     val textLayoutResult =
         textMeasurer.measure(
-            text = cell.number.toString(),
+            text = cellNumber.toString(),
             style = textStyle,
         )
 

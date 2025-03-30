@@ -12,7 +12,7 @@
 <img src='./docs/imgs/Screenshot_20250319_214019.png' width=200>
 </div>
 
-C9 is a dual-cursor application that takes inspiration from T9 to provide clicks using the numpad on Android feature phones. The primary features of the application include:
+C9 is a dual-cursor application that takes inspiration from T9 to provide clicks using the numpad on Android feature phones. Features of the application include:
 
 - 🤖 Android 8.0+ support
 - 🌎 Universal Android 11 compatibility via Shizuku as needed
@@ -20,6 +20,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
 - ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
+- ✨ Additional features such as landscape orientation support and cursor auto-hide in text fields
 
 ## Table of Contents
 - [Overview](#overview)
@@ -29,6 +30,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
   - [Standard Cursor](#standard-cursor)
     - [Instructions](#instructions-1)
     - [Usage](#usage-1)
+- [Recommendations](#recommendations)
 - [Installation](#installation)
 - [Troubleshooting](#troubleshooting)
 - [Known Issues](#known-issues)
@@ -37,8 +39,22 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - [Acknowledgment](#acknowledgments)
 
 ## Overview
-### Grid Cursor
+Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
 
+The following options can be configured, which affects scrolls and zooms in both modes:
+- Natural scrolling
+- Gesture visualizations
+- Gesture style
+  - `Fixed`: gestures are controlled and fixed distance
+  - `Inertia`: gestures resemble touchscreen flicks
+- Gesture duration
+- Scroll distance
+
+Additionally, the following options can be configured to adjust the behavior of the cursors:
+- Auto-hide in text fields
+  - This is application-dependent and may not work reliably.
+
+### Grid Cursor
 <br />
 
 <div align="center">
@@ -72,9 +88,9 @@ The following options can be configured:
 - To activate the grid cursor:
     - Hold the activation key.
     - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
+- See the table below for gesture dispatch.
 - When activated, press the activation key to quickly reset any grid back to the main grid.
 - When activated, press any number to advance to the next subgrid.
-- See the table below for gesture dispatch.
 - To deactivate, hold the activation key.
     - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
 
@@ -118,7 +134,6 @@ The following options can be configured:
     - Hold the activation key.
     - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
 - See the table below for gesture dispatch.
-- When activated, either D-pad center or numpad 5 can be used to long press. For example, in the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
 - When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
 - To deactivate, hold the activation key.
     - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
@@ -135,21 +150,13 @@ All gestures are dispatched at the cursor's current location:
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. |
 | Zoom | Numpad 1 and 3. |
 
-### Common
-Because of their different navigation paradigms, each cursor mode maps gestures uniquely as shown in the above tables. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
-
-The following options can be configured, which affects scrolls and zooms in both modes:
-- Natural scrolling
-- Gesture visualizations
-- Gesture style
-  - `Fixed`: gestures are controlled and fixed distance
-  - `Inertia`: gestures resemble touchscreen flicks
-- Gesture duration
-- Scroll distance
-
-Additionally, the following options can be configured to adjust the behavior of the cursors:
-- Auto-hide in text fields
-  - This is application-dependent and may not work reliably.
+### Recommendations
+- For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
+- In the standard cursor mode with the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
+- If the device is in landscape orientation, the appropriate buttons in each mode can also rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled:
+  - Grid cursor: D-pad rotates, numpad 1-9 rotates (along with the on-screen grid), zoom and activation remain unchanged
+  - Standard cursor: D-pad rotates, numpad 2/4/6/8 rotates, zoom and activation remain unchanged
+  - Example: If the device is rotated to the left, D-pad left becomes D-pad down.
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
@@ -220,6 +227,9 @@ A green banner on the main page indicates that Shizuku authorization has been gr
 <img src='./docs/imgs/Screenshot_20250328_194745.png' width=200>
 <img src='./docs/imgs/Screenshot_20250328_194815.png' width=200>
 </div>
+
+### Activation key stops working
+If you are unable to deactivate the cursor, clear the activation key, which disables that cursor and hides any active cursor.
 
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.

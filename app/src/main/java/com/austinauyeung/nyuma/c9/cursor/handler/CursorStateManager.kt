@@ -25,7 +25,7 @@ import kotlin.math.sqrt
  */
 class CursorStateManager(
     private val settingsFlow: StateFlow<OverlaySettings>,
-    private val screenDimensions: ScreenDimensions,
+    private val dimensionsFlow: StateFlow<ScreenDimensions>,
     private val onCursorStateChanged: (CursorState?) -> Unit
 ) {
     private val _cursorState = MutableStateFlow<CursorState?>(null)
@@ -71,7 +71,8 @@ class CursorStateManager(
     fun isInScrollMode(): Boolean = _cursorState.value?.inScrollMode == true
 
     private fun showCursor() {
-        val (centerX, centerY) = screenDimensions.center()
+        val dimensions = dimensionsFlow.value
+        val (centerX, centerY) = dimensions.center()
         val initialPosition = Offset(centerX, centerY)
 
         val newCursor = CursorState(
@@ -111,12 +112,13 @@ class CursorStateManager(
     }
 
     fun calculateFrameSpeed(timeHeld: Long): Float {
+        val dimensions = dimensionsFlow.value
         val settings = settingsFlow.value
         val currentExponent = settings.cursorSpeed.toFloat().pow(CursorConstants.DEFAULT_EXPONENT)
         val maxExponent = CursorConstants.MAX_SPEED.toFloat().pow(CursorConstants.DEFAULT_EXPONENT)
         val baseSpeed = CursorConstants.DEFAULT_SPEED_MULTIPLIER * currentExponent
 
-        val totalPixels = screenDimensions.width * screenDimensions.height
+        val totalPixels = dimensions.width * dimensions.height
         val screenScaleFactor = sqrt(totalPixels.toFloat()) / 1000f
 
         val speed = if (timeHeld > settings.cursorAccelerationThreshold) {
@@ -143,6 +145,7 @@ class CursorStateManager(
     }
 
     fun applyMovement(delta: Offset): Offset {
+        val dimensions = dimensionsFlow.value
         val currentState = _cursorState.value ?: return Offset.Zero
         val settings = settingsFlow.value
 
@@ -153,18 +156,18 @@ class CursorStateManager(
         return if (settings.cursorWrapAround) {
             Offset(
                 x = when {
-                    newX < 0 -> screenDimensions.width.toFloat()
-                    newX > screenDimensions.width -> 0f
+                    newX < 0 -> dimensions.width.toFloat()
+                    newX > dimensions.width -> 0f
                     else -> newX
                 },
                 y = when {
-                    newY < 0 -> screenDimensions.height.toFloat()
-                    newY > screenDimensions.height -> 0f
+                    newY < 0 -> dimensions.height.toFloat()
+                    newY > dimensions.height -> 0f
                     else -> newY
                 }
             )
         } else {
-            screenDimensions.constrainToBounds(newX, newY).let { (x, y) -> Offset(x, y) }
+            dimensions.constrainToBounds(newX, newY).let { (x, y) -> Offset(x, y) }
         }
     }
 }

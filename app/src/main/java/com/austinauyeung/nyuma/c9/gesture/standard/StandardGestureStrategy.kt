@@ -106,7 +106,7 @@ class StandardGestureStrategy(
         return null
     }
 
-    override fun performScroll(
+    override suspend fun performScroll(
         direction: ScrollDirection,
         startX: Float,
         startY: Float,
@@ -148,7 +148,7 @@ class StandardGestureStrategy(
         }
     }
 
-    override fun performZoom(
+    override suspend fun performZoom(
         isZoomIn: Boolean,
         startX1: Float, startY1: Float,
         startX2: Float, startY2: Float,
@@ -203,7 +203,7 @@ class StandardGestureStrategy(
         }
     }
 
-    override fun startTap(x: Float, y: Float): Boolean {
+    override suspend fun startTap(x: Float, y: Float): Boolean {
         try {
             Logger.d("StandardGestureStrategy: starting tap at ($x, $y)")
 
@@ -244,7 +244,7 @@ class StandardGestureStrategy(
         }
     }
 
-    override fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
         try {
             Logger.d("StandardGestureStrategy: dragging from ($fromX, $fromY) to ($toX, $toY)")
 
@@ -294,7 +294,7 @@ class StandardGestureStrategy(
         }
     }
 
-    override fun endTap(finalX: Float, finalY: Float): Boolean {
+    override suspend fun endTap(finalX: Float, finalY: Float): Boolean {
         try {
             Logger.d("StandardGestureStrategy: ending tap at ($finalX, $finalY)")
 
