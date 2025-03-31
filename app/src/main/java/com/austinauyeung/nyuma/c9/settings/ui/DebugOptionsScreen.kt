@@ -58,10 +58,10 @@ fun DebugOptionsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             PreferenceCategory(title = "Shizuku") {
-                val switchEnabled = (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) || BuildConfig.DEBUG
+                val switchEnabled = true
                 SwitchPreferenceItem(
                     title = "Enable Shizuku Integration",
-                    subtitle = "Required for certain Android 11 devices",
+                    subtitle = "Recommended for Android 8 and required for certain Android 11 devices",
                     checked = uiState.enableShizukuIntegration,
                     onCheckedChange = { newValue ->
                         if (switchEnabled) {
