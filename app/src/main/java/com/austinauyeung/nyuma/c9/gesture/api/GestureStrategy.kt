@@ -7,11 +7,11 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
  */
 interface GestureStrategy {
     suspend fun performScroll(
-        direction: ScrollDirection,
         startX: Float,
         startY: Float,
         endX: Float,
-        endY: Float
+        endY: Float,
+        forceFixedScroll: Boolean
     ): Boolean
 
     suspend fun performZoom(

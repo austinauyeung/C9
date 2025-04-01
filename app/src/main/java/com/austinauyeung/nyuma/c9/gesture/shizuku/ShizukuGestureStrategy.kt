@@ -105,15 +105,15 @@ class ShizukuGestureStrategy(
     }
 
     override suspend fun performScroll(
-        direction: ScrollDirection,
         startX: Float,
         startY: Float,
         endX: Float,
-        endY: Float
+        endY: Float,
+        forceFixedScroll: Boolean
     ): Boolean {
         if (!isAvailable()) return false
 
-        Logger.d("Using Shizuku to scroll $direction from ($startX, $startY) to ($endX, $endY)")
+        Logger.d("Using Shizuku to scroll from ($startX, $startY) to ($endX, $endY)")
 
         try {
             mainScope.launch {
@@ -153,7 +153,7 @@ class ShizukuGestureStrategy(
                 finalMoveEvent.recycle()
 
                 // For fixed scrolling, cancel event to remove inertia
-                if (settingsFlow.value.gestureStyle == GestureStyle.FIXED) {
+                if (settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedScroll) {
                     val cancelEvent = createMotionEvent(
                         downTime,
                         downTime + duration + GestureConstants.SCROLL_END_PAUSE,

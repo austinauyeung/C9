@@ -24,97 +24,88 @@ class StandardGestureStrategy(
     private var activeStroke: GestureDescription.StrokeDescription? = null
 
     // Callbacks to pause for fixed gesture style
-    private fun createGestureCallback(
+    private fun pauseGestureCallback(
         stroke: GestureDescription.StrokeDescription,
         endX: Float,
         endY: Float
-    ): AccessibilityService.GestureResultCallback? {
-        val settings = settingsFlow.value
-
-        if (settings.gestureStyle == GestureStyle.FIXED) {
-            return object : AccessibilityService.GestureResultCallback() {
-                override fun onCompleted(gestureDescription: GestureDescription?) {
-                    val pausePath = Path().apply {
-                        moveTo(endX, endY)
-                    }
-
-                    val pauseStrokeDescription = stroke.continueStroke(
-                        pausePath,
-                        0,
-                        GestureConstants.SCROLL_END_PAUSE,
-                        false
-                    )
-
-                    val pauseGesture = GestureDescription.Builder()
-                        .addStroke(pauseStrokeDescription)
-                        .build()
-
-                    service.dispatchGesture(pauseGesture, null, null)
+    ): AccessibilityService.GestureResultCallback {
+        return object : AccessibilityService.GestureResultCallback() {
+            override fun onCompleted(gestureDescription: GestureDescription?) {
+                val pausePath = Path().apply {
+                    moveTo(endX, endY)
                 }
+
+                val pauseStrokeDescription = stroke.continueStroke(
+                    pausePath,
+                    0,
+                    GestureConstants.SCROLL_END_PAUSE,
+                    false
+                )
+
+                val pauseGesture = GestureDescription.Builder()
+                    .addStroke(pauseStrokeDescription)
+                    .build()
+
+                service.dispatchGesture(pauseGesture, null, null)
             }
         }
-        return null
     }
 
-    private fun createGestureCallback(
+    private fun pauseGestureCallback(
         stroke1: GestureDescription.StrokeDescription,
         stroke2: GestureDescription.StrokeDescription,
         endX1: Float, endY1: Float,
         endX2: Float, endY2: Float,
-    ): AccessibilityService.GestureResultCallback? {
-        val settings = settingsFlow.value
-
-        if (settings.gestureStyle == GestureStyle.FIXED) {
-            return object : AccessibilityService.GestureResultCallback() {
-                override fun onCompleted(gestureDescription: GestureDescription?) {
-                    Logger.d("StandardGestureStrategy: zoom completed")
-                    val finger1PausePath = Path().apply {
-                        moveTo(endX1, endY1)
-                    }
-
-                    val finger2PausePath = Path().apply {
-                        moveTo(endX2, endY2)
-                    }
-
-                    val stroke1Pause = stroke1.continueStroke(
-                        finger1PausePath,
-                        0,
-                        GestureConstants.SCROLL_END_PAUSE,
-                        false
-                    )
-
-                    val stroke2Pause = stroke2.continueStroke(
-                        finger2PausePath,
-                        0,
-                        GestureConstants.SCROLL_END_PAUSE,
-                        false
-                    )
-
-                    val pauseGesture = GestureDescription.Builder()
-                        .addStroke(stroke1Pause)
-                        .addStroke(stroke2Pause)
-                        .build()
-
-                    service.dispatchGesture(pauseGesture, null, null)
+    ): AccessibilityService.GestureResultCallback {
+        return object : AccessibilityService.GestureResultCallback() {
+            override fun onCompleted(gestureDescription: GestureDescription?) {
+                Logger.d("StandardGestureStrategy: zoom completed")
+                val finger1PausePath = Path().apply {
+                    moveTo(endX1, endY1)
                 }
 
-                override fun onCancelled(gestureDescription: GestureDescription?) {
-                    Logger.d("StandardGestureStrategy: zoom cancelled")
+                val finger2PausePath = Path().apply {
+                    moveTo(endX2, endY2)
                 }
+
+                val stroke1Pause = stroke1.continueStroke(
+                    finger1PausePath,
+                    0,
+                    GestureConstants.SCROLL_END_PAUSE,
+                    false
+                )
+
+                val stroke2Pause = stroke2.continueStroke(
+                    finger2PausePath,
+                    0,
+                    GestureConstants.SCROLL_END_PAUSE,
+                    false
+                )
+
+                val pauseGesture = GestureDescription.Builder()
+                    .addStroke(stroke1Pause)
+                    .addStroke(stroke2Pause)
+                    .build()
+
+                service.dispatchGesture(pauseGesture, null, null)
+            }
+
+            override fun onCancelled(gestureDescription: GestureDescription?) {
+                Logger.d("StandardGestureStrategy: zoom cancelled")
             }
         }
-        return null
     }
 
     override suspend fun performScroll(
-        direction: ScrollDirection,
         startX: Float,
         startY: Float,
         endX: Float,
-        endY: Float
+        endY: Float,
+        forceFixedScroll: Boolean
     ): Boolean {
         try {
             val settings = settingsFlow.value
+            val willContinue = (settings.gestureStyle == GestureStyle.FIXED) || forceFixedScroll
 
             Logger.d("StandardGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
 
@@ -127,7 +118,7 @@ class StandardGestureStrategy(
                     scrollPath,
                     0,
                     settings.gestureDuration,
-                    settings.gestureStyle == GestureStyle.FIXED
+                    willContinue
                 )
 
             val gesture =
@@ -137,7 +128,7 @@ class StandardGestureStrategy(
 
             service.dispatchGesture(
                 gesture,
-                createGestureCallback(mainStrokeDescription, endX, endY),
+                if (willContinue) pauseGestureCallback(mainStrokeDescription, endX, endY) else null,
                 null
             )
 
@@ -157,6 +148,7 @@ class StandardGestureStrategy(
     ): Boolean {
         try {
             val settings = settingsFlow.value
+            val willContinue = settings.gestureStyle == GestureStyle.FIXED
 
             Logger.d("StandardGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
 
@@ -173,14 +165,14 @@ class StandardGestureStrategy(
                 path1,
                 0,
                 settings.gestureDuration,
-                settings.gestureStyle == GestureStyle.FIXED
+                willContinue
             )
 
             val stroke2 = GestureDescription.StrokeDescription(
                 path2,
                 0,
                 settings.gestureDuration,
-                settings.gestureStyle == GestureStyle.FIXED
+                willContinue
             )
 
             val gestureBuilder = GestureDescription.Builder()
@@ -191,7 +183,7 @@ class StandardGestureStrategy(
 
             service.dispatchGesture(
                 gesture,
-                createGestureCallback(stroke1, stroke2, endX1, endY1, endX2, endY2),
+                if (willContinue) pauseGestureCallback(stroke1, stroke2, endX1, endY1, endX2, endY2) else null,
                 null
             )
 

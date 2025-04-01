@@ -263,7 +263,7 @@ class GridActionHandler(
                     continuousScrollJob = backgroundScope.launch {
                         delay(initialDelay)
                         while (currentScrollDirection == direction) {
-                            gestureManager.performScroll(direction, x, y)
+                            gestureManager.performScroll(direction, x, y, true)
                             delay(gestureInterval)
                         }
                     }

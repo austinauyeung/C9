@@ -337,7 +337,7 @@ class CursorActionHandler(
                     continuousScrollJob = backgroundScope.launch {
                         delay(initialDelay)
                         while (currentScrollDirection == direction) {
-                            performScroll(direction)
+                            performScroll(direction, true)
                             delay(gestureInterval)
                         }
                     }
@@ -437,9 +437,9 @@ class CursorActionHandler(
         }
     }
 
-    private suspend fun performScroll(direction: ScrollDirection): Boolean {
+    private suspend fun performScroll(direction: ScrollDirection, forceFixedScroll: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
-        gestureManager.performScroll(direction, cursorState.position.x, cursorState.position.y)
+        gestureManager.performScroll(direction, cursorState.position.x, cursorState.position.y, forceFixedScroll)
 
         return true
     }
