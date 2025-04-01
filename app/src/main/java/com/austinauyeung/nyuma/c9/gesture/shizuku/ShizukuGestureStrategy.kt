@@ -152,20 +152,28 @@ class ShizukuGestureStrategy(
                 injectEvent(finalMoveEvent)
                 finalMoveEvent.recycle()
 
-                // Pause at the end for fixed scrolling
+                // For fixed scrolling, cancel event to remove inertia
                 if (settingsFlow.value.gestureStyle == GestureStyle.FIXED) {
-                    delay(GestureConstants.SCROLL_END_PAUSE)
+                    val cancelEvent = createMotionEvent(
+                        downTime,
+                        downTime + duration + GestureConstants.SCROLL_END_PAUSE,
+                        MotionEvent.ACTION_CANCEL,
+                        endX,
+                        endY
+                    )
+                    injectEvent(cancelEvent)
+                    cancelEvent.recycle()
+                } else {
+                    val upEvent = createMotionEvent(
+                        downTime,
+                        downTime + duration + GestureConstants.SCROLL_END_PAUSE,
+                        MotionEvent.ACTION_UP,
+                        endX,
+                        endY
+                    )
+                    injectEvent(upEvent)
+                    upEvent.recycle()
                 }
-
-                val upEvent = createMotionEvent(
-                    downTime,
-                    downTime + duration + GestureConstants.SCROLL_END_PAUSE,
-                    MotionEvent.ACTION_UP,
-                    endX,
-                    endY
-                )
-                injectEvent(upEvent)
-                upEvent.recycle()
             }
 
             return true
@@ -264,43 +272,50 @@ class ShizukuGestureStrategy(
                 }
 
                 val finalTime = downTime + duration + interEventDelayMs
-
-                val pointerUpEvent = createMotionEvent(
-                    downTime, finalTime,
-                    MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
-                    2,
-                    intArrayOf(0, 1),
-                    floatArrayOf(endX1, endX2),
-                    floatArrayOf(endY1, endY2)
-                )
-
-                val pointerUpResult = injectEvent(pointerUpEvent)
-                pointerUpEvent.recycle()
-
-                if (!pointerUpResult) {
-                    Logger.e("Failed to inject pointer up event")
-                }
-
-                delay(interEventDelayMs)
-
-                val upEvent = createMotionEvent(
-                    downTime, finalTime + interEventDelayMs,
-                    MotionEvent.ACTION_UP,
-                    1,
-                    intArrayOf(0),
-                    floatArrayOf(endX1),
-                    floatArrayOf(endY1)
-                )
-
-                val upResult = injectEvent(upEvent)
-                upEvent.recycle()
-
-                if (!upResult) {
-                    Logger.e("Failed to inject up event")
-                }
-
                 if (settingsFlow.value.gestureStyle == GestureStyle.FIXED) {
-                    delay(GestureConstants.SCROLL_END_PAUSE)
+                    val cancelEvent = createMotionEvent(
+                        downTime, finalTime,
+                        MotionEvent.ACTION_CANCEL,
+                        2,
+                        intArrayOf(0, 1),
+                        floatArrayOf(endX1, endX2),
+                        floatArrayOf(endY1, endY2)
+                    )
+                    injectEvent(cancelEvent)
+                    cancelEvent.recycle()
+                } else {
+                    val pointerUpEvent = createMotionEvent(
+                        downTime, finalTime,
+                        MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+                        2,
+                        intArrayOf(0, 1),
+                        floatArrayOf(endX1, endX2),
+                        floatArrayOf(endY1, endY2)
+                    )
+
+                    val pointerUpResult = injectEvent(pointerUpEvent)
+                    pointerUpEvent.recycle()
+
+                    if (!pointerUpResult) {
+                        Logger.e("Failed to inject pointer up event")
+                    }
+
+                    delay(interEventDelayMs)
+                    val upEvent = createMotionEvent(
+                        downTime, finalTime + interEventDelayMs,
+                        MotionEvent.ACTION_UP,
+                        1,
+                        intArrayOf(0),
+                        floatArrayOf(endX1),
+                        floatArrayOf(endY1)
+                    )
+
+                    val upResult = injectEvent(upEvent)
+                    upEvent.recycle()
+
+                    if (!upResult) {
+                        Logger.e("Failed to inject up event")
+                    }
                 }
             }
             return true
