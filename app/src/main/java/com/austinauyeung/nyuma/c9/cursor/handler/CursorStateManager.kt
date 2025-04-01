@@ -52,7 +52,7 @@ class CursorStateManager(
     // Only applies to toggle schema
     fun toggleScrollMode(): Boolean {
         val settings = settingsFlow.value
-        if (settings.controlScheme != ControlScheme.TOGGLE_MODE || !isCursorVisible()) {
+        if (settings.controlScheme !in setOf(ControlScheme.DPAD_TOGGLE, ControlScheme.NUMPAD_TOGGLE) || !isCursorVisible()) {
             return false
         }
 

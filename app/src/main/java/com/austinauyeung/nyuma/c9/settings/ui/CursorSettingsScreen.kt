@@ -190,14 +190,16 @@ fun CursorSettingsScreen(
                     when (uiState.controlScheme) {
                         ControlScheme.STANDARD -> "D-pad moves, numpad scrolls"
                         ControlScheme.SWAPPED -> "D-pad scrolls, numpad moves"
-                        else -> "D-pad scrolls and moves"
+                        ControlScheme.DPAD_TOGGLE -> "D-pad scrolls and moves"
+                        else -> "Numpad scrolls and moves"
                     },
                     selectedOption = uiState.controlScheme,
                     options =
                     listOf(
                         ControlScheme.STANDARD to "Standard",
                         ControlScheme.SWAPPED to "Swapped",
-                        ControlScheme.TOGGLE_MODE to "Toggle",
+                        ControlScheme.DPAD_TOGGLE to "D-pad",
+                        ControlScheme.NUMPAD_TOGGLE to "Numpad"
                     ),
                     onOptionSelected = { value ->
                         viewModel.updatePreference(value) { settings, v ->

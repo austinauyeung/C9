@@ -128,7 +128,7 @@ class CursorActionHandler(
                         Pair(movementKeys, scrollKeys)
                     }
 
-                    ControlScheme.TOGGLE_MODE -> {
+                    ControlScheme.DPAD_TOGGLE -> {
                         if (cursorStateManager.isInScrollMode()) {
                             Pair(
                                 emptySet(),
@@ -146,6 +146,30 @@ class CursorActionHandler(
                                     KeyEvent.KEYCODE_DPAD_DOWN,
                                     KeyEvent.KEYCODE_DPAD_LEFT,
                                     KeyEvent.KEYCODE_DPAD_RIGHT
+                                ),
+                                emptySet()
+                            )
+                        }
+                    }
+
+                    ControlScheme.NUMPAD_TOGGLE -> {
+                        if (cursorStateManager.isInScrollMode()) {
+                            Pair(
+                                emptySet(),
+                                setOf(
+                                    KeyEvent.KEYCODE_2,
+                                    KeyEvent.KEYCODE_8,
+                                    KeyEvent.KEYCODE_4,
+                                    KeyEvent.KEYCODE_6
+                                )
+                            )
+                        } else {
+                            Pair(
+                                setOf(
+                                    KeyEvent.KEYCODE_2,
+                                    KeyEvent.KEYCODE_8,
+                                    KeyEvent.KEYCODE_4,
+                                    KeyEvent.KEYCODE_6
                                 ),
                                 emptySet()
                             )
@@ -267,7 +291,7 @@ class CursorActionHandler(
                 if (cursorStateManager.isCursorVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
                     if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
-                        if (settings.controlScheme == ControlScheme.TOGGLE_MODE) {
+                        if (settings.controlScheme == ControlScheme.DPAD_TOGGLE || settings.controlScheme == ControlScheme.NUMPAD_TOGGLE) {
                             cursorStateManager.toggleScrollMode()
 
                             if (isGestureActive) {
