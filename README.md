@@ -174,7 +174,7 @@ Install using adb:
 ```
 
 ### Additional installation for Android 11
-If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Debug Options > Enable Shizuku Integration`.
+If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
 
@@ -184,7 +184,7 @@ Note that unless your device is rooted, you will need to restart the Shizuku ser
 <img src='./docs/gifs/Screen_recording_20250328_195409.gif' width=200>
 </div>
 
-If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Debug Options > Log Screen`, activate the cursor, and perform the corresponding gesture(s). Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
+If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Developer Options > Log Screen`, activate the cursor, and perform the corresponding gesture(s). Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
 
 ```
 --- SYSTEM INFORMATION ---

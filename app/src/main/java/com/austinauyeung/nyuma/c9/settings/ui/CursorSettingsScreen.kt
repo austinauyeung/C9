@@ -199,21 +199,33 @@ fun CursorSettingsScreen(
                         ControlScheme.SWAPPED to "Swapped",
                         ControlScheme.TOGGLE_MODE to "Toggle",
                     ),
-                    onOptionSelected = { viewModel.updateControlScheme(it) },
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(controlScheme = v)
+                        }
+                    },
                 )
 
                 SwitchPreferenceItem(
                     title = "Cursor Wrap Around",
                     subtitle = "Allow cursor to wrap around edges of the screen",
                     checked = uiState.cursorWrapAround,
-                    onCheckedChange = { viewModel.updateCursorWrapAround(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorWrapAround = v)
+                        }
+                    },
                 )
 
 //                SwitchPreferenceItem(
 //                    title = "Long Press Hold",
 //                    subtitle = "Press both action keys to toggle hold",
 //                    checked = uiState.toggleHold,
-//                    onCheckedChange = { viewModel.updateToggleHold(it) },
+//                    onCheckedChange = { value ->
+//                        viewModel.updatePreference(value) { settings, v ->
+//                            settings.copy(toggleHold = v)
+//                        }
+//                    },
 //                )
             }
 
@@ -230,7 +242,11 @@ fun CursorSettingsScreen(
                         4 -> "Fast"
                         else -> "Fastest"
                     },
-                    onValueChange = { viewModel.updateCursorSpeed(it.toInt()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorSpeed = v.toInt())
+                        }
+                    },
                     steps = 3,
                 )
 
@@ -246,7 +262,11 @@ fun CursorSettingsScreen(
                         4 -> "Strong"
                         else -> "Maximum"
                     },
-                    onValueChange = { viewModel.updateCursorAcceleration(it.toInt()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorAcceleration = v.toInt())
+                        }
+                    },
                     steps = 3,
                 )
 
@@ -263,7 +283,11 @@ fun CursorSettingsScreen(
                         500L -> "Slowest"
                         else -> ""
                     },
-                    onValueChange = { viewModel.updateCursorAccelerationThreshold(it.toLong()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorAccelerationThreshold = v.toLong())
+                        }
+                    },
                     steps = 3,
                 )
 
@@ -280,7 +304,11 @@ fun CursorSettingsScreen(
                         5 -> "Largest"
                         else -> ""
                     },
-                    onValueChange = { viewModel.updateCursorSize(it.toInt()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorSize = v.toInt())
+                        }
+                    },
                     steps = 3,
                 )
             }

@@ -131,48 +131,12 @@ class SettingsViewModel(
         )
     }
 
-    fun updateGridLevels(levels: Int) {
-        updateSettings { it.copy(gridLevels = levels) }
-    }
-
-    fun updateOverlayOpacity(opacity: Int) {
-        updateSettings { it.copy(overlayOpacity = opacity) }
-    }
-
-    fun updatePersistOverlay(persist: Boolean) {
-        updateSettings { it.copy(persistOverlay = persist) }
-    }
-
-    fun updateHideNumbers(hide: Boolean) {
-        updateSettings { it.copy(hideNumbers = hide) }
+    fun <T> updatePreference(value: T, updater: (OverlaySettings, T) -> OverlaySettings) {
+        updateSettings { settings -> updater(settings, value) }
     }
 
     fun updateAccessibilityServiceStatus(isEnabled: Boolean) {
         _uiState.update { it.copy(isAccessibilityServiceEnabled = isEnabled) }
-    }
-
-    fun updateNaturalScrolling(useNatural: Boolean) {
-        updateSettings { it.copy(useNaturalScrolling = useNatural) }
-    }
-
-    fun updateGestureVisualization(useVisual: Boolean) {
-        updateSettings { it.copy(showGestureVisualization = useVisual) }
-    }
-
-    fun updateCursorSpeed(speed: Int) {
-        updateSettings { it.copy(cursorSpeed = speed) }
-    }
-
-    fun updateCursorAcceleration(acc: Int) {
-        updateSettings { it.copy(cursorAcceleration = acc) }
-    }
-
-    fun updateCursorSize(size: Int) {
-        updateSettings { it.copy(cursorSize = size) }
-    }
-
-    fun updateCursorAccelerationThreshold(threshold: Long) {
-        updateSettings { it.copy(cursorAccelerationThreshold = threshold) }
     }
 
     fun updateGridActivationKey(keyCode: Int) {
@@ -188,48 +152,12 @@ class SettingsViewModel(
         serviceInstance?.forceHideAllOverlays()
     }
 
-    fun updateControlScheme(scheme: ControlScheme) {
-        updateSettings { it.copy(controlScheme = scheme) }
-    }
-
-    fun updateCursorWrapAround(wrapAround: Boolean) {
-        updateSettings { it.copy(cursorWrapAround = wrapAround) }
-    }
-
-    fun updateGestureStyle(type: GestureStyle) {
-        updateSettings { it.copy(gestureStyle = type) }
-    }
-
-    fun updateToggleHold(hold: Boolean) {
-        updateSettings { it.copy(toggleHold = hold) }
-    }
-
-    fun updateGestureDuration(duration: Long) {
-        updateSettings { it.copy(gestureDuration = duration) }
-    }
-
-    fun updateScrollMultiplier(mult: Float) {
-        updateSettings { it.copy(scrollMultiplier = mult) }
-    }
-
     fun updateAllowPassthrough(allow: Boolean) {
         updateSettings { it.copy(allowPassthrough = allow) }
     }
 
-    fun updateGridLineVisibility(visibility: GridLineVisibility) {
-        updateSettings { it.copy(gridLineVisibility = visibility) }
-    }
-
     fun updateEnableShizukuIntegration(integrate: Boolean) {
         updateSettings { it.copy(enableShizukuIntegration = integrate) }
-    }
-
-    fun updateHideOnTextField(hide: Boolean) {
-        updateSettings { it.copy(hideOnTextField = hide) }
-    }
-
-    fun updateRotateButtons(rotate: Boolean) {
-        updateSettings { it.copy(rotateButtonsWithOrientation = rotate) }
     }
 
     class Factory(

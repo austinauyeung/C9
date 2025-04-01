@@ -140,14 +140,22 @@ fun SettingsScreen(
                     title = "Natural Scrolling",
                     subtitle = "Use content-based scrolling instead of standard scrolling",
                     checked = uiState.useNaturalScrolling,
-                    onCheckedChange = { viewModel.updateNaturalScrolling(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(useNaturalScrolling = v)
+                        }
+                    }
                 )
 
                 SwitchPreferenceItem(
                     title = "Gesture Visualization",
                     subtitle = "Show gestures on screen",
                     checked = uiState.showGestureVisualization,
-                    onCheckedChange = { viewModel.updateGestureVisualization(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(showGestureVisualization = v)
+                        }
+                    },
                 )
 
                 DropdownPreferenceItem(
@@ -163,7 +171,11 @@ fun SettingsScreen(
                         GestureStyle.FIXED to "Fixed",
                         GestureStyle.INERTIA to "Inertia",
                     ),
-                    onOptionSelected = { viewModel.updateGestureStyle(it) },
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(gestureStyle = v)
+                        }
+                    },
                 )
 
                 SliderPreferenceItem(
@@ -179,7 +191,11 @@ fun SettingsScreen(
                         500L -> "Slowest"
                         else -> ""
                     },
-                    onValueChange = { viewModel.updateGestureDuration(it.toLong()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(gestureDuration = v.toLong())
+                        }
+                    },
                     steps = 3,
                 )
 
@@ -196,7 +212,11 @@ fun SettingsScreen(
                         0.7f -> "Longest"
                         else -> ""
                     },
-                    onValueChange = { viewModel.updateScrollMultiplier(it) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(scrollMultiplier = v)
+                        }
+                    },
                     steps = 3,
                 )
             }
@@ -206,20 +226,28 @@ fun SettingsScreen(
                     title = "Auto-Hide in Text Fields",
                     subtitle = "Attempt to detect text fields and temporarily hide cursor",
                     checked = uiState.hideOnTextField,
-                    onCheckedChange = { viewModel.updateHideOnTextField(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideOnTextField = v)
+                        }
+                    },
                 )
                 SwitchPreferenceItem(
                     title = "Rotate Buttons With Orientation",
                     subtitle = "Rotate certain D-pad and numpad buttons with the screen",
                     checked = uiState.rotateButtonsWithOrientation,
-                    onCheckedChange = { viewModel.updateRotateButtons(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(rotateButtonsWithOrientation = v)
+                        }
+                    },
                 )
             }
 
-            PreferenceCategory(title = "Miscellaneous") {
+            PreferenceCategory(title = "Advanced") {
                 NavigationItem(
-                    title = "Debug Options",
-                    subtitle = "Logging and experimental features",
+                    title = "Developer Options",
+                    subtitle = "Additional features for non-standard operation",
                     onClick = onNavigateToDebugOptions
                 )
             }

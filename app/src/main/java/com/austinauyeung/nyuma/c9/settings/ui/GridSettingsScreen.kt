@@ -145,13 +145,21 @@ fun GridSettingsScreen(
                         3 -> stringResource(R.string.settings_grid_levels_3)
                         else -> stringResource(R.string.settings_grid_levels_4)
                     },
-                    onValueChange = { viewModel.updateGridLevels(it.toInt()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(gridLevels = v.toInt())
+                        }
+                    },
                 )
                 SwitchPreferenceItem(
                     title = "Persistent Overlay",
                     subtitle = "Keep overlay visible after final selection",
                     checked = uiState.persistOverlay,
-                    onCheckedChange = { viewModel.updatePersistOverlay(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(persistOverlay = v)
+                        }
+                    },
                 )
             }
 
@@ -161,7 +169,11 @@ fun GridSettingsScreen(
                     value = uiState.overlayOpacity.toFloat(),
                     valueRange = GridConstants.MIN_OPACITY.toFloat()..GridConstants.MAX_OPACITY.toFloat(),
                     valueText = "${uiState.overlayOpacity}%",
-                    onValueChange = { viewModel.updateOverlayOpacity(it.toInt()) },
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(overlayOpacity = v.toInt())
+                        }
+                    },
                     steps = 7,
                 )
 
@@ -169,7 +181,11 @@ fun GridSettingsScreen(
                     title = "Hide Numbers",
                     subtitle = "Hide cell numbers in the grid",
                     checked = uiState.hideNumbers,
-                    onCheckedChange = { viewModel.updateHideNumbers(it) },
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideNumbers = v)
+                        }
+                    },
                 )
 
                 DropdownPreferenceItem(
@@ -185,7 +201,11 @@ fun GridSettingsScreen(
                         GridLineVisibility.FINAL_LEVEL_ONLY to "Final",
                         GridLineVisibility.HIDE_ALL to "Hide"
                     ),
-                    onOptionSelected = { viewModel.updateGridLineVisibility(it) },
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(gridLineVisibility = v)
+                        }
+                    },
                 )
             }
         }

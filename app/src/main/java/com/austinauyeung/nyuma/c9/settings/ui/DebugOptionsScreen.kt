@@ -39,7 +39,7 @@ fun DebugOptionsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Debug Options") },
+                title = { Text("Developer Options") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -57,6 +57,14 @@ fun DebugOptionsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
+            PreferenceCategory(title = "Logging") {
+                NavigationItem(
+                    title = "Log Screen",
+                    subtitle = "View application logs",
+                    onClick = onNavigateToLogScreen,
+                )
+            }
+
             PreferenceCategory(title = "Shizuku") {
                 val switchEnabled = true
                 SwitchPreferenceItem(
@@ -100,14 +108,6 @@ fun DebugOptionsScreen(
                             Text("Cancel")
                         }
                     }
-                )
-            }
-
-            PreferenceCategory(title = "Logging") {
-                NavigationItem(
-                    title = "Log Screen",
-                    subtitle = "View application logs",
-                    onClick = onNavigateToLogScreen,
                 )
             }
 
