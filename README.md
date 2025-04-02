@@ -88,12 +88,12 @@ The following options can be configured:
 | Action | Mapped buttons | Gesture location | Advances grid | Notes |
 | --- | --- | --- | --- | --- |
 | Activate/Deactivate | Hold the internal activation key or use a button mapper to map the "Activate Grid Cursor" shortcut. | N/A | N/A | The default internal activation key is the pound (#) key. This can be remapped or unmapped internally. Avoid using buttons in the D-pad or numpad for activation, as they will clash with the gestures below. ||
-| Navigate grid | Click numpad 1-9. | The selected number. | True ||
+| Navigate grid | Click numpad 1-9. | The selected number. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Reset back to main grid | Press the internal activation key or use a button mapper to map the "Reset Grid" shortcut. | N/A | N/A ||
-| Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True ||
+| Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
-| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
+| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 
 ### Standard Cursor
@@ -127,11 +127,11 @@ All gestures are dispatched at the cursor's current location.
 | Action | Mapped buttons | Notes |
 | --- | --- | --- |
 | Activate/Deactivate | Hold the internal activation key or use a button mapper to map the "Activate Standard Cursor" shortcut. | The default internal activation key is the star (*) key. This can be remapped or unmapped internally. Avoid using buttons in the D-pad or numpad for activation, as they will clash with the gestures below. |
-| Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). ||
+| Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center or numpad 5. ||
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. ||
-| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. ||
+| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Zoom | Numpad 1 and 3. ||
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
 
@@ -139,11 +139,7 @@ All gestures are dispatched at the cursor's current location.
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode with the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5. 
-- If the device is in landscape orientation, the appropriate buttons in each mode can also rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled:
-  - Grid cursor: D-pad rotates, numpad 1-9 rotates (along with the on-screen grid), zoom and activation remain unchanged
-  - Standard cursor: D-pad rotates, numpad 2/4/6/8 rotates, zoom and activation remain unchanged
-  - Example: If the device is rotated to the left, D-pad left becomes D-pad down.
-- If `C9 > Auto-Hide in Text Fields` is enabled, the cursors will hide when entering a text field and automatically restore after pressing enter. The standard cursor's last position is saved upon restore.
+- If `C9 > Auto-Hide in Text Fields` is set, the cursors will hide when entering a text field and automatically restore according to the setting. The standard cursor's last position is saved upon restore.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
 
 ## Installation

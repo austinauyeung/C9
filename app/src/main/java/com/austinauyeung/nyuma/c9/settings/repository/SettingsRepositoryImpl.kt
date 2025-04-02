@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -46,7 +47,7 @@ class SettingsRepositoryImpl(
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
-        private val HIDE_ON_TEXT_FIELD = booleanPreferencesKey("hide_on_text_field")
+        private val HIDE_ON_TEXT_FIELD = stringPreferencesKey("hide_on_text_field")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
     }
 
@@ -95,6 +96,18 @@ class SettingsRepositoryImpl(
                     } else {
                         OverlaySettings.DEFAULT.gridLineVisibility
                     }
+                val hideOnTextFieldStr = preferences[HIDE_ON_TEXT_FIELD]
+                val hideOnTextField =
+                    if (hideOnTextFieldStr != null) {
+                        try {
+                            AutoHideDetection.valueOf(hideOnTextFieldStr)
+                        } catch (e: Exception) {
+                            Logger.w("Invalid hide on text field value: $hideOnTextFieldStr", e)
+                            OverlaySettings.DEFAULT.hideOnTextField
+                        }
+                    } else {
+                        OverlaySettings.DEFAULT.hideOnTextField
+                    }
 
                 OverlaySettings(
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
@@ -131,8 +144,7 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
-                    hideOnTextField = preferences[HIDE_ON_TEXT_FIELD]
-                        ?: OverlaySettings.DEFAULT.hideOnTextField,
+                    hideOnTextField = hideOnTextField,
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
                         ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation
                 )
@@ -163,7 +175,7 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
-                preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField
+                preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField.name
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
             }
         } catch (e: Exception) {
