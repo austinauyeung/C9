@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Implements gestures using the AccessibilityService API.
  */
-class StandardGestureStrategy(
+class DefaultGestureStrategy(
     private val service: AccessibilityService,
     private val settingsFlow: StateFlow<OverlaySettings>
 ) : GestureStrategy {
@@ -58,7 +58,7 @@ class StandardGestureStrategy(
     ): AccessibilityService.GestureResultCallback {
         return object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription?) {
-                Logger.d("StandardGestureStrategy: zoom completed")
+                Logger.d("DefaultGestureStrategy: zoom completed")
                 val finger1PausePath = Path().apply {
                     moveTo(endX1, endY1)
                 }
@@ -90,7 +90,7 @@ class StandardGestureStrategy(
             }
 
             override fun onCancelled(gestureDescription: GestureDescription?) {
-                Logger.d("StandardGestureStrategy: zoom cancelled")
+                Logger.d("DefaultGestureStrategy: zoom cancelled")
             }
         }
     }
@@ -106,7 +106,7 @@ class StandardGestureStrategy(
             val settings = settingsFlow.value
             val willContinue = (settings.gestureStyle == GestureStyle.FIXED) || forceFixedScroll
 
-            Logger.d("StandardGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
+            Logger.d("DefaultGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
 
             scrollPath.reset()
             scrollPath.moveTo(startX, startY)
@@ -149,7 +149,7 @@ class StandardGestureStrategy(
             val settings = settingsFlow.value
             val willContinue = settings.gestureStyle == GestureStyle.FIXED
 
-            Logger.d("StandardGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
+            Logger.d("DefaultGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
 
             val path1 = Path()
             val path2 = Path()
@@ -196,7 +196,7 @@ class StandardGestureStrategy(
 
     override suspend fun startTap(x: Float, y: Float): Boolean {
         try {
-            Logger.d("StandardGestureStrategy: starting tap at ($x, $y)")
+            Logger.d("DefaultGestureStrategy: starting tap at ($x, $y)")
 
             tapPath.reset()
             tapPath.moveTo(x, y)
@@ -216,11 +216,11 @@ class StandardGestureStrategy(
                 gesture,
                 object : AccessibilityService.GestureResultCallback() {
                     override fun onCompleted(gestureDescription: GestureDescription?) {
-                        Logger.d("StandardGestureStrategy: start tap completed successfully")
+                        Logger.d("DefaultGestureStrategy: start tap completed successfully")
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("StandardGestureStrategy: start tap was cancelled")
+                        Logger.d("DefaultGestureStrategy: start tap was cancelled")
                     }
                 },
                 null
@@ -237,7 +237,7 @@ class StandardGestureStrategy(
 
     override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
         try {
-            Logger.d("StandardGestureStrategy: dragging from ($fromX, $fromY) to ($toX, $toY)")
+            Logger.d("DefaultGestureStrategy: dragging from ($fromX, $fromY) to ($toX, $toY)")
 
             if (activeStroke == null) {
                 Logger.d("Cannot continue drag: no active long press")
@@ -265,11 +265,11 @@ class StandardGestureStrategy(
                 gesture,
                 object : AccessibilityService.GestureResultCallback() {
                     override fun onCompleted(gestureDescription: GestureDescription?) {
-                        Logger.d("StandardGestureStrategy: drag completed successfully")
+                        Logger.d("DefaultGestureStrategy: drag completed successfully")
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("StandardGestureStrategy: drag was cancelled")
+                        Logger.d("DefaultGestureStrategy: drag was cancelled")
                         cancelTap()
                     }
                 },
@@ -287,7 +287,7 @@ class StandardGestureStrategy(
 
     override suspend fun endTap(finalX: Float, finalY: Float): Boolean {
         try {
-            Logger.d("StandardGestureStrategy: ending tap at ($finalX, $finalY)")
+            Logger.d("DefaultGestureStrategy: ending tap at ($finalX, $finalY)")
 
             if (activeStroke == null) {
                 Logger.d("Cannot end tap: no active tap operation")
@@ -313,11 +313,11 @@ class StandardGestureStrategy(
                 object : AccessibilityService.GestureResultCallback() {
                     override fun onCompleted(gestureDescription: GestureDescription?) {
                         activeStroke = null
-                        Logger.d("StandardGestureStrategy: end tap completed successfully")
+                        Logger.d("DefaultGestureStrategy: end tap completed successfully")
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("StandardGestureStrategy: end tap was cancelled")
+                        Logger.d("DefaultGestureStrategy: end tap was cancelled")
                         cancelTap()
                     }
                 },
@@ -339,7 +339,7 @@ class StandardGestureStrategy(
         }
 
         activeStroke = null
-        Logger.d("StandardGestureStrategy: tap operation cancelled")
+        Logger.d("DefaultGestureStrategy: tap operation cancelled")
         return true
     }
 }

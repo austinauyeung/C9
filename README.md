@@ -174,6 +174,9 @@ Device: Google sdk_gphone64_x86_64
 Android Version: 15 (SDK 35)
 Screen: 720 x 1232 pixels (density 2.0)
 
+--- USER SETTINGS ---
+...
+
 --- LOG ENTRIES ---
 [19:53:58.362] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14387767052000, downTime=14387767052000, deviceId=0, source=0x301, displayId=-1 }
 [19:53:58.665] [D] Overlay mode changed: NONE -> CURSOR
@@ -182,14 +185,14 @@ Screen: 720 x 1232 pixels (density 2.0)
 [19:53:58.886] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14388291421000, downTime=14387767052000, deviceId=0, source=0x301, displayId=-1 }
 [19:53:59.716] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14389121655000, downTime=14389121655000, deviceId=0, source=0x301, displayId=-1 }
 [19:53:59.717] [D] Starting tap gesture at (360.0, 640.0)
-[19:53:59.718] [D] StandardGestureStrategy: starting tap at (360.0, 640.0)
+[19:53:59.718] [D] DefaultGestureStrategy: starting tap at (360.0, 640.0)
 [19:53:59.718] [D] Gesture paths changed: 1 paths
-[19:53:59.746] [D] StandardGestureStrategy: start tap completed successfully
+[19:53:59.746] [D] DefaultGestureStrategy: start tap completed successfully
 [19:53:59.771] [D] Gesture paths changed: 0 paths
 [19:53:59.798] [D] Key event: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_ENTER, scanCode=28, metaState=0, flags=0x8, repeatCount=0, eventTime=14389190365000, downTime=14389121655000, deviceId=0, source=0x301, displayId=-1 }
 [19:53:59.799] [D] Ending tap at (360.0, 640.0)
-[19:53:59.799] [D] StandardGestureStrategy: ending tap at (360.0, 640.0)
-[19:53:59.808] [D] StandardGestureStrategy: end tap completed successfully
+[19:53:59.799] [D] DefaultGestureStrategy: ending tap at (360.0, 640.0)
+[19:53:59.808] [D] DefaultGestureStrategy: end tap completed successfully
 [19:54:01.307] [D] Key event: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_EQUALS, scanCode=13, metaState=0, flags=0x8, repeatCount=0, eventTime=14390712608000, downTime=14390712608000, deviceId=0, source=0x301, displayId=-1 }
 [19:54:01.609] [D] Overlay mode changed: CURSOR -> NONE
 [19:54:01.612] [D] Cursor state changed: false

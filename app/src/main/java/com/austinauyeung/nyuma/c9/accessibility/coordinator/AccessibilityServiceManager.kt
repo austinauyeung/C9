@@ -12,7 +12,7 @@ import com.austinauyeung.nyuma.c9.cursor.handler.CursorActionHandler
 import com.austinauyeung.nyuma.c9.cursor.handler.CursorStateManager
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
-import com.austinauyeung.nyuma.c9.gesture.standard.StandardGestureStrategy
+import com.austinauyeung.nyuma.c9.gesture.standard.DefaultGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.domain.GridNavigator
@@ -58,7 +58,7 @@ class AccessibilityServiceManager(
 
             modeCoordinator = OverlayModeCoordinator()
 
-            val standardStrategy = StandardGestureStrategy(service, settingsFlow)
+            val defaultStrategy = DefaultGestureStrategy(service, settingsFlow)
             val shizukuStrategy = ShizukuGestureStrategy(
                 mainScope = mainScope,
                 settingsFlow = settingsFlow
@@ -66,7 +66,7 @@ class AccessibilityServiceManager(
             C9.getInstance().setShizukuGestureStrategy(shizukuStrategy)
 
             gestureManager = GestureManager(
-                standardStrategy,
+                defaultStrategy,
                 shizukuStrategy,
                 settingsFlow,
                 screenDimensionsFlow,

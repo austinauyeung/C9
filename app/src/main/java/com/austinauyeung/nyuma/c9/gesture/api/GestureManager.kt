@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  * Translates inputs from either cursor mode into gestures, using Shizuku if necessary.
  */
 class GestureManager(
-    private val standardStrategy: GestureStrategy,
+    private val defaultStrategy: GestureStrategy,
     private val shizukuStrategy: GestureStrategy,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
@@ -32,7 +32,7 @@ class GestureManager(
     private val _gesturePaths = MutableStateFlow<List<GesturePath>>(emptyList())
     val gesturePaths: StateFlow<List<GesturePath>> = _gesturePaths.asStateFlow()
 
-    private var currentStrategy: GestureStrategy = standardStrategy
+    private var currentStrategy: GestureStrategy = defaultStrategy
     private var shizukuObserverJob: Job? = null
 
     init {
@@ -60,7 +60,7 @@ class GestureManager(
             shizukuStrategy
         } else {
             Logger.d("Using standard gesture strategy")
-            standardStrategy
+            defaultStrategy
         }
     }
 
