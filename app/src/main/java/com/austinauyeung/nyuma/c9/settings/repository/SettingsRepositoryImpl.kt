@@ -51,6 +51,7 @@ class SettingsRepositoryImpl(
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_TEXT_FIELD = stringPreferencesKey("hide_on_text_field")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
+        private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -148,7 +149,9 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
                     hideOnTextField = hideOnTextField,
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
-                        ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation
+                        ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation,
+                    roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
+                        ?: OverlaySettings.DEFAULT.roundedCursorCorners
                 )
             }
     }
@@ -179,6 +182,7 @@ class SettingsRepositoryImpl(
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField.name
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
+                preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

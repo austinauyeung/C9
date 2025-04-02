@@ -33,7 +33,8 @@ data class OverlaySettings(
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
     val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
-    val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION
+    val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
+    val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

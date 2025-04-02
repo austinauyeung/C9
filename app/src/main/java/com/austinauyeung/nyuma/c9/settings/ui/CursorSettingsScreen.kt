@@ -219,19 +219,6 @@ fun CursorSettingsScreen(
                     },
                 )
 
-//                SwitchPreferenceItem(
-//                    title = "Long Press Hold",
-//                    subtitle = "Press both action keys to toggle hold",
-//                    checked = uiState.toggleHold,
-//                    onCheckedChange = { value ->
-//                        viewModel.updatePreference(value) { settings, v ->
-//                            settings.copy(toggleHold = v)
-//                        }
-//                    },
-//                )
-            }
-
-            PreferenceCategory(title = "Appearance") {
                 SliderPreferenceItem(
                     title = "Cursor Speed",
                     value = uiState.cursorSpeed.toFloat(),
@@ -293,6 +280,19 @@ fun CursorSettingsScreen(
                     steps = 3,
                 )
 
+//                SwitchPreferenceItem(
+//                    title = "Long Press Hold",
+//                    subtitle = "Press both action keys to toggle hold",
+//                    checked = uiState.toggleHold,
+//                    onCheckedChange = { value ->
+//                        viewModel.updatePreference(value) { settings, v ->
+//                            settings.copy(toggleHold = v)
+//                        }
+//                    },
+//                )
+            }
+
+            PreferenceCategory(title = "Appearance") {
                 SliderPreferenceItem(
                     title = "Cursor Size",
                     value = uiState.cursorSize.toFloat(),
@@ -312,6 +312,17 @@ fun CursorSettingsScreen(
                         }
                     },
                     steps = 3,
+                )
+
+                SwitchPreferenceItem(
+                    title = "Smooth Cursor Corners",
+                    subtitle = "Round out the corners of the cursor",
+                    checked = uiState.roundedCursorCorners,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(roundedCursorCorners = v)
+                        }
+                    },
                 )
             }
         }

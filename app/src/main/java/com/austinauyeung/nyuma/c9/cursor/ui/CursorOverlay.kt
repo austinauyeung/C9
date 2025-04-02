@@ -11,7 +11,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
@@ -41,14 +45,21 @@ fun CursorOverlay(
         val holdOffsetY = cursorSize * 0.25f
         val scrollOffsetX = cursorSize * 0.28f
 
-        val cursorPath =
-            Path().apply {
-                moveTo(position.x, position.y)
-                lineTo(position.x, position.y + side1Y)
-                lineTo(position.x + side2X, position.y + side4Y)
-                lineTo(position.x + side2X + side3X, position.y + side4Y)
-                close()
-            }
+        val cornerRadius = cursorSize * if (settings?.roundedCursorCorners == true) 0.15f else 0f
+        val theta = atan2(side2X, side1Y - side4Y)
+
+        val cursorPath = Path().apply {
+            moveTo(position.x, position.y + cornerRadius)
+            lineTo(position.x, position.y + side1Y - cornerRadius)
+            quadraticTo(position.x, position.y + side1Y, position.x + cornerRadius * sin(theta), position.y + side1Y - cornerRadius * cos(theta))
+            lineTo(position.x + side2X - cornerRadius * sin(theta), position.y + side4Y + cornerRadius * cos(theta))
+            quadraticTo(position.x + side2X, position.y + side4Y, position.x + side2X + cornerRadius, position.y + side4Y)
+            lineTo(position.x + side2X + side3X - cornerRadius, position.y + side4Y)
+            quadraticTo(position.x + side2X + side3X, position.y + side4Y, position.x + side2X + side3X - cornerRadius * sin(theta), position.y + side4Y - cornerRadius * cos(theta))
+            lineTo(position.x + cornerRadius * cos(theta), position.y + cornerRadius * sin(theta))
+            quadraticTo(position.x, position.y, position.x, position.y + cornerRadius)
+            close()
+        }
 
         drawPath(
             path = cursorPath,

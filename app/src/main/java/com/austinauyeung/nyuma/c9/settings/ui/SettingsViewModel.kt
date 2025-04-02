@@ -72,7 +72,8 @@ class SettingsViewModel(
                             allowPassthrough = settings.allowPassthrough,
                             enableShizukuIntegration = settings.enableShizukuIntegration,
                             hideOnTextField = settings.hideOnTextField,
-                            rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation
+                            rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation,
+                            roundedCursorCorners = settings.roundedCursorCorners
                         )
                     }
                 }
@@ -128,7 +129,8 @@ class SettingsViewModel(
             allowPassthrough = _uiState.value.allowPassthrough,
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
             hideOnTextField = _uiState.value.hideOnTextField,
-            rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation
+            rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation,
+            roundedCursorCorners = _uiState.value.roundedCursorCorners
         )
     }
 
@@ -202,5 +204,6 @@ data class SettingsUiState(
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
     val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
-    val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION
+    val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
+    val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS
 )
