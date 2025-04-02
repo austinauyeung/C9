@@ -15,7 +15,7 @@ class ToggleCursorCreateShortcutActivity : Activity() {
 
         val intent = Intent()
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent)
-        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "Toggle Cursor")
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "Toggle Cursor Scroll")
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
             Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher))
 

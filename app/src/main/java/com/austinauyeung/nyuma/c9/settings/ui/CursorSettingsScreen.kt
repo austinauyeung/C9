@@ -164,7 +164,7 @@ fun CursorSettingsScreen(
                 )
 
                 ClearKeyPreferenceItem(
-                    isEnabled = uiState.cursorActivationKey != OverlaySettings.KEY_NONE,
+                    isEnabled = true,
                     mode = "standard cursor",
                     onClearKey = {
                         viewModel.requestHideAllOverlays()

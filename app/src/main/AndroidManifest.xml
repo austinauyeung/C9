@@ -83,7 +83,7 @@
         <activity
             android:name=".shortcuts.ToggleCursorCreateShortcutActivity"
             android:exported="true"
-            android:label="Toggle Cursor"
+            android:label="Toggle Cursor Scroll"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />

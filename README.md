@@ -20,16 +20,14 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
 - ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
-- ✨ Additional features such as landscape orientation support and cursor auto-hide in text fields
+- ✨ Additional quality-of-life features such as landscape orientation support and cursor auto-hide in text fields
 
 ## Table of Contents
 - [Overview](#overview)
   - [Grid Cursor](#grid-cursor)
     - [Instructions](#instructions)
-    - [Usage](#usage)
   - [Standard Cursor](#standard-cursor)
     - [Instructions](#instructions-1)
-    - [Usage](#usage-1)
 - [Recommendations](#recommendations)
 - [Installation](#installation)
 - [Troubleshooting](#troubleshooting)
@@ -39,7 +37,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - [Acknowledgment](#acknowledgments)
 
 ## Overview
-Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by setting an activation key), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
+Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by mapping their activation key or shortcut), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
 
 The following options can be configured, which affects scrolls and zooms in both modes:
 - Natural scrolling
@@ -79,7 +77,7 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 <br />
 
 The following options can be configured:
-- Grid cursor activation key
+- Grid cursor internal activation key
 - Number of grid levels
 - Grid persistence after clicking in the final grid
 - Grid opacity
@@ -87,25 +85,16 @@ The following options can be configured:
 - Grid line visibility
 
 #### Instructions
-- The default activation key is the pound (#) key.
-- To activate the grid cursor:
-    - Hold the activation key.
-    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
-- See the table below for gesture dispatch.
-- When activated, press the activation key to quickly reset any grid back to the main grid.
-- When activated, press any number to advance to the next subgrid.
-- To deactivate, hold the activation key.
-    - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
-
-#### Usage
-| Gesture | Mapped buttons | Dispatch location | Advances grid |
-| --- | --- | --- | --- |
-| Navigate grid | Click numpad 1-9. | The selected number. | True |
-| Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True |
-| Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-| Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
-| Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False |
+| Action | Mapped buttons | Gesture location | Advances grid | Notes |
+| --- | --- | --- | --- | --- |
+| Activate/Deactivate | Hold the internal activation key or use a button mapper to map the "Activate Grid Cursor" shortcut. | N/A | N/A | The default internal activation key is the pound (#) key. This can be remapped or unmapped internally. Avoid using buttons in the D-pad or numpad for activation, as they will clash with the gestures below. ||
+| Navigate grid | Click numpad 1-9. | The selected number. | True ||
+| Reset back to main grid | Press the internal activation key or use a button mapper to map the "Reset Grid" shortcut. | N/A | N/A ||
+| Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True ||
+| Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
+| Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
+| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
+| Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 
 ### Standard Cursor
 
@@ -120,11 +109,12 @@ The following options can be configured:
 A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer.
 
 The following options can be configured:
-- Standard cursor activation key
+- Standard cursor internal activation key
 - Control scheme
   - Standard: D-pad moves, numpad scrolls
   - Swapped: D-pad scrolls, numpad moves
-  - Toggle: D-pad scrolls and moves (toggle using activation key)
+  - D-pad: D-pad moves and scrolls
+  - Numpad: Numpad moves and scrolls
 - Enable cursor wrap around
 - Cursor speed
 - Cursor acceleration: accelerated cursor speed when held
@@ -132,26 +122,18 @@ The following options can be configured:
 - Cursor size
 
 #### Instructions
-- The default activation key is the star (*) key.
-- To activate the standard cursor:
-    - Hold the activation key.
-    - Alternatively, you can use a button mapper to map the "Activate Grid Cursor" shortcut. However, an activation key must still be assigned.
-- See the table below for gesture dispatch.
-- When activated and if in the toggle control scheme, press the activation key to toggle between cursor movement and scrolling.
-- To deactivate, hold the activation key.
-    - If you are using a button mapper, it may be possible to use your button mapper to deactivate the cursor as long as it does not conflict with buttons reserved and intercepted by the cursor.
+All gestures are dispatched at the cursor's current location.
 
-#### Usage
-All gestures are dispatched at the cursor's current location:
-
-| Gesture | Mapped buttons |
-| --- | --- |
-| Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). |
-| Tap | Click D-pad center or numpad 5. |
-| Double Tap | Double click D-pad center or numpad 5. |
-| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. |
-| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. |
-| Zoom | Numpad 1 and 3. |
+| Action | Mapped buttons | Notes |
+| --- | --- | --- |
+| Activate/Deactivate | Hold the internal activation key or use a button mapper to map the "Activate Standard Cursor" shortcut. | The default internal activation key is the star (*) key. This can be remapped or unmapped internally. Avoid using buttons in the D-pad or numpad for activation, as they will clash with the gestures below. |
+| Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). ||
+| Tap | Click D-pad center or numpad 5. ||
+| Double Tap | Double click D-pad center or numpad 5. ||
+| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. ||
+| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. ||
+| Zoom | Numpad 1 and 3. ||
+| Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
 
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
@@ -234,8 +216,8 @@ A green banner on the main page indicates that Shizuku authorization has been gr
 <img src='./docs/imgs/Screenshot_20250328_194815.png' width=200>
 </div>
 
-### Activation key stops working
-If you are unable to deactivate the cursor, clear the activation key, which disables that cursor and hides any active cursor.
+### Cursor does not deactivate
+If you are unable to deactivate the cursor, clear the internal activation key, which unmaps that cursor and hides any active cursor, even if it was activated using a button mapper.
 
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
@@ -257,9 +239,6 @@ Shizuku allows applications in general to perform actions that require elevated 
 
 ### What does it mean for the cursor to intercept button presses?
 The cursors sit between your button presses and the underlying application. If a button is used by the cursor, the cursor will consume it and prevent the underlying application from receiving the button press.
-
-### Why are button mappers allowed for activation but not deactivation?
-As a result of the cursors' interception, there is no guarantee that there will not be conflict with your button mapper shortcut. Because of this, and for now, deactivation must be performed through the cursor.
 
 ## License
 [Apache License Version 2.0](./LICENSE)
