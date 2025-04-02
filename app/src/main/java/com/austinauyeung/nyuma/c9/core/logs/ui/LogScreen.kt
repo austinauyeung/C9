@@ -42,9 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.core.logs.LogManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.SystemInfoUtil
+import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepositoryImpl
 
 /**
  * Basic console for real-time logs.
@@ -162,6 +164,19 @@ private fun copyLogsToClipboard(context: Context, logs: List<LogManager.LogEntry
         append("--- SYSTEM INFORMATION ---\n")
         append(SystemInfoUtil.getDeviceInfo(context))
         append("\n\n")
+
+        append("--- USER SETTINGS ---\n")
+        try {
+            val settingsRepository = C9.getInstance().settingsRepository
+            if (settingsRepository is SettingsRepositoryImpl) {
+                append(settingsRepository.exportSettings())
+            } else {
+                append("Settings repository not available")
+            }
+        } catch (e: Exception) {
+            append("Failed to export settings: ${e.message}")
+        }
+        append("\n")
 
         append("--- LOG ENTRIES ---\n")
         logs.forEach { log ->

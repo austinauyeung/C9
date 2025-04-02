@@ -17,7 +17,9 @@ import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 /**
  * Persists user settings.
@@ -204,6 +206,25 @@ class SettingsRepositoryImpl(
                 isValid = false,
                 errors = listOf("Error updating settings: ${e.message}"),
             )
+        }
+    }
+
+    fun exportSettings(): String {
+        return try {
+            runBlocking {
+                val preferences = dataStore.data.first()
+                val sb = StringBuilder()
+                val sortedKeys = preferences.asMap().keys.sortedBy { it.name }
+                for (key in sortedKeys) {
+                    val value = preferences[key]
+                    sb.appendLine("${key.name}=$value")
+                }
+
+                sb.toString()
+            }
+        } catch (e: Exception) {
+            Logger.e("Failed to export DataStore contents", e)
+            "Failed to export settings: ${e.message}"
         }
     }
 }

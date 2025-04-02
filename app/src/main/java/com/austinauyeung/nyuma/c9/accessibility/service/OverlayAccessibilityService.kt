@@ -23,14 +23,12 @@ import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
 import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**

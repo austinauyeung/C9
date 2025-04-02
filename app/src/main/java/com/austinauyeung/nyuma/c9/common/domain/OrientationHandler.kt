@@ -7,7 +7,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.Display
-import android.view.Surface
 import android.view.WindowManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil

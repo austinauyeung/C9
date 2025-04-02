@@ -1,7 +1,5 @@
 package com.austinauyeung.nyuma.c9.gesture.api
 
-import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
-
 /**
  * Strategy interface for gesture implementations.
  */
