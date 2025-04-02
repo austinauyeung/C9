@@ -77,7 +77,7 @@ class CursorActionHandler(
         val settings = settingsFlow.value
 
         try {
-            if (event == null || settings.cursorActivationKey == OverlaySettings.KEY_NONE) return false
+            if (event == null) return false
 
             val activateKeys = buildSet {
                 add(settings.cursorActivationKey)

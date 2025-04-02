@@ -48,7 +48,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private lateinit var serviceJob: Job
     private lateinit var backgroundScope: CoroutineScope
     private lateinit var mainScope: CoroutineScope
-    private lateinit var ioScope: CoroutineScope
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
@@ -80,17 +79,23 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_ACTIVATE_GRID -> {
-                    ioScope.launch {
-                        val settings = C9.getInstance().settingsRepository.getSettings().first()
-                        if (settings.gridActivationKey == OverlaySettings.KEY_NONE) return@launch
+                    backgroundScope.launch {
                         serviceManager.activateGridMode()
                     }
                 }
+                ACTION_RESET_GRID -> {
+                    backgroundScope.launch {
+                        serviceManager.resetGrid()
+                    }
+                }
                 ACTION_ACTIVATE_CURSOR -> {
-                    ioScope.launch {
-                        val settings = C9.getInstance().settingsRepository.getSettings().first()
-                        if (settings.cursorActivationKey == OverlaySettings.KEY_NONE) return@launch
+                    backgroundScope.launch {
                         serviceManager.activateCursorMode()
+                    }
+                }
+                ACTION_TOGGLE_CURSOR -> {
+                    backgroundScope.launch {
+                        serviceManager.toggleCursorScroll()
                     }
                 }
             }
@@ -105,7 +110,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
 
         const val ACTION_ACTIVATE_GRID = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_GRID"
+        const val ACTION_RESET_GRID = "com.austinauyeung.nyuma.c9.ACTION_RESET_GRID"
         const val ACTION_ACTIVATE_CURSOR = "com.austinauyeung.nyuma.c9.ACTION_ACTIVATE_CURSOR"
+        const val ACTION_TOGGLE_CURSOR = "com.austinauyeung.nyuma.c9.ACTION_TOGGLE_CURSOR"
 
         fun activateGridCursor(context: Context) {
             val intent = Intent(ACTION_ACTIVATE_GRID)
@@ -117,8 +124,28 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             }
         }
 
+        fun resetGrid(context: Context) {
+            val intent = Intent(ACTION_RESET_GRID)
+            intent.setPackage(context.packageName)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.sendBroadcast(intent, null)
+            } else {
+                context.sendBroadcast(intent)
+            }
+        }
+
         fun activateStandardCursor(context: Context) {
             val intent = Intent(ACTION_ACTIVATE_CURSOR)
+            intent.setPackage(context.packageName)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.sendBroadcast(intent, null)
+            } else {
+                context.sendBroadcast(intent)
+            }
+        }
+
+        fun toggleCursorScroll(context: Context) {
+            val intent = Intent(ACTION_TOGGLE_CURSOR)
             intent.setPackage(context.packageName)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.sendBroadcast(intent, null)
@@ -139,7 +166,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             serviceJob = SupervisorJob()
             backgroundScope = CoroutineScope(Dispatchers.Default + serviceJob + coroutineExceptionHandler)
             mainScope = CoroutineScope(Dispatchers.Main + serviceJob + coroutineExceptionHandler)
-            ioScope = CoroutineScope(Dispatchers.IO + serviceJob + coroutineExceptionHandler)
 
             val settingsFlow = C9.getInstance().getSettingsFlow()
 
@@ -170,7 +196,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             val filter = IntentFilter().apply {
                 addAction(ACTION_ACTIVATE_GRID)
+                addAction(ACTION_RESET_GRID)
                 addAction(ACTION_ACTIVATE_CURSOR)
+                addAction(ACTION_TOGGLE_CURSOR)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
@@ -268,10 +296,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             if (::mainScope.isInitialized) {
                 mainScope.cancel("Service destroyed")
-            }
-
-            if (::ioScope.isInitialized) {
-                ioScope.cancel("Service destroyed")
             }
 
             if (::serviceManager.isInitialized) {

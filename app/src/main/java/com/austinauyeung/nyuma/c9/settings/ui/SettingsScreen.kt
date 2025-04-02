@@ -116,9 +116,9 @@ fun SettingsScreen(
                     title = "Grid Cursor",
                     subtitle =
                     if (uiState.gridActivationKey == OverlaySettings.KEY_NONE) {
-                        "Disabled"
+                        "Unmapped"
                     } else {
-                        "Enabled"
+                        "Mapped"
                     },
                     onClick = onNavigateToGridSettings,
                 )
@@ -129,7 +129,7 @@ fun SettingsScreen(
                     if (uiState.cursorActivationKey == OverlaySettings.KEY_NONE) {
                         "Disabled"
                     } else {
-                        "Enabled"
+                        "Mapped"
                     },
                     onClick = onNavigateToCursorSettings,
                 )
@@ -549,7 +549,7 @@ fun SetKeyPreferenceItem(
 ) {
     val subtitle =
         if (currentKeyCode == OverlaySettings.KEY_NONE) {
-            "Feature disabled (no key set)"
+            "Cursor is not mapped internally"
         } else {
             "Current: ${KeyEvent.keyCodeToString(currentKeyCode)}"
         }
@@ -570,7 +570,7 @@ fun ClearKeyPreferenceItem(
 ) {
     PreferenceItem(
         title = title,
-        subtitle = "Disables $mode mode",
+        subtitle = "Unmaps $mode mode",
         onClick = if (isEnabled) onClearKey else null,
     )
 }

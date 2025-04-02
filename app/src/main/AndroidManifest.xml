@@ -59,9 +59,31 @@
         </activity>
 
         <activity
+            android:name=".shortcuts.ResetGridCreateShortcutActivity"
+            android:exported="true"
+            android:label="Reset Grid"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".shortcuts.StandardCursorCreateShortcutActivity"
             android:exported="true"
             android:label="Activate Standard Cursor"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".shortcuts.ToggleCursorCreateShortcutActivity"
+            android:exported="true"
+            android:label="Toggle Cursor"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
@@ -78,7 +100,23 @@
             android:launchMode="singleInstance" />
 
         <activity
+            android:name=".shortcuts.ResetGridActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance" />
+
+        <activity
             android:name=".shortcuts.StandardCursorActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance" />
+
+        <activity
+            android:name=".shortcuts.ToggleCursorActivity"
             android:exported="true"
             android:theme="@android:style/Theme.NoDisplay"
             android:taskAffinity=""

@@ -61,7 +61,7 @@ class GridActionHandler(
         val settings = settingsFlow.value
 
         try {
-            if (event == null || settings.gridActivationKey == OverlaySettings.KEY_NONE) return false
+            if (event == null) return false
 
             val activateKeys = buildSet {
                 add(settings.gridActivationKey)

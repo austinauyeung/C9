@@ -149,6 +149,19 @@ class AccessibilityServiceManager(
         }
     }
 
+    fun resetGrid(): Boolean {
+        try {
+            if (modeCoordinator.activeMode.value == OverlayModeCoordinator.OverlayMode.GRID) {
+                gridStateManager.resetToMainGrid()
+                return true
+            }
+            return false
+        } catch (e: Exception) {
+            Logger.e("Error resetting grid mode", e)
+            return false
+        }
+    }
+
     fun activateCursorMode(position: Offset? = null): Boolean {
         try {
             if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
@@ -163,6 +176,19 @@ class AccessibilityServiceManager(
             return false
         } catch (e: Exception) {
             Logger.e("Error activating cursor mode", e)
+            return false
+        }
+    }
+
+    fun toggleCursorScroll(): Boolean {
+        try {
+            if (modeCoordinator.activeMode.value == OverlayModeCoordinator.OverlayMode.CURSOR) {
+                cursorStateManager.toggleScrollMode()
+                return true
+            }
+            return false
+        } catch (e: Exception) {
+            Logger.e("Error toggling cursor scroll", e)
             return false
         }
     }
