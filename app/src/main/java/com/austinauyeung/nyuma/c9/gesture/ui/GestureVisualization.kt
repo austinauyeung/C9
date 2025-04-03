@@ -7,7 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,21 +38,25 @@ enum class GestureType {
 @Composable
 fun GestureVisualization(
     gesturePaths: List<GesturePath>,
-    modifier: Modifier = Modifier,
+    dimensions: ScreenDimensions,
+    settings: OverlaySettings? = null,
+    modifier: Modifier = Modifier
 ) {
+    var visualSize = settings?.visualSize?.toFloat() ?: GestureConstants.DEFAULT_SIZE.toFloat()
+    visualSize *= GestureConstants.SIZE_MULTIPLIER * dimensions.getScreenScaleFactor()
     val circleColor = Color.White.copy(alpha = 0.8f)
 
     Canvas(modifier = modifier.fillMaxSize()) {
         gesturePaths.forEach { gesturePath ->
             drawCircle(
                 color = Color.Black,
-                radius = 15f,
+                radius = visualSize,
                 center = gesturePath.currentPosition,
-                style = Stroke(width = 15f * 0.3f),
+                style = Stroke(width = visualSize * 0.3f),
             )
             drawCircle(
                 color = circleColor,
-                radius = 15f,
+                radius = visualSize,
                 center = gesturePath.currentPosition,
             )
         }

@@ -36,6 +36,7 @@ class SettingsRepositoryImpl(
         private val GRID_LINE_VISIBILITY = stringPreferencesKey("grid_line_visibility")
         private val USE_NATURAL_SCROLLING = booleanPreferencesKey("use_natural_scrolling")
         private val SHOW_GESTURE_VISUAL = booleanPreferencesKey("show_gesture_visual")
+        private val VISUAL_SIZE = intPreferencesKey("visual_size")
         private val CURSOR_SPEED = intPreferencesKey("cursor_speed")
         private val CURSOR_ACCELERATION = intPreferencesKey("cursor_acceleration")
         private val CURSOR_SIZE = intPreferencesKey("cursor_size")
@@ -139,6 +140,7 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.useNaturalScrolling,
                     showGestureVisualization = preferences[SHOW_GESTURE_VISUAL]
                         ?: OverlaySettings.DEFAULT.showGestureVisualization,
+                    visualSize = preferences[VISUAL_SIZE] ?: OverlaySettings.DEFAULT.visualSize,
                     cursorSpeed = preferences[CURSOR_SPEED] ?: OverlaySettings.DEFAULT.cursorSpeed,
                     cursorAcceleration = preferences[CURSOR_ACCELERATION]
                         ?: OverlaySettings.DEFAULT.cursorAcceleration,
@@ -180,6 +182,7 @@ class SettingsRepositoryImpl(
                 preferences[GRID_LINE_VISIBILITY] = settings.gridLineVisibility.name
                 preferences[USE_NATURAL_SCROLLING] = settings.useNaturalScrolling
                 preferences[SHOW_GESTURE_VISUAL] = settings.showGestureVisualization
+                preferences[VISUAL_SIZE] = settings.visualSize
                 preferences[CURSOR_SPEED] = settings.cursorSpeed
                 preferences[CURSOR_ACCELERATION] = settings.cursorAcceleration
                 preferences[CURSOR_SIZE] = settings.cursorSize

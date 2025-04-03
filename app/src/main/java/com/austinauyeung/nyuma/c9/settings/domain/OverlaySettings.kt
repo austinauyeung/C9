@@ -19,6 +19,7 @@ data class OverlaySettings(
     val gridLineVisibility: GridLineVisibility = Defaults.Settings.GRID_LINE_VISIBILITY,
     val useNaturalScrolling: Boolean = Defaults.Settings.USE_NATURAL_SCROLLING,
     val showGestureVisualization: Boolean = Defaults.Settings.SHOW_GESTURE_VISUAL,
+    val visualSize: Int = Defaults.Settings.VISUAL_SIZE,
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,
     val cursorAcceleration: Int = Defaults.Settings.CURSOR_ACCELERATION,
     val cursorSize: Int = Defaults.Settings.CURSOR_SIZE,

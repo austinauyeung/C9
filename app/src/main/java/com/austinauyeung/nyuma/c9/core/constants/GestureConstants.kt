@@ -26,6 +26,10 @@ object GestureConstants {
 
     // Visualization
     const val SHOW_GESTURE_VISUAL = true
+    const val MIN_SIZE = 1
+    const val MAX_SIZE = 10
+    const val DEFAULT_SIZE = 5
+    const val SIZE_MULTIPLIER = 3f
 
     // Intercept
     const val ALLOW_PASSTHROUGH = false

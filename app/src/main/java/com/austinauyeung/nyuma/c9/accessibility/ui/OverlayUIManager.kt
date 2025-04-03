@@ -195,6 +195,8 @@ class OverlayUIManager(
                         if (currentSettings.showGestureVisualization && currentGesturePaths.isNotEmpty()) {
                             GestureVisualization(
                                 gesturePaths = currentGesturePaths,
+                                settings = currentSettings,
+                                dimensions = orientationHandler.screenDimensions.value
                             )
                         }
                     }

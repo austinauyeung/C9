@@ -23,6 +23,7 @@ object Defaults {
         val GRID_LINE_VISIBILITY = GridLineVisibility.SHOW_ALL
         const val USE_NATURAL_SCROLLING = GestureConstants.USE_NATURAL_SCROLLING
         const val SHOW_GESTURE_VISUAL = GestureConstants.SHOW_GESTURE_VISUAL
+        const val VISUAL_SIZE = GestureConstants.DEFAULT_SIZE
         const val CURSOR_SPEED = CursorConstants.DEFAULT_SPEED
         const val CURSOR_ACCELERATION = CursorConstants.DEFAULT_ACCELERATION
         const val CURSOR_SIZE = CursorConstants.DEFAULT_SIZE

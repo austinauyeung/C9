@@ -5,7 +5,7 @@
 ---
 
 # C9: Click on 9 keys
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/austinauyeung/C9) ![GitHub all releases](https://img.shields.io/github/downloads/austinauyeung/C9/total) ![License](https://img.shields.io/github/license/austinauyeung/C9) ![API Level](https://img.shields.io/badge/API-26%2B-brightgreen)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/austinauyeung/C9) ![Android Version](https://img.shields.io/badge/Android%20Version-8.0%2B-brightgreen) ![GitHub all releases](https://img.shields.io/github/downloads/austinauyeung/C9/total) ![License](https://img.shields.io/github/license/austinauyeung/C9)
 
 <div align="center">
 <img src='./docs/imgs/Screenshot_20250319_213956.png' width=200>

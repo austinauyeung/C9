@@ -148,17 +148,6 @@ fun SettingsScreen(
                     }
                 )
 
-                SwitchPreferenceItem(
-                    title = "Gesture Visualization",
-                    subtitle = "Show gestures on screen",
-                    checked = uiState.showGestureVisualization,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(showGestureVisualization = v)
-                        }
-                    },
-                )
-
                 DropdownPreferenceItem(
                     title = "Gesture Style",
                     subtitle =
@@ -211,6 +200,31 @@ fun SettingsScreen(
                         }
                     },
                     steps = 3,
+                )
+
+                SwitchPreferenceItem(
+                    title = "Gesture Visualization",
+                    subtitle = "Show gestures on screen",
+                    checked = uiState.showGestureVisualization,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(showGestureVisualization = v)
+                        }
+                    },
+                )
+
+                SliderPreferenceItem(
+                    title = "Gesture Visualization Size",
+                    value = uiState.visualSize.toFloat(),
+                    valueRange = GestureConstants.MIN_SIZE.toFloat()..GestureConstants.MAX_SIZE.toFloat(),
+                    valueText = uiState.visualSize.toString(),
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(visualSize = v.toInt())
+                        }
+                    },
+                    steps = 8,
+                    enabled = uiState.showGestureVisualization
                 )
             }
 
@@ -353,6 +367,7 @@ fun SliderPreferenceItem(
     valueText: String,
     steps: Int = 0,
     onValueChange: (Float) -> Unit,
+    enabled: Boolean = true
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -371,6 +386,7 @@ fun SliderPreferenceItem(
                 onValueChange = onValueChange,
                 valueRange = valueRange,
                 steps = steps,
+                enabled = enabled
             )
         }
     }
