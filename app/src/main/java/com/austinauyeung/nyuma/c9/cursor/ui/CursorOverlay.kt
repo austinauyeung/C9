@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
-import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow

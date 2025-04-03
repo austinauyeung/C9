@@ -77,14 +77,21 @@ class GestureManager(
         return isReady
     }
 
-    suspend fun performScroll(direction: ScrollDirection, startX: Float, startY: Float, forceFixedScroll: Boolean = false): Boolean {
+    suspend fun performScroll(
+        direction: ScrollDirection,
+        startX: Float = dimensionsFlow.value.width / 2f,
+        startY: Float = dimensionsFlow.value.height / 2f,
+        duration: Long = settingsFlow.value.gestureDuration,
+        useNaturalScrolling: Boolean = settingsFlow.value.useNaturalScrolling,
+        forceFixedScroll: Boolean = false,
+        distanceFactor: Float = settingsFlow.value.scrollMultiplier
+    ): Boolean {
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing scroll gesture in direction $direction at position ($startX, $startY)")
-            val settings = settingsFlow.value
 
             // Calculate motion direction based on natural scrolling setting
-            val motionDirection = if (!settings.useNaturalScrolling) {
+            val motionDirection = if (!useNaturalScrolling) {
                 when (direction) {
                     ScrollDirection.UP -> ScrollDirection.DOWN
                     ScrollDirection.DOWN -> ScrollDirection.UP
@@ -95,7 +102,6 @@ class GestureManager(
                 direction
             }
 
-            val distanceFactor = settings.scrollMultiplier
             val distance = dimensions.percentOfSmallerDimension(distanceFactor)
 
             var (endX, endY) = when (motionDirection) {
@@ -112,7 +118,7 @@ class GestureManager(
                 visualizeScroll(direction, startX, startY, endX, endY)
             }
 
-            return currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll)
+            return currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll, duration)
         } catch (e: Exception) {
             Logger.e("Error performing scroll gesture", e)
             return false

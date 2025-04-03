@@ -4,10 +4,10 @@ import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.gestureInterval
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.initialDelay
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
@@ -232,11 +232,6 @@ class GridActionHandler(
     }
 
     private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
-        val settings = settingsFlow.value
-        val offset = if (settings.gestureStyle == GestureStyle.FIXED) GestureConstants.SCROLL_END_PAUSE else 0
-        val gestureInterval = ((settings.gestureDuration + offset) * GestureConstants.CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
-        val initialDelay = ((GestureConstants.MAX_GESTURE_DURATION + offset) * GestureConstants.CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
-
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 cancelContinuousScrolling()
@@ -257,13 +252,13 @@ class GridActionHandler(
                 if (direction != null) {
                     currentScrollDirection = direction
                     backgroundScope.launch {
-                        gestureManager.performScroll(direction, x, y)
+                        gestureManager.performScroll(direction, startX = x, startY = y)
                     }
 
                     continuousScrollJob = backgroundScope.launch {
                         delay(initialDelay)
                         while (currentScrollDirection == direction) {
-                            gestureManager.performScroll(direction, x, y, true)
+                            gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true)
                             delay(gestureInterval)
                         }
                     }

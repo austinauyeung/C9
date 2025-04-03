@@ -3,6 +3,7 @@ package com.austinauyeung.nyuma.c9.settings.domain
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
@@ -28,7 +29,7 @@ object Defaults {
         const val CURSOR_ACCELERATION_THRESHOLD = CursorConstants.DEFAULT_ACCELERATION_THRESHOLD
         const val GRID_ACTIVATION_KEY = KeyEvent.KEYCODE_POUND
         const val CURSOR_ACTIVATION_KEY = KeyEvent.KEYCODE_STAR
-        const val CURSOR_WRAP_AROUND = CursorConstants.CURSOR_WRAP_AROUND
+        val CURSOR_EDGE_BEHAVIOR = ScreenEdgeBehavior.NONE
         val CONTROL_SCHEME = ControlScheme.STANDARD
         val GESTURE_STYLE = GestureStyle.FIXED
         const val TOGGLE_HOLD = CursorConstants.TOGGLE_HOLD

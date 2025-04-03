@@ -2,6 +2,7 @@ package com.austinauyeung.nyuma.c9.settings.domain
 
 import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
@@ -25,7 +26,7 @@ data class OverlaySettings(
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
-    val cursorWrapAround: Boolean = Defaults.Settings.CURSOR_WRAP_AROUND,
+    val cursorEdgeBehavior: ScreenEdgeBehavior = Defaults.Settings.CURSOR_EDGE_BEHAVIOR,
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
     val toggleHold: Boolean = Defaults.Settings.TOGGLE_HOLD,
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,

@@ -2,6 +2,8 @@ package com.austinauyeung.nyuma.c9.cursor.handler
 
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
@@ -10,6 +12,7 @@ import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +33,7 @@ class CursorStateManager(
 ) {
     private val _cursorState = MutableStateFlow<CursorState?>(null)
     val cursorState: StateFlow<CursorState?> = _cursorState.asStateFlow()
+    private var edgeScrollJob: Job? = null
 
     init {
         _cursorState
@@ -153,21 +157,35 @@ class CursorStateManager(
         val newX = currentPosition.x + delta.x
         val newY = currentPosition.y + delta.y
 
-        return if (settings.cursorWrapAround) {
-            Offset(
-                x = when {
-                    newX < 0 -> dimensions.width.toFloat()
-                    newX > dimensions.width -> 0f
-                    else -> newX
-                },
-                y = when {
-                    newY < 0 -> dimensions.height.toFloat()
-                    newY > dimensions.height -> 0f
-                    else -> newY
-                }
-            )
-        } else {
-            dimensions.constrainToBounds(newX, newY).let { (x, y) -> Offset(x, y) }
+        return when (settings.cursorEdgeBehavior) {
+            ScreenEdgeBehavior.WRAP_AROUND -> {
+                Offset(
+                    x = when {
+                        newX < 0 -> dimensions.width.toFloat()
+                        newX > dimensions.width -> 0f
+                        else -> newX
+                    },
+                    y = when {
+                        newY < 0 -> dimensions.height.toFloat()
+                        newY > dimensions.height -> 0f
+                        else -> newY
+                    }
+                )
+            }
+
+            else -> dimensions.constrainToBounds(newX, newY).let { (x, y) -> Offset(x, y) }
         }
+    }
+
+    fun checkEdge(direction: CursorDirection, position: Offset): ScreenEdge {
+        val dimensions = dimensionsFlow.value
+        val threshold = 0.01f
+
+        if (direction == CursorDirection.UP && position.y <= dimensions.height * threshold) return ScreenEdge.TOP
+        if (direction == CursorDirection.DOWN && position.y >= dimensions.height * (1 - threshold)) return ScreenEdge.BOTTOM
+        if (direction == CursorDirection.LEFT && position.x <= dimensions.width * threshold) return ScreenEdge.LEFT
+        if (direction == CursorDirection.RIGHT && position.x >= dimensions.width * (1 - threshold)) return ScreenEdge.RIGHT
+
+        return ScreenEdge.NONE
     }
 }

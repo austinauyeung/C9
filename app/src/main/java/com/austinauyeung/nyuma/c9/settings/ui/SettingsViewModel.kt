@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -64,7 +65,7 @@ class SettingsViewModel(
                             gridActivationKey = settings.gridActivationKey,
                             cursorActivationKey = settings.cursorActivationKey,
                             controlScheme = settings.controlScheme,
-                            cursorWrapAround = settings.cursorWrapAround,
+                            cursorEdgeBehavior = settings.cursorEdgeBehavior,
                             gestureStyle = settings.gestureStyle,
                             toggleHold = settings.toggleHold,
                             gestureDuration = settings.gestureDuration,
@@ -121,7 +122,7 @@ class SettingsViewModel(
             gridActivationKey = _uiState.value.gridActivationKey,
             cursorActivationKey = _uiState.value.cursorActivationKey,
             controlScheme = _uiState.value.controlScheme,
-            cursorWrapAround = _uiState.value.cursorWrapAround,
+            cursorEdgeBehavior = _uiState.value.cursorEdgeBehavior,
             gestureStyle = _uiState.value.gestureStyle,
             toggleHold = _uiState.value.toggleHold,
             gestureDuration = _uiState.value.gestureDuration,
@@ -196,7 +197,7 @@ data class SettingsUiState(
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
-    val cursorWrapAround: Boolean = Defaults.Settings.CURSOR_WRAP_AROUND,
+    val cursorEdgeBehavior: ScreenEdgeBehavior = Defaults.Settings.CURSOR_EDGE_BEHAVIOR,
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
     val toggleHold: Boolean = Defaults.Settings.TOGGLE_HOLD,
     val gestureDuration: Long = Defaults.Settings.GESTURE_DURATION,

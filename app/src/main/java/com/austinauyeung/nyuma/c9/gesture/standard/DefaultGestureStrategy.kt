@@ -100,7 +100,8 @@ class DefaultGestureStrategy(
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean
+        forceFixedScroll: Boolean,
+        duration: Long
     ): Boolean {
         try {
             val settings = settingsFlow.value
@@ -116,7 +117,7 @@ class DefaultGestureStrategy(
                 GestureDescription.StrokeDescription(
                     scrollPath,
                     0,
-                    settings.gestureDuration,
+                    duration,
                     willContinue
                 )
 

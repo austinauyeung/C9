@@ -1,5 +1,8 @@
 package com.austinauyeung.nyuma.c9.core.constants
 
+import com.austinauyeung.nyuma.c9.C9
+import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+
 object GestureConstants {
     // Timing
     const val TAP_DURATION = 50L
@@ -34,4 +37,9 @@ object GestureConstants {
     fun calculateSteps(duration: Long): Int {
         return ((duration / FRAME_DURATION_MS).toInt()).coerceAtLeast(1)
     }
+
+    val settings = C9.getInstance().getSettingsFlow().value
+    val offset = if (settings.gestureStyle == GestureStyle.FIXED) SCROLL_END_PAUSE else 0
+    val gestureInterval = ((settings.gestureDuration + offset) * CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
+    val initialDelay = ((MAX_GESTURE_DURATION + offset) * CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
 }

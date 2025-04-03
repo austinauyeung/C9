@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -42,7 +43,7 @@ class SettingsRepositoryImpl(
         private val GRID_ACTIVATION_KEY = intPreferencesKey("grid_activation_key")
         private val CURSOR_ACTIVATION_KEY = intPreferencesKey("cursor_activation_key")
         private val CONTROL_SCHEME = stringPreferencesKey("control_scheme")
-        private val CURSOR_WRAP_AROUND = booleanPreferencesKey("cursor_wrap_around")
+        private val CURSOR_EDGE_BEHAVIOR = stringPreferencesKey("cursor_edge_behavior")
         private val GESTURE_STYLE = stringPreferencesKey("gesture_style")
         private val TOGGLE_HOLD = booleanPreferencesKey("toggle_hold")
         private val GESTURE_DURATION = longPreferencesKey("gesture_duration")
@@ -99,6 +100,7 @@ class SettingsRepositoryImpl(
                     } else {
                         OverlaySettings.DEFAULT.gridLineVisibility
                     }
+
                 val hideOnTextFieldStr = preferences[HIDE_ON_TEXT_FIELD]
                 val hideOnTextField =
                     if (hideOnTextFieldStr != null) {
@@ -110,6 +112,19 @@ class SettingsRepositoryImpl(
                         }
                     } else {
                         OverlaySettings.DEFAULT.hideOnTextField
+                    }
+
+                val cursorEdgeBehaviorStr = preferences[CURSOR_EDGE_BEHAVIOR]
+                val cursorEdgeBehavior =
+                    if (cursorEdgeBehaviorStr != null) {
+                        try {
+                            ScreenEdgeBehavior.valueOf(cursorEdgeBehaviorStr)
+                        } catch (e: Exception) {
+                            Logger.w("Invalid hide on text field value: $cursorEdgeBehaviorStr", e)
+                            OverlaySettings.DEFAULT.cursorEdgeBehavior
+                        }
+                    } else {
+                        OverlaySettings.DEFAULT.cursorEdgeBehavior
                     }
 
                 OverlaySettings(
@@ -135,8 +150,7 @@ class SettingsRepositoryImpl(
                     cursorActivationKey = preferences[CURSOR_ACTIVATION_KEY]
                         ?: OverlaySettings.DEFAULT.cursorActivationKey,
                     controlScheme = controlScheme,
-                    cursorWrapAround = preferences[CURSOR_WRAP_AROUND]
-                        ?: OverlaySettings.DEFAULT.cursorWrapAround,
+                    cursorEdgeBehavior = cursorEdgeBehavior,
                     gestureStyle = gestureStyle,
                     toggleHold = preferences[TOGGLE_HOLD] ?: OverlaySettings.DEFAULT.toggleHold,
                     gestureDuration = preferences[GESTURE_DURATION]
@@ -173,7 +187,7 @@ class SettingsRepositoryImpl(
                 preferences[GRID_ACTIVATION_KEY] = settings.gridActivationKey
                 preferences[CURSOR_ACTIVATION_KEY] = settings.cursorActivationKey
                 preferences[CONTROL_SCHEME] = settings.controlScheme.name
-                preferences[CURSOR_WRAP_AROUND] = settings.cursorWrapAround
+                preferences[CURSOR_EDGE_BEHAVIOR] = settings.cursorEdgeBehavior.name
                 preferences[GESTURE_STYLE] = settings.gestureStyle.name
                 preferences[TOGGLE_HOLD] = settings.toggleHold
                 preferences[GESTURE_DURATION] = settings.gestureDuration

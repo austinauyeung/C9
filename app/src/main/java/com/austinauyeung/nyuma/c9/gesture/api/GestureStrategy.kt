@@ -9,7 +9,8 @@ interface GestureStrategy {
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean
+        forceFixedScroll: Boolean,
+        duration: Long
     ): Boolean
 
     suspend fun performZoom(

@@ -26,7 +26,6 @@ object CursorConstants {
     private const val TARGET_FPS = 60
     const val FRAME_DURATION_MS = 1000f / TARGET_FPS
     const val OPACITY = 0.8f
-    const val CURSOR_WRAP_AROUND = false
 
     const val TOGGLE_HOLD = false
 }

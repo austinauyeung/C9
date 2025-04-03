@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -208,13 +209,24 @@ fun CursorSettingsScreen(
                     },
                 )
 
-                SwitchPreferenceItem(
-                    title = "Cursor Wrap Around",
-                    subtitle = "Allow cursor to wrap around edges of the screen",
-                    checked = uiState.cursorWrapAround,
-                    onCheckedChange = { value ->
+                DropdownPreferenceItem(
+                    title = "Screen Edge Behavior",
+                    subtitle =
+                    when (uiState.cursorEdgeBehavior) {
+                        ScreenEdgeBehavior.NONE -> "Cursor remains at edge"
+                        ScreenEdgeBehavior.WRAP_AROUND -> "Cursor wraps to opposite side"
+                        ScreenEdgeBehavior.AUTO_SCROLL -> "Cursor slowly scrolls in edge direction"
+                    },
+                    selectedOption = uiState.cursorEdgeBehavior,
+                    options =
+                    listOf(
+                        ScreenEdgeBehavior.NONE to "None",
+                        ScreenEdgeBehavior.WRAP_AROUND to "Wrap",
+                        ScreenEdgeBehavior.AUTO_SCROLL to "Scroll"
+                    ),
+                    onOptionSelected = { value ->
                         viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(cursorWrapAround = v)
+                            settings.copy(cursorEdgeBehavior = v)
                         }
                     },
                 )

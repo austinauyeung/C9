@@ -108,7 +108,8 @@ class ShizukuGestureStrategy(
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean
+        forceFixedScroll: Boolean,
+        duration: Long
     ): Boolean {
         if (!isAvailable()) return false
 
@@ -117,7 +118,6 @@ class ShizukuGestureStrategy(
         try {
             mainScope.launch {
                 val downTime = SystemClock.uptimeMillis()
-                val duration = settingsFlow.value.gestureDuration
                 val steps = GestureConstants.calculateSteps(duration)
 
                 // Initial touch down event
