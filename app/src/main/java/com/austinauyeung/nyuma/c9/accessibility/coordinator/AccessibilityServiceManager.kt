@@ -104,7 +104,8 @@ class AccessibilityServiceManager(
                 settingsFlow,
                 backgroundScope,
                 modeCoordinator,
-                { orientationHandler.getCurrentOrientation() }
+                { orientationHandler.getCurrentOrientation() },
+                screenDimensionsFlow
             )
 
             // Listen for orientation changes

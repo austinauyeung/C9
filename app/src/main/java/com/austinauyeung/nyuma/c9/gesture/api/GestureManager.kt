@@ -35,6 +35,13 @@ class GestureManager(
     private var currentStrategy: GestureStrategy = defaultStrategy
     private var shizukuObserverJob: Job? = null
 
+    private val _isReady = MutableStateFlow(true)
+    val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
+
+    fun setGestureReady(ready: Boolean) {
+        _isReady.value = ready
+    }
+
     init {
         evaluateStrategy()
 
@@ -77,6 +84,12 @@ class GestureManager(
         return isReady
     }
 
+    private val completionListener = object : GestureCompletionListener {
+        override fun onGestureCompleted(success: Boolean) {
+            setGestureReady(true)
+        }
+    }
+
     suspend fun performScroll(
         direction: ScrollDirection,
         startX: Float = dimensionsFlow.value.width / 2f,
@@ -86,6 +99,9 @@ class GestureManager(
         forceFixedScroll: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
     ): Boolean {
+        if (!_isReady.value) return false
+        setGestureReady(false)
+
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing scroll gesture in direction $direction at position ($startX, $startY)")
@@ -115,17 +131,24 @@ class GestureManager(
             endY = endY.coerceIn(0f, dimensions.height.toFloat())
 
             if (shouldShowGestures) {
-                visualizeScroll(direction, startX, startY, endX, endY)
+                visualizeScroll(direction, startX, startY, endX, endY, duration)
             }
 
-            return currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll, duration)
+            val result = currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll, duration, completionListener)
+            delay(duration)
+
+            return result
         } catch (e: Exception) {
             Logger.e("Error performing scroll gesture", e)
+            setGestureReady(true)
             return false
         }
     }
 
     suspend fun performZoom(isZoomIn: Boolean, startX: Float, startY: Float): Boolean {
+        if (!_isReady.value) return false
+        setGestureReady(false)
+
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
@@ -169,10 +192,12 @@ class GestureManager(
                 startX1, startY1,
                 startX2, startY2,
                 endX1, endY1,
-                endX2, endY2
+                endX2, endY2,
+                completionListener
             )
         } catch (e: Exception) {
             Logger.e("Error performing zoom gesture", e)
+            setGestureReady(true)
             return false
         }
     }
@@ -229,16 +254,16 @@ class GestureManager(
         startX: Float,
         startY: Float,
         endX: Float,
-        endY: Float
+        endY: Float,
+        duration: Long
     ) {
         val gestureId = "scroll_${System.currentTimeMillis()}_$direction"
-        val settings = settingsFlow.value
 
         animateGesturePath(
             gestureId = gestureId,
             startPosition = Offset(startX, startY),
             endPosition = Offset(endX, endY),
-            duration = settings.gestureDuration,
+            duration = duration,
             type = GestureType.SCROLL,
             pathsFlow = _gesturePaths,
             coroutineScope = serviceScope

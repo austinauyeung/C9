@@ -5,13 +5,13 @@ import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
+import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.gestureInterval
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.initialDelay
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
@@ -35,6 +35,7 @@ class CursorActionHandler(
     private val backgroundScope: CoroutineScope,
     private val modeCoordinator: OverlayModeCoordinator,
     private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT },
+    private val dimensionsFlow: StateFlow<ScreenDimensions>,
 ) {
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
@@ -280,6 +281,7 @@ class CursorActionHandler(
                                 OverlayAccessibilityService.getInstance()?.setHidingCursor(false)
                             } else {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
+                                gestureManager.setGestureReady(true)
                             }
                         }
                     }
@@ -346,6 +348,7 @@ class CursorActionHandler(
     }
 
     private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
+        val settings = settingsFlow.value
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 cancelContinuousScrolling()
@@ -365,10 +368,13 @@ class CursorActionHandler(
                     }
 
                     continuousScrollJob = backgroundScope.launch {
-                        delay(initialDelay)
+                        delay(settings.gestureDuration)
                         while (currentScrollDirection == direction) {
-                            performScroll(direction, true)
-                            delay(gestureInterval)
+                            gestureManager.isReady.collect { isReady ->
+                                if (isReady) {
+                                    performScroll(direction, true)
+                                }
+                            }
                         }
                     }
                 }
@@ -474,8 +480,11 @@ class CursorActionHandler(
             if (currentScreenEdge != ScreenEdge.NONE && slowScrollJob == null) {
                 slowScrollJob = backgroundScope.launch {
                     while (currentScreenEdge != ScreenEdge.NONE) {
-                        performSlowScroll(currentScreenEdge!!, 80L)
-                        delay(100L)
+                        gestureManager.isReady.collect { isReady ->
+                            if (isReady) {
+                                performSlowScroll(currentScreenEdge!!, GestureConstants.SLOW_SCROLL_DURATION)
+                            }
+                        }
                     }
                 }
             }
@@ -483,15 +492,33 @@ class CursorActionHandler(
     }
 
     private suspend fun performSlowScroll(edge: ScreenEdge, duration: Long): Boolean {
-        val direction = when (edge) {
-            ScreenEdge.TOP -> ScrollDirection.UP
-            ScreenEdge.BOTTOM -> ScrollDirection.DOWN
-            ScreenEdge.LEFT -> ScrollDirection.LEFT
-            ScreenEdge.RIGHT -> ScrollDirection.RIGHT
+        var direction: ScrollDirection? = null
+        val dimensions = dimensionsFlow.value
+        var x = dimensions.width / 2f
+        var y = dimensions.height / 2f
+        val cursorState = cursorStateManager.cursorState.value
+
+        when (edge) {
+            ScreenEdge.TOP -> {
+                direction = ScrollDirection.UP
+                if (cursorState != null) x = cursorState.position.x
+            }
+            ScreenEdge.BOTTOM -> {
+                direction = ScrollDirection.DOWN
+                if (cursorState != null) x = cursorState.position.x
+            }
+            ScreenEdge.LEFT -> {
+                direction = ScrollDirection.LEFT
+                if (cursorState != null) y = cursorState.position.y
+            }
+            ScreenEdge.RIGHT -> {
+                direction = ScrollDirection.RIGHT
+                if (cursorState != null) y = cursorState.position.y
+            }
             ScreenEdge.NONE -> null
         }
 
-        if (direction != null) gestureManager.performScroll(direction, duration = duration, useNaturalScrolling = false, forceFixedScroll = true, distanceFactor = 0.05f)
+        if (direction != null) gestureManager.performScroll(direction, startX = x, startY = y, duration = duration, useNaturalScrolling = false, forceFixedScroll = true, distanceFactor = GestureConstants.SLOW_SCROLL_MULTIPLIER)
         return true
     }
 

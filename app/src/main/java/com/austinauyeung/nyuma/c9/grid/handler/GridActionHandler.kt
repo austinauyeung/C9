@@ -6,8 +6,6 @@ import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinat
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.gestureInterval
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants.initialDelay
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
@@ -168,6 +166,7 @@ class GridActionHandler(
                                 OverlayAccessibilityService.getInstance()?.setHidingCursor(false)
                             } else {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
+                                gestureManager.setGestureReady(true)
                             }
                         }
                     }
@@ -232,6 +231,7 @@ class GridActionHandler(
     }
 
     private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
+        val settings = settingsFlow.value
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 cancelContinuousScrolling()
@@ -256,10 +256,13 @@ class GridActionHandler(
                     }
 
                     continuousScrollJob = backgroundScope.launch {
-                        delay(initialDelay)
+                        delay(settings.gestureDuration)
                         while (currentScrollDirection == direction) {
-                            gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true)
-                            delay(gestureInterval)
+                            gestureManager.isReady.collect { isReady ->
+                                if (isReady) {
+                                    gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true)
+                                }
+                            }
                         }
                     }
                 }

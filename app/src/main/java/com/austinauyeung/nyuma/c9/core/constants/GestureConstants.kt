@@ -14,14 +14,14 @@ object GestureConstants {
     const val MAX_GESTURE_DURATION = 500L
     const val DEFAULT_GESTURE_DURATION = 300L
     const val SCROLL_END_PAUSE = 50L
-    const val CONTINUOUS_INITIAL_DELAY_FACTOR = 1.2
-    const val CONTINUOUS_REPEAT_INTERVAL_FACTOR = 1.2
+    const val SLOW_SCROLL_DURATION = 150L
 
     // Scroll
     const val MIN_SCROLL_MULTIPLIER = 0.3f
     const val MAX_SCROLL_MULTIPLIER = 0.7f
     const val DEFAULT_SCROLL_MULTIPLIER = 0.5f
     const val USE_NATURAL_SCROLLING = false
+    const val SLOW_SCROLL_MULTIPLIER = 0.1f
 
     // Zoom
     const val ZOOM_DISTANCE_FACTOR = 0.15f
@@ -33,13 +33,11 @@ object GestureConstants {
     // Intercept
     const val ALLOW_PASSTHROUGH = false
 
+    // Screen Edge
+    const val SCREEN_EDGE_THRESHOLD = 0.02f
+
     // Steps needed to maintain frame rate
     fun calculateSteps(duration: Long): Int {
         return ((duration / FRAME_DURATION_MS).toInt()).coerceAtLeast(1)
     }
-
-    val settings = C9.getInstance().getSettingsFlow().value
-    val offset = if (settings.gestureStyle == GestureStyle.FIXED) SCROLL_END_PAUSE else 0
-    val gestureInterval = ((settings.gestureDuration + offset) * CONTINUOUS_REPEAT_INTERVAL_FACTOR).toLong()
-    val initialDelay = ((MAX_GESTURE_DURATION + offset) * CONTINUOUS_INITIAL_DELAY_FACTOR).toLong()
 }

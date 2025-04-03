@@ -5,6 +5,7 @@ import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
@@ -33,7 +34,6 @@ class CursorStateManager(
 ) {
     private val _cursorState = MutableStateFlow<CursorState?>(null)
     val cursorState: StateFlow<CursorState?> = _cursorState.asStateFlow()
-    private var edgeScrollJob: Job? = null
 
     init {
         _cursorState
@@ -179,7 +179,7 @@ class CursorStateManager(
 
     fun checkEdge(direction: CursorDirection, position: Offset): ScreenEdge {
         val dimensions = dimensionsFlow.value
-        val threshold = 0.01f
+        val threshold = GestureConstants.SCREEN_EDGE_THRESHOLD
 
         if (direction == CursorDirection.UP && position.y <= dimensions.height * threshold) return ScreenEdge.TOP
         if (direction == CursorDirection.DOWN && position.y >= dimensions.height * (1 - threshold)) return ScreenEdge.BOTTOM
