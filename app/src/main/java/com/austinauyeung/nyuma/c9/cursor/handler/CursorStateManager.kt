@@ -13,7 +13,6 @@ import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
  * Manages the cursor state, including position, visibility and mode.
@@ -118,21 +115,18 @@ class CursorStateManager(
     fun calculateFrameSpeed(timeHeld: Long): Float {
         val dimensions = dimensionsFlow.value
         val settings = settingsFlow.value
-        val currentExponent = settings.cursorSpeed.toFloat().pow(CursorConstants.DEFAULT_EXPONENT)
-        val maxExponent = CursorConstants.MAX_SPEED.toFloat().pow(CursorConstants.DEFAULT_EXPONENT)
-        val baseSpeed = CursorConstants.DEFAULT_SPEED_MULTIPLIER * currentExponent
-
-        val totalPixels = dimensions.width * dimensions.height
-        val screenScaleFactor = sqrt(totalPixels.toFloat()) / 1000f
+        val baseSpeed = settings.cursorSpeed.toFloat() * CursorConstants.DEFAULT_SPEED_MULTIPLIER
+        val acceleratedSpeed = CursorConstants.MAX_SPEED.toFloat() * CursorConstants.DEFAULT_ACCELERATION_MULTIPLIER
+        val currentSpeed = CursorConstants.DEFAULT_SPEED_MULTIPLIER * baseSpeed
 
         val speed = if (timeHeld > settings.cursorAccelerationThreshold) {
-            baseSpeed + (maxExponent * CursorConstants.DEFAULT_ACCELERATION_MULTIPLIER - currentExponent * CursorConstants.DEFAULT_SPEED_MULTIPLIER) * (settings.cursorAcceleration - 1) / (CursorConstants.MAX_ACCELERATION - CursorConstants.MIN_ACCELERATION)
+            currentSpeed + (acceleratedSpeed - baseSpeed) * (settings.cursorAcceleration - 1) / (CursorConstants.MAX_ACCELERATION - CursorConstants.MIN_ACCELERATION)
         } else {
-            baseSpeed
+            currentSpeed
         }
 
         // Pixels per second * seconds per frame = pixels per frame
-        val frameSpeed = speed * (CursorConstants.FRAME_DURATION_MS / 1000f) * screenScaleFactor
+        val frameSpeed = speed * (CursorConstants.FRAME_DURATION_MS / 1000f) * dimensions.getScreenScaleFactor()
 
         return frameSpeed
     }

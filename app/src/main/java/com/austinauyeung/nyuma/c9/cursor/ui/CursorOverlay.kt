@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -25,9 +26,10 @@ fun CursorOverlay(
     cursorState: CursorState,
     settings: OverlaySettings? = null,
     modifier: Modifier = Modifier,
+    dimensions: ScreenDimensions
 ) {
     var cursorSize = settings?.cursorSize?.toFloat() ?: CursorConstants.DEFAULT_SIZE.toFloat()
-    cursorSize *= CursorConstants.SIZE_MULTIPLIER
+    cursorSize *= CursorConstants.SIZE_MULTIPLIER * dimensions.getScreenScaleFactor()
     val opacity = CursorConstants.OPACITY
 
     Canvas(modifier = modifier.fillMaxSize()) {

@@ -183,15 +183,7 @@ fun SettingsScreen(
                     title = "Gesture Duration",
                     value = uiState.gestureDuration.toFloat(),
                     valueRange = GestureConstants.MIN_GESTURE_DURATION.toFloat()..GestureConstants.MAX_GESTURE_DURATION.toFloat(),
-                    valueText =
-                    when (uiState.gestureDuration) {
-                        100L -> "Fastest"
-                        200L -> "Fast"
-                        300L -> "Medium"
-                        400L -> "Slow"
-                        500L -> "Slowest"
-                        else -> ""
-                    },
+                    valueText = "${uiState.gestureDuration} ms",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
                             settings.copy(gestureDuration = v.toLong())
@@ -259,7 +251,7 @@ fun SettingsScreen(
             PreferenceCategory(title = "Advanced") {
                 NavigationItem(
                     title = "Developer Options",
-                    subtitle = "Additional features for non-standard operation",
+                    subtitle = "Additional non-standard features",
                     onClick = onNavigateToDebugOptions
                 )
             }

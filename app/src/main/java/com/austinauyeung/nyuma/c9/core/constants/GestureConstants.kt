@@ -1,8 +1,5 @@
 package com.austinauyeung.nyuma.c9.core.constants
 
-import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-
 object GestureConstants {
     // Timing
     const val TAP_DURATION = 50L

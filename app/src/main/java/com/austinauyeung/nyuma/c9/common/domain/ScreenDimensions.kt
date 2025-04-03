@@ -1,5 +1,7 @@
 package com.austinauyeung.nyuma.c9.common.domain
 
+import kotlin.math.sqrt
+
 /**
  * Handles screen size calculations.
  */
@@ -26,5 +28,9 @@ data class ScreenDimensions(
     fun percentOfSmallerDimension(percent: Float): Float {
         val smallerDimension = minOf(width, height)
         return smallerDimension * percent
+    }
+
+    fun getScreenScaleFactor(): Float {
+        return sqrt(width * height * 1.0f) / 1000f
     }
 }

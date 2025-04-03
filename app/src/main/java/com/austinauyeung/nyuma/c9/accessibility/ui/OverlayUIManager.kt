@@ -188,6 +188,7 @@ class OverlayUIManager(
                             CursorOverlay(
                                 cursorState = activeCursor,
                                 settings = currentSettings,
+                                dimensions = orientationHandler.screenDimensions.value
                             )
                         }
 
