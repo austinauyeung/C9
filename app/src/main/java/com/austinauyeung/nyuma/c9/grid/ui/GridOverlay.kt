@@ -3,7 +3,6 @@ package com.austinauyeung.nyuma.c9.grid.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -11,7 +10,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -20,13 +18,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
-import com.austinauyeung.nyuma.c9.grid.domain.GridCell
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
 /**
@@ -44,21 +40,13 @@ fun GridOverlay(
     val textMeasurer = rememberTextMeasurer()
     val gridBackground = colorResource(id = R.color.grid_background)
     val gridBorderColor = colorResource(id = R.color.grid_border)
-    val layoutState = remember { mutableStateOf(IntSize.Zero) }
 
-    val dimensions =
-        remember(grid, layoutState.value.width, layoutState.value.height) {
-            calculateGridDimensions(
-                grid,
-                layoutState.value.width.toFloat(),
-                layoutState.value.height.toFloat(),
-            )
-        }
+    val (cellWidth, cellHeight) = grid.getCellSize()
 
     val density = LocalDensity.current
     val fontSize = (minOf(
-        dimensions.cellWidth,
-        dimensions.cellHeight
+        cellWidth,
+        cellHeight
     ) * GridConstants.GRID_FONT_SIZE / density.density).sp
 
     val textStyle =
@@ -77,7 +65,7 @@ fun GridOverlay(
 
     val shouldShowGridLines = when (gridLineVisibility) {
         GridLineVisibility.SHOW_ALL -> true
-        GridLineVisibility.FINAL_LEVEL_ONLY -> grid.level == grid.maxLevels
+        GridLineVisibility.FINAL_LEVEL_ONLY -> grid.level == GridConstants.MAX_LEVELS
         GridLineVisibility.HIDE_ALL -> false
     }
 
@@ -91,10 +79,7 @@ fun GridOverlay(
 
     Canvas(
         modifier = Modifier
-            .fillMaxSize()
-            .onSizeChanged { newSize ->
-                layoutState.value = newSize
-            },
+            .fillMaxSize(),
     ) {
         drawRect(
             color = gridBackground.copy(alpha = backgroundAlpha),
@@ -102,28 +87,30 @@ fun GridOverlay(
         )
 
         if (!hideNumbers) {
-            grid.cells.forEach { cell ->
-                drawCell(
-                    cell = cell,
-                    dimensions = dimensions,
-                    textMeasurer = textMeasurer,
-                    textStyle = textStyle,
-                    gridNumbers = gridNumbers,
-                    useRotatedNumbers = useRotatedNumbers
-                )
+            for (row in 0 until GridConstants.DIMENSION) {
+                for (col in 0 until GridConstants.DIMENSION) {
+                    drawCell(
+                        grid = grid,
+                        row = row,
+                        col = col,
+                        textMeasurer = textMeasurer,
+                        textStyle = textStyle,
+                        gridNumbers = gridNumbers,
+                    )
+                }
             }
         }
 
         drawRect(
             color = Color.White,
-            topLeft = Offset(dimensions.x, dimensions.y),
-            size = Size(dimensions.width, dimensions.height),
+            topLeft = Offset(grid.x, grid.y),
+            size = Size(grid.width, grid.height),
             style = Stroke(width = borderStrokeWidth),
         )
 
         if (shouldShowGridLines) {
             drawGridLines(
-                dimensions = dimensions,
+                grid = grid,
                 gridBorderColor = gridBorderColor,
                 gridStrokeWidth = gridStrokeWidth,
             )
@@ -131,73 +118,19 @@ fun GridOverlay(
     }
 }
 
-private data class GridDimensions(
-    val x: Float,
-    val y: Float,
-    val width: Float,
-    val height: Float,
-    val cellWidth: Float,
-    val cellHeight: Float,
-)
-
-private fun calculateGridDimensions(
-    grid: Grid,
-    totalWidth: Float,
-    totalHeight: Float,
-): GridDimensions {
-    var currentWidth = totalWidth
-    var currentHeight = totalHeight
-    var currentX = 0f
-    var currentY = 0f
-
-    val gridPath = mutableListOf<Grid>()
-    var currentGrid: Grid? = grid
-    while (currentGrid != null) {
-        gridPath.add(currentGrid)
-        currentGrid = currentGrid.parentGrid
-    }
-    gridPath.reverse()
-
-    for (i in 0 until gridPath.size - 1) {
-        currentWidth /= GridConstants.DIMENSION
-        currentHeight /= GridConstants.DIMENSION
-
-        val nextGrid = gridPath[i + 1]
-        val parentCell = nextGrid.parentCell ?: continue
-
-        currentX += parentCell.column * currentWidth
-        currentY += parentCell.row * currentHeight
-    }
-
-    val cellWidth = currentWidth / GridConstants.DIMENSION
-    val cellHeight = currentHeight / GridConstants.DIMENSION
-
-    return GridDimensions(
-        x = currentX,
-        y = currentY,
-        width = currentWidth,
-        height = currentHeight,
-        cellWidth = cellWidth,
-        cellHeight = cellHeight,
-    )
-}
-
 private fun DrawScope.drawCell(
-    cell: GridCell,
-    dimensions: GridDimensions,
+    grid: Grid,
+    row: Int, col: Int,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
     gridNumbers: Array<Array<Int>>,
-    useRotatedNumbers: Boolean
 ) {
-    val left = dimensions.x + (cell.column * dimensions.cellWidth)
-    val top = dimensions.y + (cell.row * dimensions.cellHeight)
+    val (cellWidth, cellHeight) = grid.getCellSize()
 
-    val cellNumber = if (useRotatedNumbers) {
-        gridNumbers[cell.row][cell.column]
-    } else {
-        cell.number
-    }
+    val left = grid.x + (col * cellWidth)
+    val top = grid.y + (row * cellHeight)
+
+    val cellNumber = gridNumbers[row][col]
 
     val textLayoutResult =
         textMeasurer.measure(
@@ -207,8 +140,8 @@ private fun DrawScope.drawCell(
 
     val textOffset =
         Offset(
-            x = left + (dimensions.cellWidth - textLayoutResult.size.width) / 2,
-            y = top + (dimensions.cellHeight - textLayoutResult.size.height) / 2,
+            x = left + (cellWidth - textLayoutResult.size.width) / 2,
+            y = top + (cellHeight - textLayoutResult.size.height) / 2,
         )
 
     drawText(
@@ -218,7 +151,7 @@ private fun DrawScope.drawCell(
 }
 
 private fun DrawScope.drawGridLines(
-    dimensions: GridDimensions,
+    grid: Grid,
     gridBorderColor: Color,
     gridStrokeWidth: Float
 ) {
@@ -226,12 +159,12 @@ private fun DrawScope.drawGridLines(
         drawLine(
             color = gridBorderColor,
             start = Offset(
-                x = dimensions.x + (i * dimensions.width / GridConstants.DIMENSION),
-                y = dimensions.y
+                x = grid.x + (i * grid.width / GridConstants.DIMENSION),
+                y = grid.y
             ),
             end = Offset(
-                x = dimensions.x + (i * dimensions.width / GridConstants.DIMENSION),
-                y = dimensions.y + dimensions.height
+                x = grid.x + (i * grid.width / GridConstants.DIMENSION),
+                y = grid.y + grid.height
             ),
             strokeWidth = gridStrokeWidth,
         )
@@ -239,12 +172,12 @@ private fun DrawScope.drawGridLines(
         drawLine(
             color = gridBorderColor,
             start = Offset(
-                x = dimensions.x,
-                y = dimensions.y + (i * dimensions.height / GridConstants.DIMENSION)
+                x = grid.x,
+                y = grid.y + (i * grid.height / GridConstants.DIMENSION)
             ),
             end = Offset(
-                x = dimensions.x + dimensions.width,
-                y = dimensions.y + (i * dimensions.height / GridConstants.DIMENSION)
+                x = grid.x + grid.width,
+                y = grid.y + (i * grid.height / GridConstants.DIMENSION)
             ),
             strokeWidth = gridStrokeWidth,
         )

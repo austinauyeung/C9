@@ -1,9 +1,9 @@
 package com.austinauyeung.nyuma.c9.grid.handler
 
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
-import com.austinauyeung.nyuma.c9.grid.domain.GridNavigator
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
  * Manages grid state including visibility, grid hierarchy, and state transitions.
  */
 class GridStateManager(
-    private val gridNavigator: GridNavigator,
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
@@ -28,6 +27,7 @@ class GridStateManager(
 ) {
     private val _gridState = MutableStateFlow<Grid?>(null)
     val gridState: StateFlow<Grid?> = _gridState.asStateFlow()
+    private val keySequence = mutableListOf<Int>()
 
     init {
         _gridState
@@ -37,25 +37,19 @@ class GridStateManager(
             .launchIn(CoroutineScope(Dispatchers.Main + SupervisorJob()))
     }
 
-    fun isGridVisible(): Boolean = _gridState.value?.isVisible == true
+    fun isGridVisible(): Boolean = _gridState.value != null
 
     fun handleNumberKey(number: Int): Boolean {
-        val currentGrid = _gridState.value ?: return false
         val settings = settingsFlow.value
-
-        val (success, needsClick, cellIndex) = gridNavigator.processNumberKey(number, currentGrid)
-        if (!success) return false
-
-        if (!needsClick) {
-            // Navigate to subgrid
-            val newGrid = gridNavigator.getSubgrid(currentGrid, cellIndex)
-            updateGrid(newGrid)
-            return true
+        keySequence.add(number)
+        Logger.d("Current grid sequence: $keySequence")
+        if (keySequence.size >= settings.gridLevels) {
+            performClick(number)
         } else {
-            // Perform click at the selected cell
-            performFinalAction(cellIndex, settings.persistOverlay)
-            return true
+            updateGrid(calculateGridFromSequence(keySequence))
         }
+
+        return true
     }
 
     fun toggleGridVisibility() {
@@ -67,12 +61,12 @@ class GridStateManager(
     }
 
     private fun showGrid() {
-        val settings = settingsFlow.value
-        val newGrid = Grid.createGrid(settings)
-        updateGrid(newGrid)
+        keySequence.clear()
+        updateGrid(calculateGridFromSequence(keySequence))
     }
 
     fun hideGrid() {
+        keySequence.clear()
         updateGrid(null)
     }
 
@@ -81,13 +75,11 @@ class GridStateManager(
     }
 
     // Performs the final action when a cell is selected in the deepest grid level
-    private fun performFinalAction(
-        cellIndex: Int,
-        persistOverlay: Boolean
-    ) {
+    private fun performClick(number: Int) {
+        val settings = settingsFlow.value
         val grid = _gridState.value
-        if (grid != null && gridNavigator.isValidCellIndex(grid, cellIndex)) {
-            val coordinates = gridNavigator.calculateClickCoordinates(grid, cellIndex)
+        if (grid != null) {
+            val coordinates = grid.getCellCenter(number)
             val (x, y) = coordinates
 
             backgroundScope.launch {
@@ -96,7 +88,7 @@ class GridStateManager(
             }
         }
 
-        if (!persistOverlay) {
+        if (!settings.persistOverlay) {
             hideGrid()
         } else {
             showGrid()
@@ -104,21 +96,46 @@ class GridStateManager(
     }
 
     fun resetToMainGrid(force: Boolean = false) {
-        val settings = settingsFlow.value
         if ((_gridState.value?.level != null && _gridState.value?.level!! > 1) || force) {
-            val newGrid = Grid.createGrid(settings)
-            updateGrid(newGrid)
+            keySequence.clear()
+            updateGrid(calculateGridFromSequence(keySequence))
         }
     }
 
-    fun getCellCoordinates(cellIndex: Int?): Pair<Float, Float> {
+    fun getCellCoordinates(number: Int?): Pair<Float, Float> {
         val grid = _gridState.value
         val dimensions = dimensionsFlow.value
-        if (grid == null || !gridNavigator.isValidCellIndex(grid, cellIndex)) {
-            // Default to screen center if grid or cell index is null/invalid
-            return Pair(dimensions.width / 2f, dimensions.height / 2f)
+        if (grid != null && number != null) return grid.getCellCenter(number)
+
+        // Default to screen center if grid is null/invalid
+        return Pair(dimensions.width / 2f, dimensions.height / 2f)
+    }
+
+    fun calculateGridFromSequence(sequence: List<Int>): Grid {
+        var x = 0f
+        var y = 0f
+        val dimensions = dimensionsFlow.value
+        var width = dimensions.width.toFloat()
+        var height = dimensions.height.toFloat()
+
+        sequence.forEach { number ->
+            val row = (number - 1) / 3
+            val col = (number - 1) % 3
+            val cellWidth = width / 3
+            val cellHeight = height / 3
+
+            x += col * cellWidth
+            y += row * cellHeight
+            width = cellWidth
+            height = cellHeight
         }
 
-        return gridNavigator.calculateClickCoordinates(grid, cellIndex!!)
+        return Grid(
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            level = sequence.size
+        )
     }
 }

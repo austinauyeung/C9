@@ -15,7 +15,6 @@ import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.standard.DefaultGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
-import com.austinauyeung.nyuma.c9.grid.domain.GridNavigator
 import com.austinauyeung.nyuma.c9.grid.handler.GridActionHandler
 import com.austinauyeung.nyuma.c9.grid.handler.GridStateManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -39,7 +38,6 @@ class AccessibilityServiceManager(
     private lateinit var gestureManager: GestureManager
     private lateinit var cursorStateManager: CursorStateManager
     private lateinit var cursorActionHandler: CursorActionHandler
-    private lateinit var gridNavigator: GridNavigator
     private lateinit var gridStateManager: GridStateManager
     private lateinit var gridActionHandler: GridActionHandler
     private lateinit var modeCoordinator: OverlayModeCoordinator
@@ -74,9 +72,7 @@ class AccessibilityServiceManager(
             )
 
             // Grid components
-            gridNavigator = GridNavigator(screenDimensionsFlow)
             gridStateManager = GridStateManager(
-                gridNavigator,
                 gestureManager,
                 settingsFlow,
                 screenDimensionsFlow,

@@ -33,8 +33,8 @@ class GridActionHandler(
     private var activationJob: Job? = null
     private var continuousScrollJob: Job? = null
 
+    private var heldNumberKeyCode: Int? = null
     private var heldNumberKey: Int? = null
-    private var heldCellIndex: Int? = null
     private var gestureDispatchedDuringHold: Boolean = false
 
     private var currentScrollDirection: ScrollDirection? = null
@@ -69,6 +69,7 @@ class GridActionHandler(
                 return handleActivationKey(event)
             }
 
+            // Can assume grid is not null if not returning
             if (!gridStateManager.isGridVisible()) return false
 
             val numKeys = setOf(
@@ -138,7 +139,7 @@ class GridActionHandler(
             }
         } catch (e: Exception) {
             Logger.e("Error processing grid key event", e)
-            heldNumberKey = null
+            heldNumberKeyCode = null
             cancelContinuousScrolling()
             return false
         }
@@ -203,12 +204,12 @@ class GridActionHandler(
     private fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
-                if (heldNumberKey != null) {
+                if (heldNumberKeyCode != null) {
                     return true
                 }
 
-                heldNumberKey = keyCode
-                heldCellIndex = keyCode - KeyEvent.KEYCODE_1
+                heldNumberKeyCode = keyCode
+                heldNumberKey = keyCode - KeyEvent.KEYCODE_1 + 1
                 gestureDispatchedDuringHold = false
                 return true
             }
@@ -216,12 +217,12 @@ class GridActionHandler(
             KeyEvent.ACTION_UP -> {
                 var result: Boolean? = null
 
-                if (heldNumberKey == keyCode && !gestureDispatchedDuringHold) {
-                    result = gridStateManager.handleNumberKey(heldCellIndex!! + 1)
+                if (heldNumberKeyCode == keyCode && !gestureDispatchedDuringHold) {
+                    result = gridStateManager.handleNumberKey(heldNumberKey!!)
                 }
 
+                heldNumberKeyCode = null
                 heldNumberKey = null
-                heldCellIndex = null
                 gestureDispatchedDuringHold = false
                 return result ?: true
             }
@@ -235,9 +236,9 @@ class GridActionHandler(
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 cancelContinuousScrolling()
-                val (x, y) = gridStateManager.getCellCoordinates(heldCellIndex)
+                val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                if (heldCellIndex != null) {
+                if (heldNumberKey != null) {
                     gestureDispatchedDuringHold = true
                 }
 
@@ -279,9 +280,9 @@ class GridActionHandler(
     private fun handleZoomKey(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_UP) {
             backgroundScope.launch {
-                val (x, y) = gridStateManager.getCellCoordinates(heldCellIndex)
+                val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                if (heldCellIndex != null) {
+                if (heldNumberKey != null) {
                     gestureDispatchedDuringHold = true
                 }
 
@@ -307,9 +308,9 @@ class GridActionHandler(
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 backgroundScope.launch {
-                    val (x, y) = gridStateManager.getCellCoordinates(heldCellIndex)
+                    val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                    if (heldCellIndex != null) {
+                    if (heldNumberKey != null) {
                         gestureDispatchedDuringHold = true
                     }
 
@@ -319,9 +320,9 @@ class GridActionHandler(
 
             KeyEvent.ACTION_UP -> {
                 backgroundScope.launch {
-                    val (x, y) = gridStateManager.getCellCoordinates(heldCellIndex)
+                    val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                    if (heldCellIndex != null) {
+                    if (heldNumberKey != null) {
                         gestureDispatchedDuringHold = true
                     }
 
