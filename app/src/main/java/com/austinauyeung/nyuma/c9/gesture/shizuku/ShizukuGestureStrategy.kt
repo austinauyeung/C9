@@ -13,9 +13,11 @@ import com.austinauyeung.nyuma.c9.gesture.api.GestureCompletionListener
 import com.austinauyeung.nyuma.c9.gesture.api.GestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 import java.lang.reflect.Method
@@ -175,8 +177,10 @@ class ShizukuGestureStrategy(
                     injectEvent(upEvent)
                     upEvent.recycle()
                 }
+
+                completionListener?.onGestureCompleted(true)
             }
-            completionListener?.onGestureCompleted(true)
+
             return true
         } catch (e: Exception) {
             Logger.e("Error performing scroll via Shizuku", e)

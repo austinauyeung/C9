@@ -476,15 +476,13 @@ class CursorActionHandler(
         if (settings.cursorEdgeBehavior == ScreenEdgeBehavior.AUTO_SCROLL) {
             currentScreenEdge = cursorStateManager.checkEdge(direction, newPosition)
             if (currentScreenEdge != ScreenEdge.NONE && slowScrollJob == null) {
-                slowScrollJob = backgroundScope.launch {
-                    while (currentScreenEdge != ScreenEdge.NONE) {
-                        gestureManager.isReady.collect { isReady ->
-                            if (isReady) {
-                                performSlowScroll(currentScreenEdge!!, GestureConstants.SLOW_SCROLL_DURATION)
-                            }
-                        }
-                    }
-                }
+                slowScrollJob = launchContinuousGesture(
+                    backgroundScope = backgroundScope,
+                    gestureManager = gestureManager,
+                    initialDelay = 0L,
+                    condition = { currentScreenEdge != ScreenEdge.NONE },
+                    action = { performSlowScroll(currentScreenEdge!!, GestureConstants.SLOW_SCROLL_DURATION) }
+                )
             }
         }
     }
