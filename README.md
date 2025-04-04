@@ -160,6 +160,9 @@ Install using adb:
 >> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 ```
 
+### Additional installation for Android 8
+If you are on Android 8 and are experiencing poor scrolling performance, Shizuku may be required. Please see the next section for Shizuku guidelines.
+
 ### Additional installation for Android 11
 If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
@@ -226,8 +229,6 @@ If you are unable to deactivate the cursor, clear the internal activation key, w
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
   - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
-- Scroll gestures that are made in quick succession and are overlapping may behave unexpectedly.
-  - To perform multiple scrolls, wait for the previous scroll to complete or hold the scroll button for continuous scrolling.
 - With Shizuku enabled and a `Fixed` gesture style, pull to refresh (e.g. scrolling down at the top of a page inside a browser that supports this feature) does not work.
   - This is currently unavoidable due to the implementation of this gesture style with Shizuku. Use either long press and drag or the `Inertia` gesture style.
 
