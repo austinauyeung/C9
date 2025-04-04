@@ -185,21 +185,13 @@ fun SettingsScreen(
                     title = "Scroll Distance",
                     value = uiState.scrollMultiplier,
                     valueRange = GestureConstants.MIN_SCROLL_MULTIPLIER..GestureConstants.MAX_SCROLL_MULTIPLIER,
-                    valueText =
-                    when (round(uiState.scrollMultiplier * 10) / 10) {
-                        0.3f -> "Shortest"
-                        0.4f -> "Short"
-                        0.5f -> "Medium"
-                        0.6f -> "Long"
-                        0.7f -> "Longest"
-                        else -> ""
-                    },
+                    valueText = "${round(uiState.scrollMultiplier * 100).toInt()}% of axis at most",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
                             settings.copy(scrollMultiplier = v)
                         }
                     },
-                    steps = 3,
+                    steps = 6,
                 )
 
                 SwitchPreferenceItem(

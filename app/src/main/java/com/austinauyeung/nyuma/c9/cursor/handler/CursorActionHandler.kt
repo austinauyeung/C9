@@ -16,6 +16,7 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
+import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGesture
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +43,7 @@ class CursorActionHandler(
     private var wasActivated: Boolean = false
     private var currentScrollDirection: ScrollDirection? = null
     private var activationJob: Job? = null
-    private var continuousScrollJob: Job? = null
+    private var continuousGestureJob: Job? = null
     private var movementJob: Job? = null
     private var currentScreenEdge: ScreenEdge? = null
     private var slowScrollJob: Job? = null
@@ -60,10 +61,10 @@ class CursorActionHandler(
         activationJob = null
     }
 
-    private fun cancelContinuousScrolling() {
+    private fun cancelContinuousGesture() {
         currentScrollDirection = null
-        continuousScrollJob?.cancel()
-        continuousScrollJob = null
+        continuousGestureJob?.cancel()
+        continuousGestureJob = null
     }
 
     private fun cancelMovementJob() {
@@ -80,7 +81,7 @@ class CursorActionHandler(
 
     fun cleanup() {
         cancelActivationJob()
-        cancelContinuousScrolling()
+        cancelContinuousGesture()
         cancelMovementJob()
         slowScrollJob?.cancel()
     }
@@ -253,13 +254,13 @@ class CursorActionHandler(
             }
         } catch (e: Exception) {
             Logger.e("Error processing cursor key event", e)
-            cancelContinuousScrolling()
+            cancelContinuousGesture()
             return false
         }
     }
 
     private fun handleActivationKey(event: KeyEvent): Boolean {
-        cancelContinuousScrolling()
+        cancelContinuousGesture()
         val settings = settingsFlow.value
 
         when (event.action) {
@@ -351,7 +352,7 @@ class CursorActionHandler(
         val settings = settingsFlow.value
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
-                cancelContinuousScrolling()
+                cancelContinuousGesture()
 
                 val direction = when (keyCode) {
                     KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2 -> ScrollDirection.UP
@@ -367,21 +368,18 @@ class CursorActionHandler(
                         performScroll(direction)
                     }
 
-                    continuousScrollJob = backgroundScope.launch {
-                        delay(settings.gestureDuration)
-                        while (currentScrollDirection == direction) {
-                            gestureManager.isReady.collect { isReady ->
-                                if (isReady) {
-                                    performScroll(direction, true)
-                                }
-                            }
-                        }
-                    }
+                    continuousGestureJob = launchContinuousGesture(
+                        backgroundScope = backgroundScope,
+                        gestureManager = gestureManager,
+                        initialDelay = settings.gestureDuration,
+                        condition = { currentScrollDirection == direction },
+                        action = { performScroll(direction, true) }
+                    )
                 }
             }
 
             KeyEvent.ACTION_UP -> {
-                cancelContinuousScrolling()
+                cancelContinuousGesture()
             }
         }
         return true

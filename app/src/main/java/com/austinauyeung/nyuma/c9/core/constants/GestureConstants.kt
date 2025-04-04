@@ -14,9 +14,9 @@ object GestureConstants {
     const val SLOW_SCROLL_DURATION = 150L
 
     // Scroll
-    const val MIN_SCROLL_MULTIPLIER = 0.3f
-    const val MAX_SCROLL_MULTIPLIER = 0.7f
-    const val DEFAULT_SCROLL_MULTIPLIER = 0.5f
+    const val MIN_SCROLL_MULTIPLIER = 0.1f
+    const val MAX_SCROLL_MULTIPLIER = 0.8f
+    const val DEFAULT_SCROLL_MULTIPLIER = 0.3f
     const val USE_NATURAL_SCROLLING = false
     const val SLOW_SCROLL_MULTIPLIER = 0.1f
 

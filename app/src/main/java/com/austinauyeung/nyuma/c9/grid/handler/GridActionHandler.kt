@@ -9,6 +9,7 @@ import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
+import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGesture
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -31,7 +32,7 @@ class GridActionHandler(
     private var isActivationKeyPressed: Boolean = false
     private var wasOverlayActivated: Boolean = false
     private var activationJob: Job? = null
-    private var continuousScrollJob: Job? = null
+    private var continuousGestureJob: Job? = null
 
     private var heldNumberKeyCode: Int? = null
     private var heldNumberKey: Int? = null
@@ -44,15 +45,15 @@ class GridActionHandler(
         activationJob = null
     }
 
-    private fun cancelContinuousScrolling() {
+    private fun cancelContinuousGesture() {
         currentScrollDirection = null
-        continuousScrollJob?.cancel()
-        continuousScrollJob = null
+        continuousGestureJob?.cancel()
+        continuousGestureJob = null
     }
 
     fun cleanup() {
         cancelActivationJob()
-        cancelContinuousScrolling()
+        cancelContinuousGesture()
     }
 
     fun handleKeyEvent(event: KeyEvent?): Boolean {
@@ -140,13 +141,13 @@ class GridActionHandler(
         } catch (e: Exception) {
             Logger.e("Error processing grid key event", e)
             heldNumberKeyCode = null
-            cancelContinuousScrolling()
+            cancelContinuousGesture()
             return false
         }
     }
 
     private fun handleActivationKey(event: KeyEvent): Boolean {
-        cancelContinuousScrolling()
+        cancelContinuousGesture()
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
@@ -235,7 +236,7 @@ class GridActionHandler(
         val settings = settingsFlow.value
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
-                cancelContinuousScrolling()
+                cancelContinuousGesture()
                 val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
                 if (heldNumberKey != null) {
@@ -256,21 +257,18 @@ class GridActionHandler(
                         gestureManager.performScroll(direction, startX = x, startY = y)
                     }
 
-                    continuousScrollJob = backgroundScope.launch {
-                        delay(settings.gestureDuration)
-                        while (currentScrollDirection == direction) {
-                            gestureManager.isReady.collect { isReady ->
-                                if (isReady) {
-                                    gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true)
-                                }
-                            }
-                        }
-                    }
+                    continuousGestureJob = launchContinuousGesture(
+                        backgroundScope = backgroundScope,
+                        gestureManager = gestureManager,
+                        initialDelay = settings.gestureDuration,
+                        condition = { currentScrollDirection == direction },
+                        action = { gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true) }
+                    )
                 }
             }
 
             KeyEvent.ACTION_UP -> {
-                cancelContinuousScrolling()
+                cancelContinuousGesture()
             }
         }
 

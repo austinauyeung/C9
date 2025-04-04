@@ -79,9 +79,9 @@ class GestureManager(
             return false
         }
 
-        val isReady = ShizukuServiceConnection.isReady(forceRefresh = true)
-        Logger.d("Shizuku ready status: $isReady")
-        return isReady
+        val isShizukuReady = ShizukuServiceConnection.isReady(forceRefresh = true)
+        Logger.d("Shizuku ready status: $isShizukuReady")
+        return isShizukuReady
     }
 
     private val completionListener = object : GestureCompletionListener {
@@ -118,7 +118,10 @@ class GestureManager(
                 direction
             }
 
-            val distance = dimensions.percentOfSmallerDimension(distanceFactor)
+            val distance = when (motionDirection) {
+                ScrollDirection.UP, ScrollDirection.DOWN -> dimensions.percentOfDimension(true, distanceFactor)
+                ScrollDirection.LEFT, ScrollDirection.RIGHT -> dimensions.percentOfDimension(false, distanceFactor)
+            }
 
             var (endX, endY) = when (motionDirection) {
                 ScrollDirection.UP -> Pair(startX, startY - distance)

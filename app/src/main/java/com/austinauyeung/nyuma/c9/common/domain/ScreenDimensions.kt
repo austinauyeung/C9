@@ -30,6 +30,10 @@ data class ScreenDimensions(
         return smallerDimension * percent
     }
 
+    fun percentOfDimension(vertical: Boolean, percent: Float): Float {
+        return percent * if (vertical) height else width
+    }
+
     fun getScreenScaleFactor(): Float {
         return sqrt(width * height * 1.0f) / 1000f
     }
