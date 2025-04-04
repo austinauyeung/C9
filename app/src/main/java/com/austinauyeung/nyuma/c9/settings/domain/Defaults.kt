@@ -40,7 +40,7 @@ object Defaults {
         const val ENABLE_SHIZUKU_INTEGRATION = false
         val HIDE_ON_TEXT_FIELD = AutoHideDetection.NONE
         const val ROTATE_BUTTONS_WITH_ORIENTATION = false
-        const val ROUNDED_CURSOR_CORNERS = false
+        const val ROUNDED_CURSOR_CORNERS = true
         const val USE_PHYSICAL_SIZE = true
     }
 }

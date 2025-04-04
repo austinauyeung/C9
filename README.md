@@ -115,11 +115,13 @@ The following options can be configured:
   - Swapped: D-pad scrolls, numpad moves
   - D-pad: D-pad moves and scrolls
   - Numpad: Numpad moves and scrolls
-- Enable cursor wrap around
+- Screen Edge Behavior
+  - Enable cursor wrap around
+  - Slow and continuous scrolling in the direction of the edge
 - Cursor speed
 - Cursor acceleration: accelerated cursor speed when held
 - Cursor acceleration threshold: duration after which cursor speed is accelerated
-- Cursor size
+- Cursor size and appearance
 
 #### Instructions
 All gestures are dispatched at the cursor's current location.
@@ -138,9 +140,12 @@ All gestures are dispatched at the cursor's current location.
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode with the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
-- In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5. 
-- If `C9 > Auto-Hide in Text Fields` is set, the cursors will hide when entering a text field and automatically restore according to the setting. The standard cursor's last position is saved upon restore.
+- In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
+- If `C9 > Auto-Hide in Text Fields` is set, the cursors will hide when entering a text field and automatically restore either upon leaving a text field or pressing enter (to submit a text field). The standard cursor's last position is saved upon restore.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
+- In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
+- For both cursors, use `C9 > Developer Options > Use Physical Size` to choose whether or not the cursor extends over your device's status bar and navigation bar.
+
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
