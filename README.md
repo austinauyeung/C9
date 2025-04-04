@@ -249,6 +249,7 @@ The cursors sit between your button presses and the underlying application. If a
 
 ## Acknowledgments
 - Allegra, [Arlie](./docs/imgs/IMG_5199.jpg), and [Nyuma](./docs/imgs/IMG_3226.jpg) for their support
+- Everyone on the [releases](https://github.com/austinauyeung/C9/releases) page for their feature suggestions
 - `sam-club` for extensive testing
 - `Dev-in-the-BM` for testing and the Shizuku suggestion
 - `anonymousfliphones` for testing
