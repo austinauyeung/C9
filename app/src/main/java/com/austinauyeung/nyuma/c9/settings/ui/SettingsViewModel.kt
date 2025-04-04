@@ -75,7 +75,8 @@ class SettingsViewModel(
                             enableShizukuIntegration = settings.enableShizukuIntegration,
                             hideOnTextField = settings.hideOnTextField,
                             rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation,
-                            roundedCursorCorners = settings.roundedCursorCorners
+                            roundedCursorCorners = settings.roundedCursorCorners,
+                            usePhysicalSize = settings.usePhysicalSize
                         )
                     }
                 }
@@ -133,7 +134,8 @@ class SettingsViewModel(
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
             hideOnTextField = _uiState.value.hideOnTextField,
             rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation,
-            roundedCursorCorners = _uiState.value.roundedCursorCorners
+            roundedCursorCorners = _uiState.value.roundedCursorCorners,
+            usePhysicalSize = _uiState.value.usePhysicalSize
         )
     }
 
@@ -209,5 +211,6 @@ data class SettingsUiState(
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
     val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
     val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
-    val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS
+    val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
+    val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE
 )

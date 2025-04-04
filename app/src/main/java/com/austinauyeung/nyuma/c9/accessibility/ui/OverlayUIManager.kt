@@ -1,7 +1,10 @@
 package com.austinauyeung.nyuma.c9.accessibility.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.os.Build
 import android.os.Looper
 import android.view.Gravity
 import android.view.WindowManager
@@ -19,7 +22,6 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
 import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.ui.C9Theme
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.ui.CursorOverlay
@@ -27,7 +29,6 @@ import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
 import com.austinauyeung.nyuma.c9.grid.ui.GridOverlay
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -100,34 +101,6 @@ class OverlayUIManager(
                 }
             }
             .launchIn(backgroundScope)
-
-        // Listen for orientation changes
-        orientationHandler.screenDimensions
-            .onEach { newDimensions ->
-                handleOrientationChange(newDimensions)
-            }
-            .launchIn(backgroundScope)
-    }
-
-    private fun handleOrientationChange(newDimensions: ScreenDimensions) {
-        try {
-            if (Looper.myLooper() != Looper.getMainLooper()) {
-                mainScope.launch { handleOrientationChange(newDimensions) }
-                return
-            }
-
-            isOrientationChanging = true
-
-            mainScope.launch{
-                delay(250)
-                updateOverlayUI()
-                isOrientationChanging = false
-            }
-
-        } catch (e: Exception) {
-            Logger.e("Error handling orientation change", e)
-            isOrientationChanging = false
-        }
     }
 
     fun updateOverlayUI() {
@@ -138,10 +111,10 @@ class OverlayUIManager(
                 return
             }
 
-            if (isOrientationChanging) {
-                Logger.d("Skipping overlay update during orientation change")
-                return
-            }
+//            if (isOrientationChanging) {
+//                Logger.d("Skipping overlay update during orientation change")
+//                return
+//            }
 
             val grid = accessibilityManager.currentGrid.value
             val cursor = accessibilityManager.currentCursor.value
@@ -159,12 +132,19 @@ class OverlayUIManager(
 
             if (overlayView == null) {
                 createOverlayView()
+            } else {
+                try {
+                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams())
+                } catch (e: Exception) {
+                    Logger.e("Failed to update overlay layout", e)
+                }
             }
 
             overlayView?.setContent {
                 val currentSettings by settingsFlow.collectAsState()
                 val currentGesturePaths by accessibilityManager.getGesturePaths().collectAsState()
                 val currentOrientation by orientationHandler.currentOrientation.collectAsState()
+                val dimensions by orientationHandler.screenDimensions.collectAsState()
 
                 C9Theme {
                     Surface(
@@ -188,7 +168,7 @@ class OverlayUIManager(
                             CursorOverlay(
                                 cursorState = activeCursor,
                                 settings = currentSettings,
-                                dimensions = orientationHandler.screenDimensions.value
+                                dimensions = dimensions
                             )
                         }
 
@@ -196,7 +176,7 @@ class OverlayUIManager(
                             GestureVisualization(
                                 gesturePaths = currentGesturePaths,
                                 settings = currentSettings,
-                                dimensions = orientationHandler.screenDimensions.value
+                                dimensions = dimensions
                             )
                         }
                     }
@@ -219,6 +199,7 @@ class OverlayUIManager(
         }
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     private fun createOverlayView() {
         try {
             if (Looper.myLooper() != Looper.getMainLooper()) {
@@ -231,6 +212,18 @@ class OverlayUIManager(
             composeView.setViewTreeLifecycleOwner(lifecycleOwner)
             composeView.setViewTreeSavedStateRegistryOwner(savedStateRegistryOwner)
             composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                composeView.setOnApplyWindowInsetsListener { _, insets ->
+                    mainScope.launch { updateOverlayUI() }
+                    insets
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                composeView.setOnApplyWindowInsetsListener { _, insets ->
+                    mainScope.launch { updateOverlayUI() }
+                    insets
+                }
+            }
 
             overlayView = composeView
 
@@ -261,7 +254,37 @@ class OverlayUIManager(
         }
     }
 
+    @SuppressLint("ObsoleteSdkInt")
+    @Suppress("Deprecation")
+    fun getInsetsFromView(): Rect {
+        val view = overlayView ?: return Rect(0, 0, 0, 0)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            view.rootWindowInsets?.let {
+                Rect(
+                    it.systemWindowInsetLeft,
+                    it.systemWindowInsetTop,
+                    it.systemWindowInsetRight,
+                    it.systemWindowInsetBottom
+                )
+            } ?: Rect(0, 0, 0, 0)
+        } else {
+            Rect(0, 0, 0, 0)
+        }
+    }
+
     private fun createOverlayLayoutParams(): WindowManager.LayoutParams {
+        val settings = settingsFlow.value
+        val insets = if (!settings.usePhysicalSize) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                orientationHandler.getSystemInsets()
+            } else {
+                getInsetsFromView()
+            }
+        } else {
+            Rect(0, 0, 0, 0)
+        }
+
         return WindowManager.LayoutParams().apply {
             type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
             flags = (
@@ -273,8 +296,8 @@ class OverlayUIManager(
             format = PixelFormat.TRANSLUCENT
             gravity = Gravity.TOP or Gravity.START
 
-            x = 0
-            y = 0
+            x = insets.left
+            y = insets.top
             width = WindowManager.LayoutParams.MATCH_PARENT
             height = WindowManager.LayoutParams.MATCH_PARENT
         }

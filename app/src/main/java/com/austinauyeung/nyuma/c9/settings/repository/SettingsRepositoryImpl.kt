@@ -54,6 +54,7 @@ class SettingsRepositoryImpl(
         private val HIDE_ON_TEXT_FIELD = stringPreferencesKey("hide_on_text_field")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
         private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
+        private val USE_PHYSICAL_SIZE = booleanPreferencesKey("use_physical_size")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -167,7 +168,9 @@ class SettingsRepositoryImpl(
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
                         ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation,
                     roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
-                        ?: OverlaySettings.DEFAULT.roundedCursorCorners
+                        ?: OverlaySettings.DEFAULT.roundedCursorCorners,
+                    usePhysicalSize = preferences[USE_PHYSICAL_SIZE]
+                        ?: OverlaySettings.DEFAULT.usePhysicalSize
                 )
             }
     }
@@ -200,6 +203,7 @@ class SettingsRepositoryImpl(
                 preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField.name
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
                 preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
+                preferences[USE_PHYSICAL_SIZE] = settings.usePhysicalSize
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

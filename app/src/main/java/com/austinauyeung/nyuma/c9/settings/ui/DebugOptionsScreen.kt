@@ -64,21 +64,17 @@ fun DebugOptionsScreen(
             }
 
             PreferenceCategory(title = "Shizuku") {
-                val switchEnabled = true
                 SwitchPreferenceItem(
                     title = "Enable Shizuku Integration",
                     subtitle = "Recommended for Android 8 and required for certain Android 11 devices",
                     checked = uiState.enableShizukuIntegration,
                     onCheckedChange = { newValue ->
-                        if (switchEnabled) {
-                            if (newValue && !uiState.enableShizukuIntegration) {
-                                showShizukuDialog = true
-                            } else {
-                                viewModel.updateEnableShizukuIntegration(newValue)
-                            }
+                        if (newValue && !uiState.enableShizukuIntegration) {
+                            showShizukuDialog = true
+                        } else {
+                            viewModel.updateEnableShizukuIntegration(newValue)
                         }
                     },
-                    enabled = switchEnabled
                 )
             }
 
@@ -106,6 +102,19 @@ fun DebugOptionsScreen(
                             Text("Cancel")
                         }
                     }
+                )
+            }
+
+            PreferenceCategory(title = "Display") {
+                SwitchPreferenceItem(
+                    title = "Use Physical Size",
+                    subtitle = "Overlay cursor over the entire screen, including the status and navigation bars",
+                    checked = uiState.usePhysicalSize,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(usePhysicalSize = v)
+                        }
+                    },
                 )
             }
 

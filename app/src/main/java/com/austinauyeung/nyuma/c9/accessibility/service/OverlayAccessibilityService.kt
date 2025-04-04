@@ -172,7 +172,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val settingsFlow = C9.getInstance().getSettingsFlow()
 
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-            orientationHandler = OrientationHandler(this)
+            orientationHandler = OrientationHandler(context = this, settingsFlow = settingsFlow)
 
             serviceManager = AccessibilityServiceManager(
                 service = this,

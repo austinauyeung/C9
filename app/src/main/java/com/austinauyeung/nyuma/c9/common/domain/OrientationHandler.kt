@@ -1,23 +1,34 @@
 package com.austinauyeung.nyuma.c9.common.domain
 
 import android.content.Context
+import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.Display
+import android.view.WindowInsets
 import android.view.WindowManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
+import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Handles device orientation changes.
  */
-class OrientationHandler(private val context: Context) {
+class OrientationHandler(
+    private val context: Context,
+    private val settingsFlow: StateFlow<OverlaySettings>
+) {
     private val displayManager = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -43,12 +54,18 @@ class OrientationHandler(private val context: Context) {
 
     init {
         displayManager.registerDisplayListener(displayListener, mainHandler)
+
+        settingsFlow.onEach {
+            updateScreenInfo()
+        }.launchIn(CoroutineScope(Dispatchers.Main + SupervisorJob()))
+
         updateScreenInfo()
     }
 
     private fun updateScreenInfo() {
         try {
-            val dimensions = getPhysicalDimensions()
+            val settings = settingsFlow.value
+            val dimensions = if (settings.usePhysicalSize) getPhysicalDimensions() else getUsableDimensions()
             _screenDimensions.value = dimensions
 
             val orientation = getOrientation()
@@ -70,6 +87,44 @@ class OrientationHandler(private val context: Context) {
             val metrics = DisplayMetrics()
             display.getRealMetrics(metrics)
             ScreenDimensions(metrics.widthPixels, metrics.heightPixels)
+        }
+    }
+
+    fun getSystemInsets(): Rect {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = windowManager.currentWindowMetrics
+            val insets = windowMetrics.windowInsets
+                .getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+            Rect(insets.left, insets.top, insets.right, insets.bottom)
+        } else {
+            Rect(0, 0, 0, 0)
+        }
+    }
+
+    @Suppress("Deprecation")
+    private fun getUsableDimensions(): ScreenDimensions {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = windowManager.currentWindowMetrics
+            val insets = windowMetrics.windowInsets
+                .getInsetsIgnoringVisibility(
+                    WindowInsets.Type.systemBars() or
+                            WindowInsets.Type.displayCutout()
+                )
+            val insetsWidth = insets.left + insets.right
+            val insetsHeight = insets.top + insets.bottom
+
+            val bounds = windowMetrics.bounds
+            ScreenDimensions(
+                bounds.width() - insetsWidth,
+                bounds.height() - insetsHeight
+            )
+        } else {
+            val metrics = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(metrics)
+            ScreenDimensions(
+                metrics.widthPixels,
+                metrics.heightPixels
+            )
         }
     }
 
