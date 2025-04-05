@@ -153,28 +153,27 @@ class ShizukuGestureStrategy(
                 injectEvent(finalMoveEvent)
                 finalMoveEvent.recycle()
 
-                // For fixed scrolling, cancel event to remove inertia
                 if (settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedScroll) {
-                    val cancelEvent = createMotionEvent(
+                    val pause = createMotionEvent(
                         downTime,
-                        downTime + duration + GestureConstants.SCROLL_END_PAUSE,
-                        MotionEvent.ACTION_CANCEL,
+                        downTime + duration + GestureConstants.SCROLL_END_PAUSE * 9 / 10,
+                        MotionEvent.ACTION_MOVE,
                         endX,
                         endY
                     )
-                    injectEvent(cancelEvent)
-                    cancelEvent.recycle()
-                } else {
-                    val upEvent = createMotionEvent(
-                        downTime,
-                        downTime + duration + GestureConstants.SCROLL_END_PAUSE,
-                        MotionEvent.ACTION_UP,
-                        endX,
-                        endY
-                    )
-                    injectEvent(upEvent)
-                    upEvent.recycle()
+                    injectEvent(pause)
+                    pause.recycle()
                 }
+
+                val upEvent = createMotionEvent(
+                    downTime,
+                    downTime + duration + GestureConstants.SCROLL_END_PAUSE,
+                    MotionEvent.ACTION_UP,
+                    endX,
+                    endY
+                )
+                injectEvent(upEvent)
+                upEvent.recycle()
 
                 completionListener?.onGestureCompleted(true)
             }
