@@ -57,7 +57,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private lateinit var uiManager: OverlayUIManager
     private lateinit var orientationHandler: OrientationHandler
 
-    private var lastCursorPosition: Offset? = null
     private var lastOverlayType: OverlayModeCoordinator.OverlayMode? = null
     private var hidingCursor: Boolean = false
 
@@ -226,7 +225,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         } else if (serviceManager.currentCursor.value != null) {
             lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
             serviceManager.currentCursor.value?.let { cursor ->
-                lastCursorPosition = Offset(cursor.position.x, cursor.position.y)
+                serviceManager.cursorStateManager.setLastCursorPosition(Offset(cursor.position.x, cursor.position.y))
             }
         }
 
@@ -249,12 +248,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 }
 
                 OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                    serviceManager.activateCursorMode(lastCursorPosition)
+                    serviceManager.activateCursorMode()
                 }
 
                 else -> {}
             }
-            lastCursorPosition = null
             lastOverlayType = null
             hidingCursor = false
 
@@ -293,6 +291,13 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         val settings = C9.getInstance().getSettingsFlow().value
+        if (event?.action == KeyEvent.ACTION_DOWN) {
+            keysPressed.add(event.keyCode)
+        } else if (event?.action == KeyEvent.ACTION_UP) {
+            keysPressed.remove(event.keyCode)
+        }
+        Logger.d("Current key presses: $keysPressed")
+
         if (hidingCursor) {
             if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_ENTER &&
                 event?.keyCode in submissionKeys &&
@@ -302,13 +307,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             }
 
             if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
-                if (event?.action == KeyEvent.ACTION_DOWN) {
-                    keysPressed.add(event.keyCode)
-                } else if (event?.action == KeyEvent.ACTION_UP) {
-                    keysPressed.remove(event.keyCode)
-                    if (keysPressed.isEmpty()) {
-                        if (attemptCursorRestore()) return false
-                    }
+                if (keysPressed.isEmpty()) {
+                    if (attemptCursorRestore()) return false
                 }
             }
         }

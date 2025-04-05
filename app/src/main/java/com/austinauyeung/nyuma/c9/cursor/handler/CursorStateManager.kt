@@ -1,6 +1,7 @@
 package com.austinauyeung.nyuma.c9.cursor.handler
 
 import androidx.compose.ui.geometry.Offset
+import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
@@ -31,6 +32,7 @@ class CursorStateManager(
 ) {
     private val _cursorState = MutableStateFlow<CursorState?>(null)
     val cursorState: StateFlow<CursorState?> = _cursorState.asStateFlow()
+    private var _lastCursorPosition: Offset? = null
 
     init {
         _cursorState
@@ -74,10 +76,17 @@ class CursorStateManager(
     private fun showCursor() {
         val dimensions = dimensionsFlow.value
         val (centerX, centerY) = dimensions.center()
-        val initialPosition = Offset(centerX, centerY)
+
+        // If manually activated in text field, still restore at last position
+        val position = if (_lastCursorPosition != null) {
+            _lastCursorPosition!!
+        } else {
+            Offset(centerX, centerY)
+        }
+        _lastCursorPosition = null
 
         val newCursor = CursorState(
-            position = initialPosition,
+            position = position,
             isVisible = true,
             inScrollMode = false
         )
@@ -95,6 +104,10 @@ class CursorStateManager(
         }
 
         return _cursorState.value
+    }
+
+    fun setLastCursorPosition (pos: Offset?) {
+        _lastCursorPosition = pos
     }
 
     fun updateHoldState(isHoldActive: Boolean): CursorState? {

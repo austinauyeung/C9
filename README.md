@@ -79,12 +79,12 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 <br />
 
 <div align="center">
-<img src='./docs/gifs/Screen_recording_20250405_115309.gif' width=300>
+<img src='./docs/gifs/Screen_recording_20250405_185611.gif' width=300>
 </div>
 
 <br />
 
-A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer.
+A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer. The demo above shows auto-hiding in text fields as well as long press and drag.
 
 #### Instructions
 All gestures are dispatched at the cursor's current location.
@@ -102,7 +102,7 @@ All gestures are dispatched at the cursor's current location.
 
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
-- In the standard cursor mode with the standard control scheme, it may be easier to long press numpad 5 instead of D-pad center and then press one of the D-pad directions to long press and drag.
+- In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
 - If `C9 > Auto-Hide in Text Fields` is set, the cursors will hide when entering a text field and automatically restore either upon leaving a text field or pressing enter (to submit a text field). The standard cursor's last position is saved upon restore.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.

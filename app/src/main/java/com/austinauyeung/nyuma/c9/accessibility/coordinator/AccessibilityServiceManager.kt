@@ -36,7 +36,7 @@ class AccessibilityServiceManager(
     private val mainScope: CoroutineScope
 ) {
     private lateinit var gestureManager: GestureManager
-    private lateinit var cursorStateManager: CursorStateManager
+    lateinit var cursorStateManager: CursorStateManager
     private lateinit var cursorActionHandler: CursorActionHandler
     private lateinit var gridStateManager: GridStateManager
     private lateinit var gridActionHandler: GridActionHandler
@@ -159,15 +159,10 @@ class AccessibilityServiceManager(
         }
     }
 
-    fun activateCursorMode(position: Offset? = null): Boolean {
+    fun activateCursorMode(): Boolean {
         try {
             if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                 cursorStateManager.toggleCursorVisibility()
-
-                if (position != null) {
-                    cursorStateManager.updatePosition(position)
-                }
-
                 return cursorStateManager.isCursorVisible()
             }
             return false

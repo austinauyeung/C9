@@ -479,7 +479,7 @@ class CursorActionHandler(
                 slowScrollJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = 0L,
+                    initialDelay = settings.gestureDuration,
                     condition = { currentScreenEdge != ScreenEdge.NONE },
                     action = { performSlowScroll(currentScreenEdge!!, GestureConstants.SLOW_SCROLL_DURATION) }
                 )
