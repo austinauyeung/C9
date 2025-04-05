@@ -37,6 +37,7 @@ class GestureManager(
 
     private val _isReady = MutableStateFlow(true)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
+    private var gestureTimeoutJob: Job? = null
 
     fun setGestureReady(ready: Boolean) {
         _isReady.value = ready
@@ -102,6 +103,16 @@ class GestureManager(
         if (!_isReady.value) return false
         setGestureReady(false)
 
+        gestureTimeoutJob?.cancel()
+        gestureTimeoutJob = serviceScope.launch {
+            val timeoutDuration = settingsFlow.value.gestureDuration * 3
+            delay(timeoutDuration)
+            if (!_isReady.value) {
+                Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
+                setGestureReady(true)
+            }
+        }
+
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing scroll gesture in direction $direction at position ($startX, $startY)")
@@ -152,6 +163,16 @@ class GestureManager(
         if (!_isReady.value) return false
         setGestureReady(false)
 
+        gestureTimeoutJob?.cancel()
+        gestureTimeoutJob = serviceScope.launch {
+            val timeoutDuration = settingsFlow.value.gestureDuration * 3
+            delay(timeoutDuration)
+            if (!_isReady.value) {
+                Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
+                setGestureReady(true)
+            }
+        }
+
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
@@ -182,7 +203,6 @@ class GestureManager(
 
             if (shouldShowGestures) {
                 visualizeZoomGesture(
-                    isZoomIn,
                     startX1, startY1,
                     startX2, startY2,
                     endX1, endY1,
@@ -286,7 +306,6 @@ class GestureManager(
     }
 
     private fun visualizeZoomGesture(
-        isZoomIn: Boolean,
         finger1StartX: Float, finger1StartY: Float,
         finger2StartX: Float, finger2StartY: Float,
         finger1EndX: Float, finger1EndY: Float,
