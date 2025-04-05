@@ -114,16 +114,16 @@ The following settings and `values` are available.
 
 | Category | Setting | Description |
 | --- | --- | --- |
-| Grid Cursor | Set Activation Key | Sets the grid cursor activation key.<br />Can be cleared if a key mapper is used instead.<br />Can be cleared to disable the grid cursor. |
+| Grid Cursor | Set Activation Key | Sets the grid cursor activation key.<br />Can be cleared if a button mapper is used instead.<br />Can be cleared to disable the grid cursor. |
 | | Clear Activation Key | Clears the grid cursor activation key. |
 | | Grid Levels | Sets the number of grid levels needed to dispatch a tap. |
 | | Persistent Overlay | `On`: Resets back to the main grid after the final tap.<br />`Off`: Deactivates the grid after the final tap. |
 | | Overlay Opacity | Sets the opacity of the grid when activated. |
 | | Hide Numbers | `On`: Hides the number in each grid cell.<br />`Off`: Shows the number in each grid cell. |
 | | Grid Lines | `Show`: Always show grid lines.<br />`Final`: Only show grid lines in the final grid level.<br />`Hide`: Never show grid lines. |
-| Standard Cursor | Set Activation Key | Sets the standard cursor activation key.<br />Can be cleared if a key mapper is used instead.<br />Can be cleared to disable the standard cursor. |
+| Standard Cursor | Set Activation Key | Sets the standard cursor activation key.<br />Can be cleared if a button mapper is used instead.<br />Can be cleared to disable the standard cursor. |
 | | Clear Activation Key | Clears the standard cursor activation key. |
-| | Control Scheme | `Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to toggle between moving and scrolling.<br />`Numpad`: Use numpad to toggle between moving and scrolling.<br /> |
+| | Control Scheme | `Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br />`Numpad`: Use numpad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br /> |
 | | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
 | | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
 | | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
@@ -188,7 +188,7 @@ The following devices have been confirmed by users and is not exhaustive.
 <img src='./docs/gifs/Screen_recording_20250328_195409.gif' width=200>
 </div>
 
-If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Developer Options > Log Screen`, activate the cursor, and perform the corresponding gesture(s). Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
+If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Developer Options > Log Screen`, activate the cursor, and perform the gesture(s) in question. Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
 
 ```
 --- SYSTEM INFORMATION ---
