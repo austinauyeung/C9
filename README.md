@@ -30,6 +30,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
     - [Instructions](#instructions-1)
 - [Recommendations](#recommendations)
 - [Installation](#installation)
+- [Device Compatibility](#device-compatibility)
 - [Troubleshooting](#troubleshooting)
 - [Known Issues](#known-issues)
 - [FAQs](#faqs)
@@ -93,7 +94,7 @@ The following options can be configured:
 | Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
-| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
+| Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
 | Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 
 ### Standard Cursor
@@ -133,7 +134,7 @@ All gestures are dispatched at the cursor's current location.
 | Tap | Click D-pad center or numpad 5. ||
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. ||
-| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
+| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
 | Zoom | Numpad 1 and 3. ||
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
 
@@ -161,12 +162,25 @@ Install using adb:
 ```
 
 ### Additional installation for Android 8
-If you are on Android 8 and are experiencing poor scrolling performance, Shizuku may be required. Please see the next section for Shizuku guidelines.
+If you are on Android 8 and are experiencing poor scrolling performance, Shizuku may be required. Please follow the Shizuku instructions in the next section.
 
 ### Additional installation for Android 11
 If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
+
+## Device Compatibility
+The following devices have been confirmed by users and is not exhaustive.
+| Brand | Models | Notes |
+| --- | --- | --- |
+| ALT | `Mive Style Folder` | |
+| Freetel | `Mode 1 Retro II` | | 
+| Kyocera | `Cadence S2720` `Digno Keitai 4 A202KC` `DuraXE Epic E4830` `DuraXV Extreme E4810` `DuraXV Extreme+ E4811` `Gratina KYF42` | |
+| QIN | `F21 Pro` | |
+| Sharp | `Aquos SH-02L` `Aquos Keitai 3 805SH` | The `Aquos SH-02L` may need Shizuku if running Android 8. | 
+| Sonim | `XP3 Plus XP3900` | The `XP3 Plus XP3900` may need Shizuku if running Android 11. |
+| TCL | `Flip 2` | The `Flip 2` may need Shizuku if running Android 11. |
+| Vortex | `V3` | See [Known Issues](#known-issues). |
 
 ## Troubleshooting
 ### Generating cursor logs
@@ -229,15 +243,13 @@ If you are unable to deactivate the cursor, clear the internal activation key, w
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
   - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
-- With Shizuku enabled and a `Fixed` gesture style, pull to refresh (e.g. scrolling down at the top of a page inside a browser that supports this feature) does not work.
-  - This is currently unavoidable due to the implementation of this gesture style with Shizuku. Use either long press and drag or the `Inertia` gesture style.
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
-Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs using the built-in logger (see [Generating cursor logs](#generating-cursor-logs)) or `adb logcat C9App:V *:S`.
+Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs [using the built-in logger](#generating-cursor-logs) or `adb logcat C9App:V *:S`.
 
 ### How else can I contribute?
-Please feel free to submit a pull request, create a video walkthrough, or provide anything else you think would be helpful!
+Please feel free to submit a pull request, create a video walkthrough, [confirm your device's compatibility](#device-compatibility), or provide anything else you think would be helpful!
 
 ### What is Shizuku?
 Shizuku allows applications in general to perform actions that require elevated privileges. In C9, it is required to dispatch gestures on Android 11 using [InputManager](https://developer.android.com/reference/android/hardware/input/InputManager) instead of the standard dispatch using [AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService).
