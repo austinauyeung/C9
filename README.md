@@ -79,7 +79,7 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 <br />
 
 <div align="center">
-<img src='./docs/gifs/Screen_recording_20250319_004530.gif' width=300>
+<img src='./docs/gifs/Screen_recording_20250405_115309.gif' width=300>
 </div>
 
 <br />
