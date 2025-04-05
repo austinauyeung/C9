@@ -50,7 +50,7 @@ fun CursorSettingsScreen(
                     KeyEvent.KEYCODE_2 to "Scroll up",
                     KeyEvent.KEYCODE_3 to "Zoom in",
                     KeyEvent.KEYCODE_4 to "Scroll left",
-                    KeyEvent.KEYCODE_5 to "",
+                    KeyEvent.KEYCODE_5 to "Cursor select and double tap",
                     KeyEvent.KEYCODE_6 to "Scroll right",
                     KeyEvent.KEYCODE_7 to "",
                     KeyEvent.KEYCODE_8 to "Scroll down",
@@ -89,14 +89,14 @@ fun CursorSettingsScreen(
                 )
         }
 
-        else -> {
+        ControlScheme.DPAD_TOGGLE -> {
             reservedKeys =
                 mapOf(
-                    KeyEvent.KEYCODE_1 to "",
+                    KeyEvent.KEYCODE_1 to "Zoom out",
                     KeyEvent.KEYCODE_2 to "",
-                    KeyEvent.KEYCODE_3 to "",
+                    KeyEvent.KEYCODE_3 to "Zoom in",
                     KeyEvent.KEYCODE_4 to "",
-                    KeyEvent.KEYCODE_5 to "",
+                    KeyEvent.KEYCODE_5 to "Cursor select and double tap",
                     KeyEvent.KEYCODE_6 to "",
                     KeyEvent.KEYCODE_7 to "",
                     KeyEvent.KEYCODE_8 to "",
@@ -108,6 +108,29 @@ fun CursorSettingsScreen(
                     KeyEvent.KEYCODE_DPAD_DOWN to "Cursor down and scroll down",
                     KeyEvent.KEYCODE_DPAD_LEFT to "Cursor left and scroll left",
                     KeyEvent.KEYCODE_DPAD_RIGHT to "Cursor right and scroll right",
+                    KeyEvent.KEYCODE_DPAD_CENTER to "Cursor select and double tap",
+                )
+        }
+
+        ControlScheme.NUMPAD_TOGGLE -> {
+            reservedKeys =
+                mapOf(
+                    KeyEvent.KEYCODE_1 to "Zoom out",
+                    KeyEvent.KEYCODE_2 to "Cursor up and scroll up",
+                    KeyEvent.KEYCODE_3 to "Zoom in",
+                    KeyEvent.KEYCODE_4 to "Cursor left and scroll left",
+                    KeyEvent.KEYCODE_5 to "Cursor select and double tap",
+                    KeyEvent.KEYCODE_6 to "Cursor right and scroll right",
+                    KeyEvent.KEYCODE_7 to "",
+                    KeyEvent.KEYCODE_8 to "Cursor down and scroll down",
+                    KeyEvent.KEYCODE_9 to "",
+                    KeyEvent.KEYCODE_STAR to "",
+                    KeyEvent.KEYCODE_0 to "",
+                    KeyEvent.KEYCODE_POUND to "",
+                    KeyEvent.KEYCODE_DPAD_UP to "",
+                    KeyEvent.KEYCODE_DPAD_DOWN to "",
+                    KeyEvent.KEYCODE_DPAD_LEFT to "",
+                    KeyEvent.KEYCODE_DPAD_RIGHT to "",
                     KeyEvent.KEYCODE_DPAD_CENTER to "Cursor select and double tap",
                 )
         }

@@ -235,12 +235,14 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         hidingCursor = true
     }
 
-    private fun restoreCursor() {
+    private fun attemptCursorRestore(): Boolean {
         val settings = C9.getInstance().getSettingsFlow().value
-        if (hidingCursor &&
-            (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_ENTER ||
-                    (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST &&
-                            keysPressed.isEmpty() && !isTextField))) {
+
+        if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
+            if (keysPressed.isNotEmpty() || isTextField) return false
+        }
+
+        if (hidingCursor && settings.hideOnTextField != AutoHideDetection.NONE) {
             when (lastOverlayType) {
                 OverlayModeCoordinator.OverlayMode.GRID -> {
                     serviceManager.activateGridMode()
@@ -255,7 +257,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             lastCursorPosition = null
             lastOverlayType = null
             hidingCursor = false
+
+            return true
         }
+
+        return false
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -272,7 +278,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                     AccessibilityEvent.TYPE_VIEW_FOCUSED -> {
                         if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
                             isTextField = (event.source?.className?.contains("EditText") == true) || (event.source?.isEditable == true)
-                            if (hidingCursor && !isTextField) restoreCursor()
+                            if (hidingCursor && !isTextField) attemptCursorRestore()
+                            if (!hidingCursor && isTextField) autoHideCursor()
                         }
                     }
                     else -> {}
@@ -291,8 +298,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 event?.keyCode in submissionKeys &&
                 event?.action == KeyEvent.ACTION_UP) {
                 Logger.d("Enter key pressed, assuming form submission")
-                restoreCursor()
-                return false
+                if (attemptCursorRestore()) return false
             }
 
             if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
@@ -301,8 +307,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 } else if (event?.action == KeyEvent.ACTION_UP) {
                     keysPressed.remove(event.keyCode)
                     if (keysPressed.isEmpty()) {
-                        restoreCursor()
-                        return false
+                        if (attemptCursorRestore()) return false
                     }
                 }
             }
