@@ -28,7 +28,8 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
     - [Instructions](#instructions)
   - [Standard Cursor](#standard-cursor)
     - [Instructions](#instructions-1)
-- [Recommendations](#recommendations)
+  - [Recommendations](#recommendations)
+- [Settings](#settings)
 - [Installation](#installation)
 - [Device Compatibility](#device-compatibility)
 - [Troubleshooting](#troubleshooting)
@@ -39,22 +40,6 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 
 ## Overview
 Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by mapping their activation key or shortcut), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
-
-The following options can be configured, which affects scrolls and zooms in both modes:
-- Natural scrolling
-- Gesture visualizations
-- Gesture style
-  - `Fixed`: Gestures are controlled and fixed distance.
-  - `Inertia`: Gestures resemble touchscreen flicks.
-- Gesture duration
-- Scroll distance
-
-Additionally, the following options can be configured to adjust the behavior of the cursors:
-- Auto-hide in text fields
-
-The following options cannot be configured but are enabled:
-- Continuous scrolling
-  - Regardless of the gesture style used for single scrolls, continuous scrolling will use the `Fixed` gesture style.
 
 ### Grid Cursor
 <br />
@@ -77,21 +62,13 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 
 <br />
 
-The following options can be configured:
-- Grid cursor internal activation key
-- Number of grid levels
-- Grid persistence after clicking in the final grid
-- Grid opacity
-- Grid number visibility
-- Grid line visibility
-
 #### Instructions
 | Action | Mapped buttons | Gesture location | Advances grid | Notes |
 | --- | --- | --- | --- | --- |
 | Activate/Deactivate | Hold the internal activation key or use a button mapper to map the "Activate Grid Cursor" shortcut. | N/A | N/A | The default internal activation key is the pound (#) key. This can be remapped or unmapped internally. Avoid using buttons in the D-pad or numpad for activation, as they will clash with the gestures below. ||
 | Navigate grid | Click numpad 1-9. | The selected number. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Reset back to main grid | Press the internal activation key or use a button mapper to map the "Reset Grid" shortcut. | N/A | N/A ||
-| Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
+| Final Tap | Click numpad 1-9 in the final grid level. | The center of the selected number's cell. | True | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
@@ -108,21 +85,6 @@ The following options can be configured:
 <br />
 
 A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer.
-
-The following options can be configured:
-- Standard cursor internal activation key
-- Control scheme
-  - Standard: D-pad moves, numpad scrolls
-  - Swapped: D-pad scrolls, numpad moves
-  - D-pad: D-pad moves and scrolls
-  - Numpad: Numpad moves and scrolls
-- Screen Edge Behavior
-  - Enable cursor wrap around
-  - Slow and continuous scrolling in the direction of the edge
-- Cursor speed
-- Cursor acceleration: accelerated cursor speed when held
-- Cursor acceleration threshold: duration after which cursor speed is accelerated
-- Cursor size and appearance
 
 #### Instructions
 All gestures are dispatched at the cursor's current location.
@@ -147,6 +109,43 @@ All gestures are dispatched at the cursor's current location.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
 - For both cursors, use `C9 > Developer Options > Use Physical Size` to choose whether or not the cursor extends over your device's status bar and navigation bar.
 
+## Settings
+The following settings and `values` are available.
+
+| Category | Setting | Description |
+| --- | --- | --- |
+| Grid Cursor | Set Activation Key | Sets the grid cursor activation key.<br />Can be cleared if a key mapper is used instead.<br />Can be cleared to disable the grid cursor. |
+| | Clear Activation Key | Clears the grid cursor activation key. |
+| | Grid Levels | Sets the number of grid levels needed to dispatch a tap. |
+| | Persistent Overlay | `On`: Resets back to the main grid after the final tap.<br />`Off`: Deactivates the grid after the final tap. |
+| | Overlay Opacity | Sets the opacity of the grid when activated. |
+| | Hide Numbers | `On`: Hides the number in each grid cell.<br />`Off`: Shows the number in each grid cell. |
+| | Grid Lines | `Show`: Always show grid lines.<br />`Final`: Only show grid lines in the final grid level.<br />`Hide`: Never show grid lines. |
+| Standard Cursor | Set Activation Key | Sets the standard cursor activation key.<br />Can be cleared if a key mapper is used instead.<br />Can be cleared to disable the standard cursor. |
+| | Clear Activation Key | Clears the standard cursor activation key. |
+| | Control Scheme | `Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to toggle between moving and scrolling.<br />`Numpad`: Use numpad to toggle between moving and scrolling.<br /> |
+| | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
+| | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
+| | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
+| | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
+| | Cursor Size | Size of the cursor. |
+| | Smooth Cursor Corners | `On`: Round out the corners of the cursor. `Off`: Use default icon. |
+| General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
+| | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
+| | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
+| | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
+| | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
+| | Gesture Visualization Size | Size of visualization icon. |
+| | Auto-Hide in Text Fields | `Disabled`: Never auto-hide the cursor.<br />`Text field exit`: Hide the cursor when a text field is selected, and restore the cursor at any point the text field is exited.<br />`Text field submit`: Hide the cursor when a text field is selected, and restore the cursor only after pressing enter.<br /> |
+| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
+| Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
+| | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
+| | Use Physical Size | `On`: Cursor will use the screen's physical dimensions to overlay.<br />`Off`: Cursor will not overlay on top of any status or navigation bars. |
+| | Allow Passthrough | `On`: Cursor will not intercept key presses. Not recommended.<br />`Off`: Cursor intercepts key presses. Default behavior. |
+
+The following settings cannot be configured but are enforced:
+- Continuous scrolling
+  - Regardless of the gesture style used for single scrolls, continuous scrolling will use the `Fixed` gesture style.
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.
@@ -174,6 +173,7 @@ The following devices have been confirmed by users and is not exhaustive.
 | Brand | Models | Notes |
 | --- | --- | --- |
 | ALT | `Mive Style Folder` | |
+| Doro | `7080` | |
 | Freetel | `Mode 1 Retro II` | | 
 | Kyocera | `Cadence S2720` `Digno Keitai 4 A202KC` `DuraXE Epic E4830` `DuraXV Extreme E4810` `DuraXV Extreme+ E4811` `Gratina KYF42` | |
 | QIN | `F21 Pro` | |
