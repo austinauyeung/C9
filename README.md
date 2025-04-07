@@ -39,6 +39,8 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - [Acknowledgment](#acknowledgments)
 
 ## Overview
+The majority of modern applications are touch-oriented. The goal of C9 is to mimic the touchscreen gestures required of these applications as closely as possible through button presses in each of the two cursor modes.
+
 Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by mapping their activation key or shortcut), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
 
 ### Grid Cursor
@@ -104,10 +106,9 @@ All gestures are dispatched at the cursor's current location.
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
-- If `C9 > Auto-Hide in Text Fields` is set, the cursors will hide when entering a text field and automatically restore either upon leaving a text field or pressing enter (to submit a text field). The standard cursor's last position is saved upon restore.
+- Use `C9 > Auto-Hide in Text Fields` to auto-hide the cursor in text fields. The standard cursor's last position is saved upon restore. See [Settings](#settings) for more information.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
-- For both cursors, use `C9 > Developer Options > Use Physical Size` to choose whether or not the cursor extends over your device's status bar and navigation bar.
 
 ## Settings
 The following settings and `values` are available.
@@ -129,7 +130,7 @@ The following settings and `values` are available.
 | | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
 | | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
 | | Cursor Size | Size of the cursor. |
-| | Smooth Cursor Corners | `On`: Round out the corners of the cursor. `Off`: Use default icon. |
+| | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
 | General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
@@ -160,11 +161,12 @@ Install using adb:
 >> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 ```
 
-### Additional installation for Android 8
-If you are on Android 8 and are experiencing poor scrolling performance, Shizuku may be required. Please follow the Shizuku instructions in the next section.
+### Additional installation for Android 8 and Android 11
+If any of the following is true, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
+- You are on Android 8 and are experiencing poor scrolling performance.
+- You are on Android 11 and the application does not work as-is (i.e. no gestures can be dispatched), or you have had trouble in the past with other cursor apps.
 
-### Additional installation for Android 11
-If you are on Android 11, please first try the application as-is. If gestures cannot be dispatched successfully, or if you have had trouble in the past with other cursor apps, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application. Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
+Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
 Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
 
@@ -242,7 +244,7 @@ If you are unable to deactivate the cursor, clear the internal activation key, w
 
 ## Known Issues
 - On the Vortex V3, the numpad backlight may not function when the cursor is active.
-  - This is likely due to the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
+  - This is likely due to a firmware limitation in the phone as well as the cursors' interception of key presses. There is an experimental setting "Allow Passthrough" that may fix this at the expense of unintended behavior in the underlying application.
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
