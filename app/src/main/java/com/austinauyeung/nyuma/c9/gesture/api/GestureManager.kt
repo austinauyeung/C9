@@ -149,7 +149,6 @@ class GestureManager(
             }
 
             val result = currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll, duration, completionListener)
-            delay(duration)
 
             return result
         } catch (e: Exception) {

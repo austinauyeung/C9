@@ -129,7 +129,7 @@ class ShizukuGestureStrategy(
                 downEvent.recycle()
 
                 // Linear movement
-                for (i in 1 until steps) {
+                for (i in 1 until steps + 1) {
                     val fraction = i.toFloat() / steps
                     val moveEvent = createMotionEvent(
                         downTime,
@@ -142,16 +142,6 @@ class ShizukuGestureStrategy(
                     moveEvent.recycle()
                     delay(duration / steps)
                 }
-
-                val finalMoveEvent = createMotionEvent(
-                    downTime,
-                    downTime + duration,
-                    MotionEvent.ACTION_MOVE,
-                    endX,
-                    endY
-                )
-                injectEvent(finalMoveEvent)
-                finalMoveEvent.recycle()
 
                 if (settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedScroll) {
                     val pause = createMotionEvent(
