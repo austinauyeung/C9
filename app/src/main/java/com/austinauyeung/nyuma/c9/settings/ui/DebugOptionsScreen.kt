@@ -56,7 +56,7 @@ fun DebugOptionsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             PreferenceCategory(title = "Logging") {
-                NavigationItem(
+                SimplePreferenceItem(
                     title = "Log Screen",
                     subtitle = "View application logs",
                     onClick = onNavigateToLogScreen,

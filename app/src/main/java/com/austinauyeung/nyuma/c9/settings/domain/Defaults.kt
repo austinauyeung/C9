@@ -42,5 +42,7 @@ object Defaults {
         const val ROTATE_BUTTONS_WITH_ORIENTATION = false
         const val ROUNDED_CURSOR_CORNERS = true
         const val USE_PHYSICAL_SIZE = true
+        const val STANDARD_CURSOR_HEX = CursorConstants.STANDARD_CURSOR_HEX
+        const val STANDARD_CURSOR_MATCH_BORDER = false
     }
 }

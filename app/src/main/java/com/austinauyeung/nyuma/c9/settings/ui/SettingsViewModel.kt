@@ -76,7 +76,9 @@ class SettingsViewModel(
                             hideOnTextField = settings.hideOnTextField,
                             rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation,
                             roundedCursorCorners = settings.roundedCursorCorners,
-                            usePhysicalSize = settings.usePhysicalSize
+                            usePhysicalSize = settings.usePhysicalSize,
+                            standardCursorHex = settings.standardCursorHex,
+                            standardCursorMatchBorder = settings.standardCursorMatchBorder
                         )
                     }
                 }
@@ -135,7 +137,9 @@ class SettingsViewModel(
             hideOnTextField = _uiState.value.hideOnTextField,
             rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation,
             roundedCursorCorners = _uiState.value.roundedCursorCorners,
-            usePhysicalSize = _uiState.value.usePhysicalSize
+            usePhysicalSize = _uiState.value.usePhysicalSize,
+            standardCursorHex = _uiState.value.standardCursorHex,
+            standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder
         )
     }
 
@@ -212,5 +216,7 @@ data class SettingsUiState(
     val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
     val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
-    val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE
+    val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,
+    val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
+    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER
 )

@@ -113,7 +113,7 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Input Modes") {
-                NavigationItem(
+                SimplePreferenceItem(
                     title = "Grid Cursor",
                     subtitle =
                     if (uiState.gridActivationKey == OverlaySettings.KEY_NONE) {
@@ -124,7 +124,7 @@ fun SettingsScreen(
                     onClick = onNavigateToGridSettings,
                 )
 
-                NavigationItem(
+                SimplePreferenceItem(
                     title = "Standard Cursor",
                     subtitle =
                     if (uiState.cursorActivationKey == OverlaySettings.KEY_NONE) {
@@ -255,7 +255,7 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Advanced") {
-                NavigationItem(
+                SimplePreferenceItem(
                     title = "Developer Options",
                     subtitle = "Additional non-standard features",
                     onClick = onNavigateToDebugOptions
@@ -588,7 +588,7 @@ fun ClearKeyPreferenceItem(
 }
 
 @Composable
-fun NavigationItem(
+fun SimplePreferenceItem(
     title: String,
     subtitle: String,
     onClick: () -> Unit,

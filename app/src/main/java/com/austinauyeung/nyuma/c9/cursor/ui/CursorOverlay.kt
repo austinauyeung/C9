@@ -34,6 +34,7 @@ fun CursorOverlay(
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val position = cursorState.position
+        val color = Color(android.graphics.Color.parseColor("#${settings?.standardCursorHex ?: "FFFFFF"}"))
 
         // Arrowhead shape
         val side1Y = cursorSize * 1.0f
@@ -64,12 +65,12 @@ fun CursorOverlay(
 
         drawPath(
             path = cursorPath,
-            color = Color.White.copy(alpha = opacity),
+            color = color.copy(alpha = opacity),
         )
 
         drawPath(
             path = cursorPath,
-            color = Color.Black.copy(alpha = opacity),
+            color = if (settings?.standardCursorMatchBorder == true) color else Color.Black,
             style = Stroke(width = cursorSize * 0.1f),
         )
 

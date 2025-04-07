@@ -22,9 +22,12 @@ object CursorConstants {
     const val DEFAULT_SIZE = 5
     const val SIZE_MULTIPLIER = 8f
 
+    // Appearance
+    const val STANDARD_CURSOR_HEX = "FFFFFF"
+
     private const val TARGET_FPS = 60
     const val FRAME_DURATION_MS = 1000f / TARGET_FPS
-    const val OPACITY = 0.8f
+    const val OPACITY = 0.7f
 
     const val TOGGLE_HOLD = false
 }

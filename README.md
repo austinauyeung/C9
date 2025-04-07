@@ -89,7 +89,7 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer. The demo above shows auto-hiding in text fields as well as long press and drag.
 
 #### Instructions
-All gestures are dispatched at the cursor's current location.
+All gestures are dispatched at the tip of the cursor's current location.
 
 | Action | Mapped buttons | Notes |
 | --- | --- | --- |
@@ -131,6 +131,8 @@ The following settings and `values` are available.
 | | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
 | | Cursor Size | Size of the cursor. |
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
+| | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
+| | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black.
 | General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |

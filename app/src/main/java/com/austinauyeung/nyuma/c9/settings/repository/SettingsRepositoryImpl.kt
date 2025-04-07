@@ -55,6 +55,8 @@ class SettingsRepositoryImpl(
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
         private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
         private val USE_PHYSICAL_SIZE = booleanPreferencesKey("use_physical_size")
+        private val STANDARD_CURSOR_HEX = stringPreferencesKey("standard_cursor_hex")
+        private val STANDARD_CURSOR_MATCH_BORDER = booleanPreferencesKey("standard_cursor_match_border")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -170,7 +172,11 @@ class SettingsRepositoryImpl(
                     roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
                         ?: OverlaySettings.DEFAULT.roundedCursorCorners,
                     usePhysicalSize = preferences[USE_PHYSICAL_SIZE]
-                        ?: OverlaySettings.DEFAULT.usePhysicalSize
+                        ?: OverlaySettings.DEFAULT.usePhysicalSize,
+                    standardCursorHex = preferences[STANDARD_CURSOR_HEX]
+                        ?: OverlaySettings.DEFAULT.standardCursorHex,
+                    standardCursorMatchBorder = preferences[STANDARD_CURSOR_MATCH_BORDER]
+                        ?: OverlaySettings.DEFAULT.standardCursorMatchBorder
                 )
             }
     }
@@ -204,6 +210,8 @@ class SettingsRepositoryImpl(
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
                 preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
                 preferences[USE_PHYSICAL_SIZE] = settings.usePhysicalSize
+                preferences[STANDARD_CURSOR_HEX] = settings.standardCursorHex
+                preferences[STANDARD_CURSOR_MATCH_BORDER] = settings.standardCursorMatchBorder
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

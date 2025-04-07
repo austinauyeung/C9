@@ -2,19 +2,28 @@ package com.austinauyeung.nyuma.c9.settings.ui
 
 import KeyCaptureOverlay
 import android.view.KeyEvent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -41,6 +54,7 @@ fun CursorSettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showCursorKeyCaptureOverlay by remember { mutableStateOf(false) }
     var reservedKeys by remember { mutableStateOf(emptyMap<Int, String>()) }
+    var showColorPickerDialog by remember { mutableStateOf(false) }
 
     when (uiState.controlScheme) {
         ControlScheme.STANDARD -> {
@@ -329,7 +343,149 @@ fun CursorSettingsScreen(
                         }
                     },
                 )
+
+                SimplePreferenceItem(
+                    title = "Cursor Color",
+                    subtitle = "Current hex value: #${uiState.standardCursorHex}",
+                    onClick = { showColorPickerDialog = true }
+                )
+
+                SwitchPreferenceItem(
+                    title = "Match Border to Body",
+                    subtitle = "Replace black border and match cursor body color",
+                    checked = uiState.standardCursorMatchBorder,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(standardCursorMatchBorder = v)
+                        }
+                    },
+                )
+
+                if (showColorPickerDialog) {
+                    ColorPickerDialog(
+                        initialColorHex = uiState.standardCursorHex,
+                        onColorSelected = { newColorHex ->
+                            viewModel.updatePreference(newColorHex) { settings, v ->
+                                settings.copy(standardCursorHex = v)
+                            }
+                        },
+                        onDismiss = { showColorPickerDialog = false }
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+fun ColorPickerDialog(
+    initialColorHex: String,
+    onColorSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var colorHex by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = initialColorHex,
+                selection = TextRange(initialColorHex.length)
+            )
+        )
+    }
+    var isError by remember { mutableStateOf(false) }
+
+    val previewColor = try {
+        Color(android.graphics.Color.parseColor("#${colorHex.text}"))
+        isError = false
+        Color(android.graphics.Color.parseColor("#${colorHex.text}"))
+    } catch (e: Exception) {
+        isError = true
+        Color.Black
+    }
+
+    val saveAction = {
+        if (!isError) {
+            onColorSelected(colorHex.text)
+            onDismiss()
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Cursor Color") },
+        text = {
+            OutlinedTextField(
+                value = colorHex,
+                onValueChange = { input ->
+                    val filtered = input.text.filter {
+                        it.isDigit() || it in 'A'..'F' || it in 'a'..'f'
+                    }.take(6)
+
+                    val newSelection = TextRange(
+                        start = minOf(filtered.length, input.selection.start),
+                        end = minOf(filtered.length, input.selection.end)
+                    )
+
+                    colorHex = TextFieldValue(
+                        text = filtered,
+                        selection = newSelection,
+                        composition = input.composition
+                    )
+                    try {
+                        Color(android.graphics.Color.parseColor("#$filtered"))
+                        isError = false
+                    } catch (e: Exception) {
+                        isError = true
+                    }
+                },
+                label = { Text("Hex value") },
+                singleLine = true,
+                isError = isError,
+                prefix = { Text("#") },
+                supportingText = {
+                    if (isError) {
+                        Text(
+                            text = "Invalid hex code",
+                            color = Color.Red,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (!isError) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(previewColor)
+                                .border(1.dp, Color.Black)
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (!isError) {
+                            saveAction()
+                        }
+                    }
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (!isError) saveAction()
+                },
+                enabled = !isError
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
