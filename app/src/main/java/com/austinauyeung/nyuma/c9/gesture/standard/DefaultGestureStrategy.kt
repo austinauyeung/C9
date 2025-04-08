@@ -53,7 +53,7 @@ class DefaultGestureStrategy(
                     val pauseStrokeDescription = stroke.continueStroke(
                         pausePath,
                         0,
-                        GestureConstants.SCROLL_END_PAUSE,
+                        GestureConstants.GESTURE_PAUSE,
                         false
                     )
 
@@ -95,14 +95,14 @@ class DefaultGestureStrategy(
                     val stroke1Pause = stroke1.continueStroke(
                         finger1PausePath,
                         0,
-                        GestureConstants.SCROLL_END_PAUSE,
+                        GestureConstants.GESTURE_PAUSE,
                         false
                     )
 
                     val stroke2Pause = stroke2.continueStroke(
                         finger2PausePath,
                         0,
-                        GestureConstants.SCROLL_END_PAUSE,
+                        GestureConstants.GESTURE_PAUSE,
                         false
                     )
 
@@ -128,13 +128,13 @@ class DefaultGestureStrategy(
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean,
+        forceFixedGesture: Boolean,
         duration: Long,
         completionListener: GestureCompletionListener?
     ): Boolean {
         try {
             val settings = settingsFlow.value
-            val willContinue = (settings.gestureStyle == GestureStyle.FIXED) || forceFixedScroll
+            val willContinue = (settings.gestureStyle == GestureStyle.FIXED) || forceFixedGesture
 
             Logger.d("DefaultGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
 
@@ -174,11 +174,12 @@ class DefaultGestureStrategy(
         startX2: Float, startY2: Float,
         endX1: Float, endY1: Float,
         endX2: Float, endY2: Float,
+        forceFixedGesture: Boolean,
         completionListener: GestureCompletionListener?
     ): Boolean {
         try {
             val settings = settingsFlow.value
-            val willContinue = settings.gestureStyle == GestureStyle.FIXED
+            val willContinue = settings.gestureStyle == GestureStyle.FIXED || forceFixedGesture
 
             Logger.d("DefaultGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
 

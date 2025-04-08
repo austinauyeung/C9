@@ -9,7 +9,7 @@ interface GestureStrategy {
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean,
+        forceFixedGesture: Boolean,
         duration: Long,
         completionListener: GestureCompletionListener? = null
     ): Boolean
@@ -20,6 +20,7 @@ interface GestureStrategy {
         startX2: Float, startY2: Float,
         endX1: Float, endY1: Float,
         endX2: Float, endY2: Float,
+        forceFixedGesture: Boolean,
         completionListener: GestureCompletionListener? = null
     ): Boolean
 

@@ -97,7 +97,7 @@ class GestureManager(
         startY: Float = dimensionsFlow.value.height / 2f,
         duration: Long = settingsFlow.value.gestureDuration,
         useNaturalScrolling: Boolean = settingsFlow.value.useNaturalScrolling,
-        forceFixedScroll: Boolean = false,
+        forceFixedGesture: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
     ): Boolean {
         if (!_isReady.value) return false
@@ -148,7 +148,7 @@ class GestureManager(
                 visualizeScroll(direction, startX, startY, endX, endY, duration)
             }
 
-            val result = currentStrategy.performScroll(startX, startY, endX, endY, forceFixedScroll, duration, completionListener)
+            val result = currentStrategy.performScroll(startX, startY, endX, endY, forceFixedGesture, duration, completionListener)
 
             return result
         } catch (e: Exception) {
@@ -158,7 +158,12 @@ class GestureManager(
         }
     }
 
-    suspend fun performZoom(isZoomIn: Boolean, startX: Float, startY: Float): Boolean {
+    suspend fun performZoom(
+        isZoomIn: Boolean,
+        startX: Float,
+        startY: Float,
+        forceFixedGesture: Boolean = false
+    ): Boolean {
         if (!_isReady.value) return false
         setGestureReady(false)
 
@@ -175,21 +180,20 @@ class GestureManager(
         val dimensions = dimensionsFlow.value
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
-            val randomness = 1
             val zoomDistance =
-                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR) * randomness
+                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR)
             val zoomOffset =
-                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET) * randomness
+                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET)
 
-            var startX1 = startX * randomness - if (isZoomIn) zoomOffset else zoomDistance
-            var startY1 = startY * randomness + if (isZoomIn) zoomOffset else zoomDistance
-            var startX2 = startX * randomness + if (isZoomIn) zoomOffset else zoomDistance
-            var startY2 = startY * randomness - if (isZoomIn) zoomOffset else zoomDistance
+            var startX1 = startX - if (isZoomIn) zoomOffset else zoomDistance
+            var startY1 = startY + if (isZoomIn) zoomOffset else zoomDistance
+            var startX2 = startX + if (isZoomIn) zoomOffset else zoomDistance
+            var startY2 = startY - if (isZoomIn) zoomOffset else zoomDistance
 
-            var endX1 = startX * randomness - if (isZoomIn) zoomDistance else zoomOffset
-            var endY1 = startY * randomness + if (isZoomIn) zoomDistance else zoomOffset
-            var endX2 = startX * randomness + if (isZoomIn) zoomDistance else zoomOffset
-            var endY2 = startY * randomness - if (isZoomIn) zoomDistance else zoomOffset
+            var endX1 = startX - if (isZoomIn) zoomDistance else zoomOffset
+            var endY1 = startY + if (isZoomIn) zoomDistance else zoomOffset
+            var endX2 = startX + if (isZoomIn) zoomDistance else zoomOffset
+            var endY2 = startY - if (isZoomIn) zoomDistance else zoomOffset
 
             startX1 = startX1.coerceIn(0f, dimensions.width.toFloat())
             startY1 = startY1.coerceIn(0f, dimensions.height.toFloat())
@@ -202,19 +206,20 @@ class GestureManager(
 
             if (shouldShowGestures) {
                 visualizeZoomGesture(
-                    startX1, startY1,
-                    startX2, startY2,
-                    endX1, endY1,
-                    endX2, endY2
+                    startX1, startY,
+                    startX2, startY,
+                    endX1, startY,
+                    endX2, startY
                 )
             }
 
             return currentStrategy.performZoom(
                 isZoomIn,
-                startX1, startY1,
-                startX2, startY2,
-                endX1, endY1,
-                endX2, endY2,
+                startX1, startY,
+                startX2, startY,
+                endX1, startY,
+                endX2, startY,
+                forceFixedGesture,
                 completionListener
             )
         } catch (e: Exception) {

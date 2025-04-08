@@ -39,6 +39,7 @@ class GridActionHandler(
     private var gestureDispatchedDuringHold: Boolean = false
 
     private var currentScrollDirection: ScrollDirection? = null
+    private var currentZoomDirection: Boolean? = null
 
     private fun cancelActivationJob() {
         activationJob?.cancel()
@@ -47,6 +48,7 @@ class GridActionHandler(
 
     private fun cancelContinuousGesture() {
         currentScrollDirection = null
+        currentZoomDirection = null
         continuousGestureJob?.cancel()
         continuousGestureJob = null
     }
@@ -262,7 +264,7 @@ class GridActionHandler(
                         gestureManager = gestureManager,
                         initialDelay = settings.gestureDuration,
                         condition = { currentScrollDirection == direction },
-                        action = { gestureManager.performScroll(direction, startX = x, startY = y, forceFixedScroll = true) }
+                        action = { gestureManager.performScroll(direction, startX = x, startY = y, forceFixedGesture = true) }
                     )
                 }
             }
@@ -276,27 +278,38 @@ class GridActionHandler(
     }
 
     private fun handleZoomKey(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_UP) {
-            backgroundScope.launch {
+        val settings = settingsFlow.value
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> {
+                cancelContinuousGesture()
                 val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
                 if (heldNumberKey != null) {
                     gestureDispatchedDuringHold = true
                 }
 
-                when (event.keyCode) {
-                    KeyEvent.KEYCODE_STAR, KeyEvent.KEYCODE_LEFT_BRACKET -> gestureManager.performZoom(
-                        false,
-                        x,
-                        y
-                    )
-
-                    KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_RIGHT_BRACKET -> gestureManager.performZoom(
-                        true,
-                        x,
-                        y
-                    )
+                val isZoomIn = when (event.keyCode) {
+                    KeyEvent.KEYCODE_STAR, KeyEvent.KEYCODE_LEFT_BRACKET -> false
+                    KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_RIGHT_BRACKET -> true
+                    else -> return false
                 }
+
+                currentZoomDirection = isZoomIn
+                backgroundScope.launch {
+                    gestureManager.performZoom(isZoomIn, x, y)
+                }
+
+                continuousGestureJob = launchContinuousGesture(
+                    backgroundScope = backgroundScope,
+                    gestureManager = gestureManager,
+                    initialDelay = settings.gestureDuration,
+                    condition = { currentZoomDirection == isZoomIn },
+                    action = { gestureManager.performZoom(isZoomIn, x, y, forceFixedGesture = true) }
+                )
+            }
+
+            KeyEvent.ACTION_UP -> {
+                cancelContinuousGesture()
             }
         }
         return true

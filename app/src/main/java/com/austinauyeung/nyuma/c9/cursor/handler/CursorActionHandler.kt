@@ -42,6 +42,7 @@ class CursorActionHandler(
     private var isActivationKeyPressed: Boolean = false
     private var wasActivated: Boolean = false
     private var currentScrollDirection: ScrollDirection? = null
+    private var currentZoomDirection: Boolean? = null
     private var activationJob: Job? = null
     private var continuousGestureJob: Job? = null
     private var movementJob: Job? = null
@@ -63,6 +64,7 @@ class CursorActionHandler(
 
     private fun cancelContinuousGesture() {
         currentScrollDirection = null
+        currentZoomDirection = null
         continuousGestureJob?.cancel()
         continuousGestureJob = null
     }
@@ -386,15 +388,34 @@ class CursorActionHandler(
     }
 
     private fun handleZoomKey(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_UP) {
-            val isZoomIn = when (event.keyCode) {
-                KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_LEFT_BRACKET -> false
-                KeyEvent.KEYCODE_3, KeyEvent.KEYCODE_RIGHT_BRACKET -> true
-                else -> return false
+        val settings = settingsFlow.value
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> {
+                cancelContinuousGesture()
+
+                val isZoomIn = when (event.keyCode) {
+                    KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_LEFT_BRACKET -> false
+                    KeyEvent.KEYCODE_3, KeyEvent.KEYCODE_RIGHT_BRACKET -> true
+                    else -> return false
+                }
+
+                currentZoomDirection = isZoomIn
+                backgroundScope.launch {
+                    performZoom(isZoomIn)
+                }
+
+                continuousGestureJob = launchContinuousGesture(
+                    backgroundScope = backgroundScope,
+                    gestureManager = gestureManager,
+                    initialDelay = settings.gestureDuration,
+                    condition = { currentZoomDirection == isZoomIn },
+                    action = { performZoom(isZoomIn, true) }
+                )
             }
 
-            performZoom(isZoomIn)
-            return true
+            KeyEvent.ACTION_UP -> {
+                cancelContinuousGesture()
+            }
         }
         return true
     }
@@ -514,21 +535,21 @@ class CursorActionHandler(
             ScreenEdge.NONE -> null
         }
 
-        if (direction != null) gestureManager.performScroll(direction, startX = x, startY = y, duration = duration, useNaturalScrolling = false, forceFixedScroll = true, distanceFactor = GestureConstants.SLOW_SCROLL_MULTIPLIER)
+        if (direction != null) gestureManager.performScroll(direction, startX = x, startY = y, duration = duration, useNaturalScrolling = false, forceFixedGesture = true, distanceFactor = GestureConstants.SLOW_SCROLL_MULTIPLIER)
         return true
     }
 
-    private suspend fun performScroll(direction: ScrollDirection, forceFixedScroll: Boolean = false): Boolean {
+    private suspend fun performScroll(direction: ScrollDirection, forceFixedGesture: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
-        gestureManager.performScroll(direction, startX = cursorState.position.x, startY = cursorState.position.y, forceFixedScroll = forceFixedScroll)
+        gestureManager.performScroll(direction, startX = cursorState.position.x, startY = cursorState.position.y, forceFixedGesture = forceFixedGesture)
 
         return true
     }
 
-    private fun performZoom(isZoomIn: Boolean): Boolean {
+    private fun performZoom(isZoomIn: Boolean, forceFixedGesture: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
         backgroundScope.launch {
-            gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y)
+            gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y, forceFixedGesture = forceFixedGesture)
         }
 
         return true
