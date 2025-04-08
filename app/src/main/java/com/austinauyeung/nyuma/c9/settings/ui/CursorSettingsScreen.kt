@@ -6,9 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -413,64 +416,68 @@ fun ColorPickerDialog(
         onDismissRequest = onDismiss,
         title = { Text("Cursor Color") },
         text = {
-            OutlinedTextField(
-                value = colorHex,
-                onValueChange = { input ->
-                    val filtered = input.text.filter {
-                        it.isDigit() || it in 'A'..'F' || it in 'a'..'f'
-                    }.take(6)
+            Column {
+                Text("Enter a hex value. A preview is shown on the right.")
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = colorHex,
+                    onValueChange = { input ->
+                        val filtered = input.text.filter {
+                            it.isDigit() || it in 'A'..'F' || it in 'a'..'f'
+                        }.take(6)
 
-                    val newSelection = TextRange(
-                        start = minOf(filtered.length, input.selection.start),
-                        end = minOf(filtered.length, input.selection.end)
-                    )
+                        val newSelection = TextRange(
+                            start = minOf(filtered.length, input.selection.start),
+                            end = minOf(filtered.length, input.selection.end)
+                        )
 
-                    colorHex = TextFieldValue(
-                        text = filtered,
-                        selection = newSelection,
-                        composition = input.composition
-                    )
-                    try {
-                        Color(android.graphics.Color.parseColor("#$filtered"))
-                        isError = false
-                    } catch (e: Exception) {
-                        isError = true
-                    }
-                },
-                label = { Text("Hex value") },
-                singleLine = true,
-                isError = isError,
-                prefix = { Text("#") },
-                supportingText = {
-                    if (isError) {
-                        Text(
-                            text = "Invalid hex code",
-                            color = Color.Red,
-                            modifier = Modifier.padding(top = 4.dp)
+                        colorHex = TextFieldValue(
+                            text = filtered,
+                            selection = newSelection,
+                            composition = input.composition
                         )
-                    }
-                },
-                trailingIcon = {
-                    if (!isError) {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .background(previewColor)
-                                .border(1.dp, Color.Black)
-                        )
-                    }
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (!isError) {
-                            saveAction()
+                        try {
+                            Color(android.graphics.Color.parseColor("#$filtered"))
+                            isError = false
+                        } catch (e: Exception) {
+                            isError = true
                         }
-                    }
+                    },
+                    label = { Text("Hex value") },
+                    singleLine = true,
+                    isError = isError,
+                    prefix = { Text("#") },
+                    supportingText = {
+                        if (isError) {
+                            Text(
+                                text = "Invalid hex code",
+                                color = Color.Red,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (!isError) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(previewColor)
+                                    .border(2.dp, Color.Black)
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (!isError) {
+                                saveAction()
+                            }
+                        }
+                    )
                 )
-            )
+            }
         },
         confirmButton = {
             TextButton(
