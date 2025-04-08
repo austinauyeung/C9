@@ -39,7 +39,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - [Acknowledgment](#acknowledgments)
 
 ## Overview
-The majority of modern applications are touch-oriented. The goal of C9 is to mimic the touchscreen gestures required of these applications as closely as possible through button presses in each of the two cursor modes.
+The majority of modern applications are touch-oriented. The goal of C9 is to mimic the touchscreen gestures required of these applications as closely as possible by adapting button presses in each of the two cursor modes.
 
 Because of their different navigation paradigms, each cursor mode maps gestures uniquely as will be shown below. While both modes can be **enabled** simultaneously (by mapping their activation key or shortcut), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
 
@@ -74,7 +74,7 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
-| Zoom | Click star (*) and numpad 0. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
+| Zoom | Click star (*) and numpad 0. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | Zoom distance is not currently user-configurable. |
 
 ### Standard Cursor
 
@@ -89,7 +89,7 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 A standard cursor is included for actions requiring more precision and for those who strictly prefer a traditional pointer. The demo above shows auto-hiding in text fields as well as long press and drag.
 
 #### Instructions
-All gestures are dispatched at the cursor's current location.
+All gestures are dispatched at the tip of the cursor's current location.
 
 | Action | Mapped buttons | Notes |
 | --- | --- | --- |
@@ -99,7 +99,7 @@ All gestures are dispatched at the cursor's current location.
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
-| Zoom | Numpad 1 and 3. ||
+| Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
 
 ### Recommendations
@@ -131,6 +131,8 @@ The following settings and `values` are available.
 | | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
 | | Cursor Size | Size of the cursor. |
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
+| | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
+| | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black.
 | General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
@@ -143,10 +145,6 @@ The following settings and `values` are available.
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
 | | Use Physical Size | `On`: Cursor will use the screen's physical dimensions to overlay.<br />`Off`: Cursor will not overlay on top of any status or navigation bars. |
 | | Allow Passthrough | `On`: Cursor will not intercept key presses. Not recommended.<br />`Off`: Cursor intercepts key presses. Default behavior. |
-
-The following settings cannot be configured but are enforced:
-- Continuous scrolling
-  - Regardless of the gesture style used for single scrolls, continuous scrolling will use the `Fixed` gesture style.
 
 ## Installation
 The latest version can be found under [releases](https://github.com/austinauyeung/C9/releases). You can use GitHub's `Watch > Custom > Releases` option to be notified of new releases.

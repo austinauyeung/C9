@@ -1,7 +1,6 @@
 package com.austinauyeung.nyuma.c9.cursor.handler
 
 import androidx.compose.ui.geometry.Offset
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior

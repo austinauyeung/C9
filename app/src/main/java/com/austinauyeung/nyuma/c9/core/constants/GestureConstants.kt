@@ -10,7 +10,7 @@ object GestureConstants {
     const val MIN_GESTURE_DURATION = 100L
     const val MAX_GESTURE_DURATION = 500L
     const val DEFAULT_GESTURE_DURATION = 300L
-    const val SCROLL_END_PAUSE = 50L
+    const val GESTURE_PAUSE = 50L
     const val SLOW_SCROLL_DURATION = 150L
 
     // Scroll
@@ -21,7 +21,7 @@ object GestureConstants {
     const val SLOW_SCROLL_MULTIPLIER = 0.1f
 
     // Zoom
-    const val ZOOM_DISTANCE_FACTOR = 0.15f
+    const val ZOOM_DISTANCE_FACTOR = 0.2f
     const val ZOOM_DISTANCE_OFFSET = ZOOM_DISTANCE_FACTOR / 3
 
     // Visualization

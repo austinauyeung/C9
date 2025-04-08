@@ -109,7 +109,7 @@ class ShizukuGestureStrategy(
         startY: Float,
         endX: Float,
         endY: Float,
-        forceFixedScroll: Boolean,
+        forceFixedGesture: Boolean,
         duration: Long,
         completionListener: GestureCompletionListener?
     ): Boolean {
@@ -121,6 +121,7 @@ class ShizukuGestureStrategy(
             mainScope.launch {
                 val downTime = SystemClock.uptimeMillis()
                 val steps = GestureConstants.calculateSteps(duration)
+                val pausing = settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedGesture
 
                 // Initial touch down event
                 val downEvent =
@@ -143,31 +144,37 @@ class ShizukuGestureStrategy(
                     delay(duration / steps)
                 }
 
-                val finalMoveEvent = createMotionEvent(
-                    downTime,
-                    downTime + duration,
-                    MotionEvent.ACTION_MOVE,
-                    endX,
-                    endY
-                )
-                injectEvent(finalMoveEvent)
-                finalMoveEvent.recycle()
+                // If pausing, move to final coordinates, pause, then lift
+                val upTime: Long
+                if (pausing) {
+                    val moveEvent = createMotionEvent(
+                        downTime,
+                        downTime + duration,
+                        MotionEvent.ACTION_MOVE,
+                        endX,
+                        endY
+                    )
+                    injectEvent(moveEvent)
+                    moveEvent.recycle()
 
-                if (settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedScroll) {
                     val pause = createMotionEvent(
                         downTime,
-                        downTime + duration + GestureConstants.SCROLL_END_PAUSE * 9 / 10,
+                        downTime + duration + GestureConstants.GESTURE_PAUSE * 9 / 10,
                         MotionEvent.ACTION_MOVE,
                         endX,
                         endY
                     )
                     injectEvent(pause)
                     pause.recycle()
+
+                    upTime = downTime + duration + GestureConstants.GESTURE_PAUSE
+                } else {
+                    upTime = downTime + duration
                 }
 
                 val upEvent = createMotionEvent(
                     downTime,
-                    downTime + duration + GestureConstants.SCROLL_END_PAUSE,
+                    upTime,
                     MotionEvent.ACTION_UP,
                     endX,
                     endY
@@ -192,6 +199,7 @@ class ShizukuGestureStrategy(
         startX2: Float, startY2: Float,
         endX1: Float, endY1: Float,
         endX2: Float, endY2: Float,
+        forceFixedGesture: Boolean,
         completionListener: GestureCompletionListener?
     ): Boolean {
         if (!isAvailable()) return false
@@ -205,6 +213,7 @@ class ShizukuGestureStrategy(
                 val steps = GestureConstants.calculateSteps(duration)
                 val stepDuration = duration / steps
                 val interEventDelayMs = 20L
+                val pausing = settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedGesture
 
                 val firstFingerEvent = createMotionEvent(
                     downTime, downTime,
@@ -242,7 +251,7 @@ class ShizukuGestureStrategy(
                 var allMoveEventsSucceeded = true
 
                 // Linear movement
-                for (i in 1..steps) {
+                for (i in 1 until steps) {
                     val fraction = i.toFloat() / steps
                     val currentTime = downTime + interEventDelayMs + (i * stepDuration)
 
@@ -276,53 +285,71 @@ class ShizukuGestureStrategy(
                 }
 
                 val finalTime = downTime + duration + interEventDelayMs
-                if (settingsFlow.value.gestureStyle == GestureStyle.FIXED) {
-                    val cancelEvent = createMotionEvent(
+                val upTime: Long
+                if (pausing) {
+                    val moveEvent = createMotionEvent(
                         downTime, finalTime,
-                        MotionEvent.ACTION_CANCEL,
+                        MotionEvent.ACTION_MOVE,
                         2,
                         intArrayOf(0, 1),
                         floatArrayOf(endX1, endX2),
                         floatArrayOf(endY1, endY2)
                     )
-                    injectEvent(cancelEvent)
-                    cancelEvent.recycle()
+
+                    injectEvent(moveEvent)
+                    moveEvent.recycle()
+
+                    val pauseEvent = createMotionEvent(
+                        downTime, finalTime + GestureConstants.GESTURE_PAUSE * 9 / 10,
+                        MotionEvent.ACTION_MOVE,
+                        2,
+                        intArrayOf(0, 1),
+                        floatArrayOf(endX1, endX2),
+                        floatArrayOf(endY1, endY2)
+                    )
+                    injectEvent(pauseEvent)
+                    pauseEvent.recycle()
+
+                    upTime = downTime + interEventDelayMs + duration + GestureConstants.GESTURE_PAUSE
                 } else {
-                    val pointerUpEvent = createMotionEvent(
-                        downTime, finalTime,
-                        MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
-                        2,
-                        intArrayOf(0, 1),
-                        floatArrayOf(endX1, endX2),
-                        floatArrayOf(endY1, endY2)
-                    )
-
-                    val pointerUpResult = injectEvent(pointerUpEvent)
-                    pointerUpEvent.recycle()
-
-                    if (!pointerUpResult) {
-                        Logger.e("Failed to inject pointer up event")
-                    }
-
-                    delay(interEventDelayMs)
-                    val upEvent = createMotionEvent(
-                        downTime, finalTime + interEventDelayMs,
-                        MotionEvent.ACTION_UP,
-                        1,
-                        intArrayOf(0),
-                        floatArrayOf(endX1),
-                        floatArrayOf(endY1)
-                    )
-
-                    val upResult = injectEvent(upEvent)
-                    upEvent.recycle()
-
-                    if (!upResult) {
-                        Logger.e("Failed to inject up event")
-                    }
+                    upTime = downTime + interEventDelayMs + duration
                 }
+
+                val pointerUpEvent = createMotionEvent(
+                    downTime, upTime,
+                    MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+                    2,
+                    intArrayOf(0, 1),
+                    floatArrayOf(endX1, endX2),
+                    floatArrayOf(endY1, endY2)
+                )
+
+                val pointerUpResult = injectEvent(pointerUpEvent)
+                pointerUpEvent.recycle()
+
+                if (!pointerUpResult) {
+                    Logger.e("Failed to inject pointer up event")
+                }
+
+                delay(interEventDelayMs)
+                val upEvent = createMotionEvent(
+                    downTime, upTime + interEventDelayMs,
+                    MotionEvent.ACTION_UP,
+                    1,
+                    intArrayOf(0),
+                    floatArrayOf(endX1),
+                    floatArrayOf(endY1)
+                )
+
+                val upResult = injectEvent(upEvent)
+                upEvent.recycle()
+
+                if (!upResult) {
+                    Logger.e("Failed to inject up event")
+                }
+
+                completionListener?.onGestureCompleted(true)
             }
-            completionListener?.onGestureCompleted(true)
             return true
         } catch (e: Exception) {
             Logger.e("Error performing scroll via Shizuku", e)

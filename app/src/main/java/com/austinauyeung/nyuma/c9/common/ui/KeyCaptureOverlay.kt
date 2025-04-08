@@ -53,13 +53,6 @@ fun KeyCaptureOverlay(
     }
 
     LaunchedEffect(Unit) {
-        try {
-            focusRequester.requestFocus()
-        } catch (_: Exception) {
-        }
-    }
-
-    LaunchedEffect(Unit) {
         val startTime = System.currentTimeMillis()
         val totalDuration = 10000L
 
