@@ -444,7 +444,7 @@ class CursorActionHandler(
             movementJob = backgroundScope.launch {
                 while (activeDirections.isNotEmpty()) {
                     moveCursor(direction)
-                    delay(CursorConstants.FRAME_DURATION_MS.toLong())
+                    delay(CursorConstants.POLLING_DURATION_MS.toLong())
                 }
             }
         }

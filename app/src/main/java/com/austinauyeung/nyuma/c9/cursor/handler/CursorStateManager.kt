@@ -138,7 +138,7 @@ class CursorStateManager(
         }
 
         // Pixels per second * seconds per frame = pixels per frame
-        val frameSpeed = speed * (CursorConstants.FRAME_DURATION_MS / 1000f) * dimensions.getScreenScaleFactor()
+        val frameSpeed = speed * (CursorConstants.POLLING_DURATION_MS / 1000f) * dimensions.getScreenScaleFactor()
 
         return frameSpeed
     }
