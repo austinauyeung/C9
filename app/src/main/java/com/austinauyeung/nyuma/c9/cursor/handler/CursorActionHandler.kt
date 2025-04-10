@@ -443,6 +443,8 @@ class CursorActionHandler(
 
             movementJob = backgroundScope.launch {
                 while (activeDirections.isNotEmpty()) {
+                    // FIXME: if delay is too short, may have race condition with dragging
+                    // Error during drag tap: java.lang.IllegalArgumentException: Path has more than one contour
                     moveCursor(direction)
                     delay(CursorConstants.POLLING_DURATION_MS.toLong())
                 }
