@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.abs
+import kotlin.math.pow
 
 /**
  * Translates inputs from either cursor mode into gestures, using Shizuku if necessary.
@@ -35,12 +38,18 @@ class GestureManager(
     private var currentStrategy: GestureStrategy = defaultStrategy
     private var shizukuObserverJob: Job? = null
 
+    private val gestureReady = AtomicBoolean(true)
     private val _isReady = MutableStateFlow(true)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
     private var gestureTimeoutJob: Job? = null
 
     fun setGestureReady(ready: Boolean) {
+        gestureReady.set(ready)
         _isReady.value = ready
+    }
+
+    fun getGestureReady(): Boolean {
+        return gestureReady.get()
     }
 
     init {
@@ -100,14 +109,14 @@ class GestureManager(
         forceFixedGesture: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
     ): Boolean {
-        if (!_isReady.value) return false
+        if (!getGestureReady()) return false
         setGestureReady(false)
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
             val timeoutDuration = settingsFlow.value.gestureDuration * 3
             delay(timeoutDuration)
-            if (!_isReady.value) {
+            if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
                 setGestureReady(true)
             }
@@ -164,14 +173,14 @@ class GestureManager(
         startY: Float,
         forceFixedGesture: Boolean = false
     ): Boolean {
-        if (!_isReady.value) return false
+        if (!getGestureReady()) return false
         setGestureReady(false)
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
             val timeoutDuration = settingsFlow.value.gestureDuration * 3
             delay(timeoutDuration)
-            if (!_isReady.value) {
+            if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
                 setGestureReady(true)
             }
@@ -230,13 +239,16 @@ class GestureManager(
     }
 
     suspend fun startTap(x: Float, y: Float): Boolean {
+        if (!getGestureReady()) return false
+        setGestureReady(false)
+
         try {
             Logger.d("Starting tap gesture at ($x, $y)")
             if (shouldShowGestures) {
                 visualizeTap(x, y)
             }
 
-            return currentStrategy.startTap(x, y)
+            return currentStrategy.startTap(x, y, completionListener)
         } catch (e: Exception) {
             Logger.e("Error starting tap gesture", e)
             cancelTap()
@@ -244,10 +256,23 @@ class GestureManager(
         }
     }
 
+    fun Float.equalToDecimalPlaces(other: Float, decimalPlaces: Int): Boolean {
+        val epsilon = 0.1f.pow(decimalPlaces)
+        return abs(this - other) < epsilon
+    }
+
     suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+        if (!getGestureReady()) return false
+        if (fromX.equalToDecimalPlaces(toX, 4) && fromY.equalToDecimalPlaces(toY, 4)) {
+            setGestureReady(true)
+            return false
+        }
+
+        setGestureReady(false)
+
         try {
             Logger.d("Dragging from ($fromX, $fromY) to ($toX, $toY)")
-            return currentStrategy.dragTap(fromX, fromY, toX, toY)
+            return currentStrategy.dragTap(fromX, fromY, toX, toY, completionListener)
         } catch (e: Exception) {
             Logger.e("Error during drag tap", e)
             cancelTap()
@@ -256,9 +281,12 @@ class GestureManager(
     }
 
     suspend fun endTap(x: Float, y: Float): Boolean {
+        if (!getGestureReady()) return false
+        setGestureReady(false)
+
         try {
             Logger.d("Ending tap at ($x, $y)")
-            return currentStrategy.endTap(x, y)
+            return currentStrategy.endTap(x, y, completionListener)
         } catch (e: Exception) {
             Logger.e("Error ending tap gesture", e)
             cancelTap()
@@ -269,7 +297,7 @@ class GestureManager(
     private fun cancelTap(): Boolean {
         try {
             Logger.d("Cancelling tap gesture")
-            return currentStrategy.cancelTap()
+            return currentStrategy.cancelTap(completionListener)
         } catch (e: Exception) {
             Logger.e("Error cancelling tap gesture", e)
             return false

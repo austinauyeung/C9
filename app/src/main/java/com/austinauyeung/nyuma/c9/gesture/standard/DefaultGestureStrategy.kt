@@ -226,7 +226,7 @@ class DefaultGestureStrategy(
         }
     }
 
-    override suspend fun startTap(x: Float, y: Float): Boolean {
+    override suspend fun startTap(x: Float, y: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: starting tap at ($x, $y)")
 
@@ -249,10 +249,12 @@ class DefaultGestureStrategy(
                 object : AccessibilityService.GestureResultCallback() {
                     override fun onCompleted(gestureDescription: GestureDescription?) {
                         Logger.d("DefaultGestureStrategy: start tap completed successfully")
+                        completionListener?.onGestureCompleted(true)
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
                         Logger.d("DefaultGestureStrategy: start tap was cancelled")
+                        completionListener?.onGestureCompleted(true)
                     }
                 },
                 null
@@ -261,18 +263,19 @@ class DefaultGestureStrategy(
             return true
 
         } catch (e: Exception) {
-            cancelTap()
+            cancelTap(completionListener)
             Logger.e("Error starting tap", e)
             return false
         }
     }
 
-    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: dragging from ($fromX, $fromY) to ($toX, $toY)")
 
             if (activeStroke == null) {
                 Logger.d("Cannot continue drag: no active long press")
+                cancelTap(completionListener)
                 return false
             }
 
@@ -298,11 +301,12 @@ class DefaultGestureStrategy(
                 object : AccessibilityService.GestureResultCallback() {
                     override fun onCompleted(gestureDescription: GestureDescription?) {
                         Logger.d("DefaultGestureStrategy: drag completed successfully")
+                        completionListener?.onGestureCompleted(true)
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
                         Logger.d("DefaultGestureStrategy: drag was cancelled")
-                        cancelTap()
+                        cancelTap(completionListener)
                     }
                 },
                 null
@@ -311,18 +315,19 @@ class DefaultGestureStrategy(
             return true
 
         } catch (e: Exception) {
-            cancelTap()
+            cancelTap(completionListener)
             Logger.e("Error continuing drag", e)
             return false
         }
     }
 
-    override suspend fun endTap(finalX: Float, finalY: Float): Boolean {
+    override suspend fun endTap(finalX: Float, finalY: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: ending tap at ($finalX, $finalY)")
 
             if (activeStroke == null) {
                 Logger.d("Cannot end tap: no active tap operation")
+                cancelTap(completionListener)
                 return false
             }
 
@@ -346,11 +351,12 @@ class DefaultGestureStrategy(
                     override fun onCompleted(gestureDescription: GestureDescription?) {
                         activeStroke = null
                         Logger.d("DefaultGestureStrategy: end tap completed successfully")
+                        completionListener?.onGestureCompleted(true)
                     }
 
                     override fun onCancelled(gestureDescription: GestureDescription?) {
                         Logger.d("DefaultGestureStrategy: end tap was cancelled")
-                        cancelTap()
+                        cancelTap(completionListener)
                     }
                 },
                 null
@@ -359,13 +365,15 @@ class DefaultGestureStrategy(
             return true
 
         } catch (e: Exception) {
-            cancelTap()
+            cancelTap(completionListener)
             Logger.e("Error ending tap", e)
             return false
         }
     }
 
-    override fun cancelTap(): Boolean {
+    override fun cancelTap(completionListener: GestureCompletionListener?): Boolean {
+        completionListener?.onGestureCompleted(true)
+
         if (activeStroke == null) {
             return false
         }
