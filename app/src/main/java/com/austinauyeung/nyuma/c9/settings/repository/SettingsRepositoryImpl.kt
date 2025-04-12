@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.repository
 
+import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -13,6 +14,7 @@ import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -131,7 +133,7 @@ class SettingsRepositoryImpl(
                         OverlaySettings.DEFAULT.cursorEdgeBehavior
                     }
 
-                OverlaySettings(
+                val settings = OverlaySettings(
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
                     overlayOpacity = preferences[OVERLAY_OPACITY]
                         ?: OverlaySettings.DEFAULT.overlayOpacity,
@@ -178,6 +180,8 @@ class SettingsRepositoryImpl(
                     standardCursorMatchBorder = preferences[STANDARD_CURSOR_MATCH_BORDER]
                         ?: OverlaySettings.DEFAULT.standardCursorMatchBorder
                 )
+
+                if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
             }
     }
 

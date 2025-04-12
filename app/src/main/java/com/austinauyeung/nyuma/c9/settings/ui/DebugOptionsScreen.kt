@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +77,7 @@ fun DebugOptionsScreen(
                             viewModel.updateEnableShizukuIntegration(newValue)
                         }
                     },
+                    enabled = !VersionUtil.belowVersion(Build.VERSION_CODES.O)
                 )
             }
 

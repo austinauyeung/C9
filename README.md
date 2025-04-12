@@ -5,7 +5,7 @@
 ---
 
 # C9: Click on 9 keys
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/austinauyeung/C9) ![Android Version](https://img.shields.io/badge/Android-8.0%2B-brightgreen) ![GitHub all releases](https://img.shields.io/github/downloads/austinauyeung/C9/total) ![License](https://img.shields.io/github/license/austinauyeung/C9)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/austinauyeung/C9) ![Android Version](https://img.shields.io/badge/Android-7.0%2B-brightgreen) ![GitHub all releases](https://img.shields.io/github/downloads/austinauyeung/C9/total) ![License](https://img.shields.io/github/license/austinauyeung/C9)
 
 <div align="center">
 <img src='./docs/imgs/Screenshot_20250319_213956.png' width=200>
@@ -14,8 +14,7 @@
 
 C9 is a dual-cursor application that takes inspiration from T9 to provide clicks using the numpad on Android feature phones. Features of the application include:
 
-- 🤖 Android 8.0+ support
-- 🌎 Universal Android 11 compatibility via Shizuku as needed
+- 🌎 Universal Android 7.0+ support via Shizuku as needed
 - ⚡ Introduction of a grid cursor focused on efficiency
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
 - ⚙️ Remappable cursor activation keys and integration with button mappers
@@ -159,8 +158,9 @@ Install using adb:
 >> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 ```
 
-### Additional installation for Android 8 and Android 11
+### Additional installation for Android 7, 8, and 11
 If any of the following is true, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
+- You are on Android 7.
 - You are on Android 8 and are experiencing poor scrolling performance.
 - You are on Android 11 and the application does not work as-is (i.e. no gestures can be dispatched), or you have had trouble in the past with other cursor apps.
 

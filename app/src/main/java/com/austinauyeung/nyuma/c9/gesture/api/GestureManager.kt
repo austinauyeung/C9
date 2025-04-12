@@ -1,11 +1,13 @@
 package com.austinauyeung.nyuma.c9.gesture.api
 
+import android.os.Build
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureType
 import com.austinauyeung.nyuma.c9.gesture.ui.animateGesturePath
@@ -84,6 +86,8 @@ class GestureManager(
     private var shouldShowGestures = false
 
     private fun shouldUseShizuku(): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) return true
+
         val settings = settingsFlow.value
         if (!settings.enableShizukuIntegration) {
             return false
@@ -256,7 +260,7 @@ class GestureManager(
         }
     }
 
-    fun Float.equalToDecimalPlaces(other: Float, decimalPlaces: Int): Boolean {
+    private fun Float.equalToDecimalPlaces(other: Float, decimalPlaces: Int): Boolean {
         val epsilon = 0.1f.pow(decimalPlaces)
         return abs(this - other) < epsilon
     }
