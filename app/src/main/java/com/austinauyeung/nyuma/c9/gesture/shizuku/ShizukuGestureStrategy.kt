@@ -358,33 +358,38 @@ class ShizukuGestureStrategy(
         }
     }
 
-    override suspend fun startTap(x: Float, y: Float): Boolean {
+    override suspend fun startTap(x: Float, y: Float, completionListener: GestureCompletionListener?): Boolean {
         if (!isAvailable()) return false
 
         Logger.d("Using Shizuku to start gesture at ($x, $y)")
 
         try {
-            val downTime = SystemClock.uptimeMillis()
-            _gestureDownTime = downTime
-            _gestureActive = true
+            mainScope.launch {
+                val downTime = SystemClock.uptimeMillis()
+                _gestureDownTime = downTime
+                _gestureActive = true
 
-            val downEvent = createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y)
-            val result = injectEvent(downEvent)
-            downEvent.recycle()
+                val downEvent = createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y)
+                val result = injectEvent(downEvent)
+                downEvent.recycle()
 
-            _currentGestureX = x
-            _currentGestureY = y
+                _currentGestureX = x
+                _currentGestureY = y
 
-            return result
+                completionListener?.onGestureCompleted(true)
+            }
+
+            return true
         } catch (e: Exception) {
             Logger.e("Error starting gesture via Shizuku", e)
+            completionListener?.onGestureCompleted(true)
             _gestureActive = false
             _gestureDownTime = 0
             return false
         }
     }
 
-    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+    override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float, completionListener: GestureCompletionListener?): Boolean {
         if (!isAvailable() || !_gestureActive || _gestureDownTime == 0L) return false
 
         Logger.d("Using Shizuku to continue gesture from ($fromX, $fromY) to ($toX, $toY)")
@@ -417,88 +422,101 @@ class ShizukuGestureStrategy(
 
                 _currentGestureX = toX
                 _currentGestureY = toY
+
+                completionListener?.onGestureCompleted(true)
             }
 
             return true
         } catch (e: Exception) {
             Logger.e("Error continuing gesture via Shizuku", e)
+            completionListener?.onGestureCompleted(true)
             return false
         }
     }
 
-    override suspend fun endTap(finalX: Float, finalY: Float): Boolean {
+    override suspend fun endTap(finalX: Float, finalY: Float, completionListener: GestureCompletionListener?): Boolean {
         if (!isAvailable() || !_gestureActive || _gestureDownTime == 0L) return false
 
         Logger.d("Using Shizuku to end gesture at ($finalX, $finalY)")
 
         try {
-            val downTime = _gestureDownTime
-            val upTime = SystemClock.uptimeMillis()
-
-            // Inject one more event if cursor moved from its last position
-            if (_currentGestureX != finalX || _currentGestureY != finalY) {
-                val finalMoveEvent = createMotionEvent(
-                    downTime,
-                    upTime - 5,
-                    MotionEvent.ACTION_MOVE,
-                    finalX,
-                    finalY
-                )
-                injectEvent(finalMoveEvent)
-                finalMoveEvent.recycle()
-            }
-
-            val upEvent = createMotionEvent(downTime, upTime, MotionEvent.ACTION_UP, finalX, finalY)
-            val result = injectEvent(upEvent)
-            upEvent.recycle()
-
-            _gestureActive = false
-            _gestureDownTime = 0
-            _currentGestureX = 0f
-            _currentGestureY = 0f
-
-            return result
-        } catch (e: Exception) {
-            Logger.e("Error ending gesture via Shizuku", e)
-            _gestureActive = false
-            _gestureDownTime = 0
-            return false
-        }
-    }
-
-    override fun cancelTap(): Boolean {
-        if (!isAvailable() || !_gestureActive) return false
-
-        Logger.d("Using Shizuku to cancel gesture")
-
-        try {
-            if (_gestureDownTime != 0L) {
+            mainScope.launch {
                 val downTime = _gestureDownTime
-                val cancelTime = SystemClock.uptimeMillis()
+                val upTime = SystemClock.uptimeMillis()
 
-                val cancelEvent = createMotionEvent(
-                    downTime,
-                    cancelTime,
-                    MotionEvent.ACTION_CANCEL,
-                    _currentGestureX,
-                    _currentGestureY
-                )
-                val result = injectEvent(cancelEvent)
-                cancelEvent.recycle()
+                // Inject one more event if cursor moved from its last position
+                if (_currentGestureX != finalX || _currentGestureY != finalY) {
+                    val finalMoveEvent = createMotionEvent(
+                        downTime,
+                        upTime - 5,
+                        MotionEvent.ACTION_MOVE,
+                        finalX,
+                        finalY
+                    )
+                    injectEvent(finalMoveEvent)
+                    finalMoveEvent.recycle()
+                }
+
+                val upEvent =
+                    createMotionEvent(downTime, upTime, MotionEvent.ACTION_UP, finalX, finalY)
+                injectEvent(upEvent)
+                upEvent.recycle()
 
                 _gestureActive = false
                 _gestureDownTime = 0
                 _currentGestureX = 0f
                 _currentGestureY = 0f
 
-                return result
+                completionListener?.onGestureCompleted(true)
             }
 
+            return true
+        } catch (e: Exception) {
+            Logger.e("Error ending gesture via Shizuku", e)
+            completionListener?.onGestureCompleted(true)
             _gestureActive = false
             _gestureDownTime = 0
+            return false
+        }
+    }
+
+    override fun cancelTap(completionListener: GestureCompletionListener?): Boolean {
+        if (!isAvailable() || !_gestureActive) return false
+
+        Logger.d("Using Shizuku to cancel gesture")
+
+        try {
+            mainScope.launch {
+                if (_gestureDownTime != 0L) {
+                    val downTime = _gestureDownTime
+                    val cancelTime = SystemClock.uptimeMillis()
+
+                    val cancelEvent = createMotionEvent(
+                        downTime,
+                        cancelTime,
+                        MotionEvent.ACTION_CANCEL,
+                        _currentGestureX,
+                        _currentGestureY
+                    )
+                    injectEvent(cancelEvent)
+                    cancelEvent.recycle()
+
+                    _gestureActive = false
+                    _gestureDownTime = 0
+                    _currentGestureX = 0f
+                    _currentGestureY = 0f
+                } else {
+                    _gestureActive = false
+                    _gestureDownTime = 0
+                }
+
+                completionListener?.onGestureCompleted(true)
+            }
+
             return true
         } catch (e: Exception) {
             Logger.e("Error canceling gesture via Shizuku", e)
+            completionListener?.onGestureCompleted(true)
             _gestureActive = false
             _gestureDownTime = 0
             return false

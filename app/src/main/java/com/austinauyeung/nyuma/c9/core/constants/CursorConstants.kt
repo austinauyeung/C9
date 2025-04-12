@@ -25,8 +25,8 @@ object CursorConstants {
     // Appearance
     const val STANDARD_CURSOR_HEX = "FFFFFF"
 
-    private const val TARGET_FPS = 60
-    const val FRAME_DURATION_MS = 1000f / TARGET_FPS
+    private const val POLLING_RATE = 60
+    const val POLLING_DURATION_MS = 1000f / POLLING_RATE
     const val OPACITY = 0.7f
 
     const val TOGGLE_HOLD = false

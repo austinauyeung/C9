@@ -1,6 +1,7 @@
 package com.austinauyeung.nyuma.c9.grid.handler
 
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
@@ -8,6 +9,7 @@ import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,6 +86,9 @@ class GridStateManager(
 
             backgroundScope.launch {
                 gestureManager.startTap(x, y)
+                while (!gestureManager.getGestureReady()) {
+                    delay(CursorConstants.POLLING_DURATION_MS.toLong())
+                }
                 gestureManager.endTap(x, y)
             }
         }
@@ -96,7 +101,7 @@ class GridStateManager(
     }
 
     fun resetToMainGrid(force: Boolean = false) {
-        if ((_gridState.value?.level != null && _gridState.value?.level!! > 1) || force) {
+        if ((_gridState.value?.level != null && _gridState.value?.level!! > 0) || force) {
             keySequence.clear()
             updateGrid(calculateGridFromSequence(keySequence))
         }
@@ -111,7 +116,7 @@ class GridStateManager(
         return Pair(dimensions.width / 2f, dimensions.height / 2f)
     }
 
-    fun calculateGridFromSequence(sequence: List<Int>): Grid {
+    private fun calculateGridFromSequence(sequence: List<Int>): Grid {
         var x = 0f
         var y = 0f
         val dimensions = dimensionsFlow.value

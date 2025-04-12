@@ -52,8 +52,9 @@ class CursorActionHandler(
     private val activeDirections = mutableSetOf<CursorDirection>()
     private var lastMovementTime = 0L
 
-    private var isGestureActive = false
+    private var isLongPressing = false
     private var lastDragPosition: Offset? = null
+    private var isDragging = false
 
     private var actionKeysPressed = 0
 
@@ -310,7 +311,7 @@ class CursorActionHandler(
                         if (settings.controlScheme == ControlScheme.DPAD_TOGGLE || settings.controlScheme == ControlScheme.NUMPAD_TOGGLE) {
                             cursorStateManager.toggleScrollMode()
 
-                            if (isGestureActive) {
+                            if (isLongPressing) {
                                 endTap()
                             }
                         }
@@ -444,7 +445,7 @@ class CursorActionHandler(
             movementJob = backgroundScope.launch {
                 while (activeDirections.isNotEmpty()) {
                     moveCursor(direction)
-                    delay(CursorConstants.FRAME_DURATION_MS.toLong())
+                    delay(CursorConstants.POLLING_DURATION_MS.toLong())
                 }
             }
         }
@@ -488,10 +489,14 @@ class CursorActionHandler(
         cursorStateManager.updatePosition(newPosition)
 
         // Handle drag if active
-        if (isGestureActive && lastDragPosition != null) {
-            dragToNewPosition(lastDragPosition!!, newPosition)
-            lastDragPosition = newPosition
-            return
+        if (!isDragging) {
+            if (isLongPressing && lastDragPosition != null) {
+                isDragging = true
+                dragToNewPosition(lastDragPosition!!, newPosition)
+                return
+            }
+        } else {
+            if (gestureManager.getGestureReady()) isDragging = false
         }
 
         if (settings.cursorEdgeBehavior == ScreenEdgeBehavior.AUTO_SCROLL) {
@@ -502,7 +507,12 @@ class CursorActionHandler(
                     gestureManager = gestureManager,
                     initialDelay = settings.gestureDuration,
                     condition = { currentScreenEdge != ScreenEdge.NONE },
-                    action = { performSlowScroll(currentScreenEdge!!, GestureConstants.SLOW_SCROLL_DURATION) }
+                    action = {
+                        performSlowScroll(
+                            currentScreenEdge!!,
+                            GestureConstants.SLOW_SCROLL_DURATION
+                        )
+                    }
                 )
             }
         }
@@ -574,8 +584,8 @@ class CursorActionHandler(
                 allowTap = !cursorState.inScrollMode && !cursorState.isHoldActive
             }
 
-            if (!isGestureActive && allowTap) {
-                isGestureActive = true
+            if (!isLongPressing && allowTap) {
+                isLongPressing = true
                 lastDragPosition = cursorState.position
 
                 backgroundScope.launch {
@@ -594,7 +604,7 @@ class CursorActionHandler(
         actionKeysPressed--
 
         if (cursorState != null) {
-            if (!isGestureActive) {
+            if (!isLongPressing) {
                 return false
             }
 
@@ -607,26 +617,23 @@ class CursorActionHandler(
     }
 
     private fun dragToNewPosition(fromPosition: Offset, toPosition: Offset) {
+        lastDragPosition = toPosition
         backgroundScope.launch {
-            val result = gestureManager.dragTap(
+            gestureManager.dragTap(
                 fromPosition.x,
                 fromPosition.y,
                 toPosition.x,
                 toPosition.y
             )
-
-            if (!result) {
-                endTap()
-                cursorStateManager.updateHoldState(false)
-            }
         }
     }
 
     private fun endTap(): Boolean {
-        val cursorState = cursorStateManager.cursorState.value ?: return false
-        isGestureActive = false
+        cursorStateManager.updateHoldState(false)
+        isLongPressing = false
         lastDragPosition = null
 
+        val cursorState = cursorStateManager.cursorState.value ?: return false
         backgroundScope.launch {
             gestureManager.endTap(cursorState.position.x, cursorState.position.y)
         }
