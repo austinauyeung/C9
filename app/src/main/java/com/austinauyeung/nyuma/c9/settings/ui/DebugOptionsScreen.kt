@@ -111,7 +111,7 @@ fun DebugOptionsScreen(
             PreferenceCategory(title = "Display") {
                 SwitchPreferenceItem(
                     title = "Use Physical Size",
-                    subtitle = "Overlay cursor over the entire screen, including the status and navigation bars",
+                    subtitle = "Overlay cursor over the entire screen, including any navigation bars",
                     checked = uiState.usePhysicalSize,
                     onCheckedChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
