@@ -39,7 +39,8 @@ data class OverlaySettings(
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
     val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
-    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER
+    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
+    val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

@@ -78,7 +78,8 @@ class SettingsViewModel(
                             roundedCursorCorners = settings.roundedCursorCorners,
                             usePhysicalSize = settings.usePhysicalSize,
                             standardCursorHex = settings.standardCursorHex,
-                            standardCursorMatchBorder = settings.standardCursorMatchBorder
+                            standardCursorMatchBorder = settings.standardCursorMatchBorder,
+                            allowOverlappingGestures = settings.allowOverlappingGestures
                         )
                     }
                 }
@@ -139,7 +140,8 @@ class SettingsViewModel(
             roundedCursorCorners = _uiState.value.roundedCursorCorners,
             usePhysicalSize = _uiState.value.usePhysicalSize,
             standardCursorHex = _uiState.value.standardCursorHex,
-            standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder
+            standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder,
+            allowOverlappingGestures = _uiState.value.allowOverlappingGestures
         )
     }
 
@@ -218,5 +220,6 @@ data class SettingsUiState(
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
     val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
-    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER
+    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
+    val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES
 )

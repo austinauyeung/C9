@@ -68,7 +68,7 @@ fun DebugOptionsScreen(
             PreferenceCategory(title = "Shizuku") {
                 SwitchPreferenceItem(
                     title = "Enable Shizuku Integration",
-                    subtitle = "Recommended for Android 8 and required for certain Android 11 devices",
+                    subtitle = "Required for certain Android devices",
                     checked = uiState.enableShizukuIntegration,
                     onCheckedChange = { newValue ->
                         if (newValue && !uiState.enableShizukuIntegration) {
@@ -105,6 +105,19 @@ fun DebugOptionsScreen(
                             Text("Cancel")
                         }
                     }
+                )
+            }
+
+            PreferenceCategory(title = "Gestures") {
+                SwitchPreferenceItem(
+                    title = "Overlapping Gestures",
+                    subtitle = "Allow manual scrolls and zooms to overlap",
+                    checked = uiState. allowOverlappingGestures,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(allowOverlappingGestures = v)
+                        }
+                    },
                 )
             }
 

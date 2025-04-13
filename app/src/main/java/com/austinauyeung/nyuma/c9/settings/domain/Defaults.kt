@@ -44,5 +44,6 @@ object Defaults {
         const val USE_PHYSICAL_SIZE = true
         const val STANDARD_CURSOR_HEX = CursorConstants.STANDARD_CURSOR_HEX
         const val STANDARD_CURSOR_MATCH_BORDER = false
+        const val ALLOW_OVERLAPPING_GESTURES = false
     }
 }
