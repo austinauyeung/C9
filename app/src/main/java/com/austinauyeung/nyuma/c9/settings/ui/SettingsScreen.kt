@@ -257,7 +257,7 @@ fun SettingsScreen(
             PreferenceCategory(title = "Advanced") {
                 SimplePreferenceItem(
                     title = "Developer Options",
-                    subtitle = "Additional non-standard features",
+                    subtitle = "Additional configurable features",
                     onClick = onNavigateToDebugOptions
                 )
             }
