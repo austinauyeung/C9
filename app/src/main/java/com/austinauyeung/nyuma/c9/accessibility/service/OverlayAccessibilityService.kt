@@ -9,6 +9,7 @@ import android.os.Build
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -20,7 +21,6 @@ import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -63,18 +63,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private val keysPressed: MutableSet<Int> = mutableSetOf()
     private var isTextField: Boolean = false
 
-    // Taking some guesses here and may need to revise
-    private val submissionKeys = setOf(
-        KeyEvent.KEYCODE_ENTER,
-        KeyEvent.KEYCODE_NUMPAD_ENTER,
-        KeyEvent.KEYCODE_BUTTON_START,
-        KeyEvent.KEYCODE_CALL,
-        KeyEvent.KEYCODE_SEARCH
-    )
-
-    fun setHidingCursor(hiding: Boolean) {
-        hidingCursor = hiding
-    }
+    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+    private var keyboardHeight = 0
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -229,59 +219,51 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             }
         }
 
-        Logger.d("Text field focused, hiding cursor overlays")
+        Logger.d("Hiding cursor overlay")
         forceHideAllOverlays()
         hidingCursor = true
     }
 
     private fun attemptCursorRestore(): Boolean {
+        Logger.d("Restoring cursor overlay")
+
         val settings = C9.getInstance().getSettingsFlow().value
-
-        if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
+        if (settings.hideOnKeyboardOpen) {
             if (keysPressed.isNotEmpty() || isTextField) return false
-        }
 
-        if (hidingCursor && settings.hideOnTextField != AutoHideDetection.NONE) {
-            when (lastOverlayType) {
-                OverlayModeCoordinator.OverlayMode.GRID -> {
-                    serviceManager.activateGridMode()
+            if (hidingCursor) {
+                when (lastOverlayType) {
+                    OverlayModeCoordinator.OverlayMode.GRID -> {
+                        serviceManager.activateGridMode(toggle = false)
+                    }
+
+                    OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                        serviceManager.activateCursorMode(toggle = false)
+                    }
+
+                    else -> {}
                 }
+                lastOverlayType = null
+                hidingCursor = false
 
-                OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                    serviceManager.activateCursorMode()
-                }
-
-                else -> {}
+                return true
             }
-            lastOverlayType = null
-            hidingCursor = false
-
-            return true
         }
 
         return false
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.hideOnTextField != AutoHideDetection.NONE) {
-            event?.let{
-                when (event.eventType) {
-                    // For any detection method, hide keyboard when it opens
-                    AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                        val isKeyboardActivated = event.className?.toString() == "android.inputmethodservice.SoftInputWindow"
-                        if (isKeyboardActivated && !hidingCursor) autoHideCursor()
-                    }
+        // https://stackoverflow.com/a/52171843
+        val windowHeightMethod = InputMethodManager::class.java.getMethod("getInputMethodWindowVisibleHeight")
+        keyboardHeight = windowHeightMethod.invoke(imm) as Int
 
-                    AccessibilityEvent.TYPE_VIEW_FOCUSED -> {
-                        if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
-                            isTextField = (event.source?.className?.contains("EditText") == true) || (event.source?.isEditable == true)
-                            if (hidingCursor && !isTextField) attemptCursorRestore()
-                            if (!hidingCursor && isTextField) autoHideCursor()
-                        }
-                    }
-                    else -> {}
-                }
+        val settings = C9.getInstance().getSettingsFlow().value
+        if (settings.hideOnKeyboardOpen) {
+            if (keyboardHeight > 0 && !hidingCursor) {
+                autoHideCursor()
+            } else if (keyboardHeight == 0 && hidingCursor && keysPressed.isEmpty()) {
+                attemptCursorRestore()
             }
         }
     }
@@ -290,28 +272,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     override fun onInterrupt() {}
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
-        val settings = C9.getInstance().getSettingsFlow().value
         if (event?.action == KeyEvent.ACTION_DOWN) {
             keysPressed.add(event.keyCode)
         } else if (event?.action == KeyEvent.ACTION_UP) {
             keysPressed.remove(event.keyCode)
         }
         Logger.d("Current key presses: $keysPressed")
-
-        if (hidingCursor) {
-            if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_ENTER &&
-                event?.keyCode in submissionKeys &&
-                event?.action == KeyEvent.ACTION_UP) {
-                Logger.d("Enter key pressed, assuming form submission")
-                if (attemptCursorRestore()) return false
-            }
-
-            if (settings.hideOnTextField == AutoHideDetection.RESTORE_ON_FOCUS_LOST) {
-                if (keysPressed.isEmpty()) {
-                    if (attemptCursorRestore()) return false
-                }
-            }
-        }
 
         return try {
             serviceManager.handleKeyEvent(event)

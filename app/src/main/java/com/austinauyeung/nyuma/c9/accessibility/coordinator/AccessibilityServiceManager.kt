@@ -133,9 +133,9 @@ class AccessibilityServiceManager(
         }
     }
 
-    fun activateGridMode(): Boolean {
+    fun activateGridMode(toggle: Boolean = true): Boolean {
         try {
-            if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
+            if ((!gridStateManager.isGridVisible() || toggle) && modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
                 gridStateManager.toggleGridVisibility()
                 return gridStateManager.isGridVisible()
             }
@@ -159,9 +159,9 @@ class AccessibilityServiceManager(
         }
     }
 
-    fun activateCursorMode(): Boolean {
+    fun activateCursorMode(toggle: Boolean = true): Boolean {
         try {
-            if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
+            if ((!cursorStateManager.isCursorVisible() || toggle) && modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                 cursorStateManager.toggleCursorVisibility()
                 return cursorStateManager.isCursorVisible()
             }

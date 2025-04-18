@@ -3,7 +3,6 @@ package com.austinauyeung.nyuma.c9.grid.handler
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -166,9 +165,7 @@ class GridActionHandler(
                             gridStateManager.toggleGridVisibility()
                             wasOverlayActivated = gridStateManager.isGridVisible()
 
-                            if (wasOverlayActivated) {
-                                OverlayAccessibilityService.getInstance()?.setHidingCursor(false)
-                            } else {
+                            if (!wasOverlayActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
                                 gestureManager.setGestureReady(true)
                             }

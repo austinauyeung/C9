@@ -1,7 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
 import android.view.KeyEvent
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
@@ -38,7 +37,7 @@ object Defaults {
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
-        val HIDE_ON_TEXT_FIELD = AutoHideDetection.NONE
+        const val HIDE_ON_KEYBOARD_OPEN = false
         const val ROTATE_BUTTONS_WITH_ORIENTATION = false
         const val ROUNDED_CURSOR_CORNERS = true
         const val USE_PHYSICAL_SIZE = true

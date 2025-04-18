@@ -50,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
@@ -221,24 +220,13 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Behavior") {
-                DropdownPreferenceItem(
-                    title = "Auto-Hide in Text Fields",
-                    subtitle =
-                    when (uiState.hideOnTextField) {
-                        AutoHideDetection.NONE -> "Do not auto-hide cursor"
-                        AutoHideDetection.RESTORE_ON_FOCUS_LOST -> "Restore cursor on text field exit"
-                        AutoHideDetection.RESTORE_ON_ENTER -> "Restore cursor after pressing enter"
-                    },
-                    selectedOption = uiState.hideOnTextField,
-                    options =
-                    listOf(
-                        AutoHideDetection.NONE to "Disabled",
-                        AutoHideDetection.RESTORE_ON_FOCUS_LOST to "Text field exit",
-                        AutoHideDetection.RESTORE_ON_ENTER to "Text field submit"
-                    ),
-                    onOptionSelected = { value ->
+                SwitchPreferenceItem(
+                    title = "Auto-Hide Cursor in Text Fields",
+                    subtitle = "Hide on keyboard open, restore on keyboard close",
+                    checked = uiState.hideOnKeyboardOpen,
+                    onCheckedChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnTextField = v)
+                            settings.copy(hideOnKeyboardOpen = v)
                         }
                     },
                 )

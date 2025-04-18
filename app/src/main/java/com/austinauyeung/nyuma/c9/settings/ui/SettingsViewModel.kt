@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -73,7 +72,7 @@ class SettingsViewModel(
                             scrollMultiplier = settings.scrollMultiplier,
                             allowPassthrough = settings.allowPassthrough,
                             enableShizukuIntegration = settings.enableShizukuIntegration,
-                            hideOnTextField = settings.hideOnTextField,
+                            hideOnKeyboardOpen = settings.hideOnKeyboardOpen,
                             rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation,
                             roundedCursorCorners = settings.roundedCursorCorners,
                             usePhysicalSize = settings.usePhysicalSize,
@@ -135,7 +134,7 @@ class SettingsViewModel(
             scrollMultiplier = _uiState.value.scrollMultiplier,
             allowPassthrough = _uiState.value.allowPassthrough,
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
-            hideOnTextField = _uiState.value.hideOnTextField,
+            hideOnKeyboardOpen = _uiState.value.hideOnKeyboardOpen,
             rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation,
             roundedCursorCorners = _uiState.value.roundedCursorCorners,
             usePhysicalSize = _uiState.value.usePhysicalSize,
@@ -215,7 +214,7 @@ data class SettingsUiState(
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
-    val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
+    val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
     val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
     val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,

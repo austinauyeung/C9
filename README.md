@@ -96,7 +96,7 @@ All gestures are dispatched at the tip of the cursor's current location.
 | Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center or numpad 5. ||
 | Double Tap | Double click D-pad center or numpad 5. ||
-| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
+| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide Cursor in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
 | Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
@@ -105,8 +105,9 @@ All gestures are dispatched at the tip of the cursor's current location.
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
-- Use `C9 > Auto-Hide in Text Fields` to auto-hide the cursor in text fields. The standard cursor's last position is saved upon restore. See [Settings](#settings) for more information.
+- Use `C9 > Auto-Hide Cursor in Text Fields` to auto-hide the cursor in text fields. The standard cursor's last position is saved upon restore. See [Settings](#settings) for more information.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
+  - This setting is only compatible with keyboards that have a non-zero height when open. [TT9](https://github.com/sspanak/tt9) is compatible.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
 
 ## Settings
@@ -138,7 +139,7 @@ The following settings and `values` are available.
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
-| | Auto-Hide in Text Fields | `Disabled`: Never auto-hide the cursor.<br />`Text field exit`: Hide the cursor when a text field is selected, and restore the cursor at any point the text field is exited.<br />`Text field submit`: Hide the cursor when a text field is selected, and restore the cursor only after pressing enter.<br /> |
+| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor. |
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |

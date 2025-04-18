@@ -10,7 +10,6 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -53,7 +52,7 @@ class SettingsRepositoryImpl(
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
-        private val HIDE_ON_TEXT_FIELD = stringPreferencesKey("hide_on_text_field")
+        private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
         private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
         private val USE_PHYSICAL_SIZE = booleanPreferencesKey("use_physical_size")
@@ -108,19 +107,6 @@ class SettingsRepositoryImpl(
                         OverlaySettings.DEFAULT.gridLineVisibility
                     }
 
-                val hideOnTextFieldStr = preferences[HIDE_ON_TEXT_FIELD]
-                val hideOnTextField =
-                    if (hideOnTextFieldStr != null) {
-                        try {
-                            AutoHideDetection.valueOf(hideOnTextFieldStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid hide on text field value: $hideOnTextFieldStr", e)
-                            OverlaySettings.DEFAULT.hideOnTextField
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.hideOnTextField
-                    }
-
                 val cursorEdgeBehaviorStr = preferences[CURSOR_EDGE_BEHAVIOR]
                 val cursorEdgeBehavior =
                     if (cursorEdgeBehaviorStr != null) {
@@ -169,7 +155,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
-                    hideOnTextField = hideOnTextField,
+                    hideOnKeyboardOpen = preferences[HIDE_ON_KEYBOARD_OPEN]
+                        ?: OverlaySettings.DEFAULT.hideOnKeyboardOpen,
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
                         ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation,
                     roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
@@ -213,7 +200,7 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
-                preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField.name
+                preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
                 preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
                 preferences[USE_PHYSICAL_SIZE] = settings.usePhysicalSize
