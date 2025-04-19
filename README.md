@@ -19,7 +19,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
 - ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
-- ✨ Additional quality-of-life features such as landscape orientation support and cursor auto-hide in text fields
+- ✨ Additional quality-of-life features such as landscape orientation support and cursor auto-hide in text fields and launchers
 
 ## Table of Contents
 - [Overview](#overview)
