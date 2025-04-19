@@ -50,8 +50,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
@@ -133,6 +133,67 @@ fun SettingsScreen(
                         "Mapped"
                     },
                     onClick = onNavigateToCursorSettings,
+                )
+            }
+
+            PreferenceCategory(title = "Behavior") {
+                SliderPreferenceItem(
+                    title = "Activation Duration",
+                    value = uiState.activationDuration.toFloat(),
+                    valueRange = ApplicationConstants.MIN_ACTIVATION_HOLD_DURATION.toFloat()..ApplicationConstants.MAX_ACTIVATION_HOLD_DURATION.toFloat(),
+                    valueText = "${uiState.activationDuration} ms",
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(activationDuration = v.toLong())
+                        }
+                    },
+                    steps = 4,
+                )
+
+                if (uiState.activationDuration == 0L) {
+                    NoteItem(
+                        title = "Activation keys will be fully intercepted",
+                        icon = Icons.Default.Warning,
+                        contentDescription = "Warning",
+                        color = Color(0xFFFFF4E6),
+                    )
+                    NoteItem(
+                        title = "Grid cursor reset and standard cursor control scheme toggle will be disabled",
+                        icon = Icons.Default.Warning,
+                        contentDescription = "Warning",
+                        color = Color(0xFFFFF4E6),
+                    )
+                }
+
+                SwitchPreferenceItem(
+                    title = "Auto-Hide Cursor in Text Fields",
+                    subtitle = "Hide on keyboard open, restore on keyboard close",
+                    checked = uiState.hideOnKeyboardOpen,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideOnKeyboardOpen = v)
+                        }
+                    },
+                )
+                SwitchPreferenceItem(
+                    title = "Auto-Hide Cursor in Launchers",
+                    subtitle = "Hide on launcher open, restore on launcher close",
+                    checked = uiState.hideOnLauncherOpen,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideOnLauncherOpen = v)
+                        }
+                    },
+                )
+                SwitchPreferenceItem(
+                    title = "Rotate Buttons With Orientation",
+                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
+                    checked = uiState.rotateButtonsWithOrientation,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(rotateButtonsWithOrientation = v)
+                        }
+                    },
                 )
             }
 
@@ -220,44 +281,10 @@ fun SettingsScreen(
                 )
             }
 
-            PreferenceCategory(title = "Behavior") {
-                DropdownPreferenceItem(
-                    title = "Auto-Hide in Text Fields",
-                    subtitle =
-                    when (uiState.hideOnTextField) {
-                        AutoHideDetection.NONE -> "Do not auto-hide cursor"
-                        AutoHideDetection.RESTORE_ON_FOCUS_LOST -> "Restore cursor on text field exit"
-                        AutoHideDetection.RESTORE_ON_ENTER -> "Restore cursor after pressing enter"
-                    },
-                    selectedOption = uiState.hideOnTextField,
-                    options =
-                    listOf(
-                        AutoHideDetection.NONE to "Disabled",
-                        AutoHideDetection.RESTORE_ON_FOCUS_LOST to "Text field exit",
-                        AutoHideDetection.RESTORE_ON_ENTER to "Text field submit"
-                    ),
-                    onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnTextField = v)
-                        }
-                    },
-                )
-                SwitchPreferenceItem(
-                    title = "Rotate Buttons With Orientation",
-                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
-                    checked = uiState.rotateButtonsWithOrientation,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(rotateButtonsWithOrientation = v)
-                        }
-                    },
-                )
-            }
-
             PreferenceCategory(title = "Advanced") {
                 SimplePreferenceItem(
                     title = "Developer Options",
-                    subtitle = "Additional non-standard features",
+                    subtitle = "Additional configurable features",
                     onClick = onNavigateToDebugOptions
                 )
             }

@@ -297,16 +297,29 @@ fun CursorSettingsScreen(
                 )
 
                 SliderPreferenceItem(
-                    title = "Cursor Acceleration Threshold",
-                    value = uiState.cursorAccelerationThreshold.toFloat(),
-                    valueRange = CursorConstants.MIN_ACCELERATION_THRESHOLD.toFloat()..CursorConstants.MAX_ACCELERATION_THRESHOLD.toFloat(),
-                    valueText = "${uiState.cursorAccelerationThreshold} ms",
+                    title = "Cursor Acceleration Start",
+                    value = uiState.cursorAccelerationStart.toFloat(),
+                    valueRange = CursorConstants.MIN_ACCELERATION_START.toFloat()..CursorConstants.MAX_ACCELERATION_START.toFloat(),
+                    valueText = "${uiState.cursorAccelerationStart} ms",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(cursorAccelerationThreshold = v.toLong())
+                            settings.copy(cursorAccelerationStart = v.toLong())
                         }
                     },
-                    steps = 3,
+                    steps = 8,
+                )
+
+                SliderPreferenceItem(
+                    title = "Cursor Acceleration Duration",
+                    value = uiState.cursorAccelerationDuration.toFloat(),
+                    valueRange = CursorConstants.MIN_ACCELERATION_DURATION.toFloat()..CursorConstants.MAX_ACCELERATION_DURATION.toFloat(),
+                    valueText = "${uiState.cursorAccelerationDuration} ms",
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorAccelerationDuration = v.toLong())
+                        }
+                    },
+                    steps = 9,
                 )
 
 //                SwitchPreferenceItem(

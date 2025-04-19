@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -51,6 +50,7 @@ class SettingsViewModel(
                 settingsRepository.getSettings().collect { settings ->
                     _uiState.update { currentState ->
                         currentState.copy(
+                            activationDuration = settings.activationDuration,
                             gridLevels = settings.gridLevels,
                             overlayOpacity = settings.overlayOpacity,
                             persistOverlay = settings.persistOverlay,
@@ -62,7 +62,8 @@ class SettingsViewModel(
                             cursorSpeed = settings.cursorSpeed,
                             cursorAcceleration = settings.cursorAcceleration,
                             cursorSize = settings.cursorSize,
-                            cursorAccelerationThreshold = settings.cursorAccelerationThreshold,
+                            cursorAccelerationStart = settings.cursorAccelerationStart,
+                            cursorAccelerationDuration = settings.cursorAccelerationDuration,
                             gridActivationKey = settings.gridActivationKey,
                             cursorActivationKey = settings.cursorActivationKey,
                             controlScheme = settings.controlScheme,
@@ -73,12 +74,15 @@ class SettingsViewModel(
                             scrollMultiplier = settings.scrollMultiplier,
                             allowPassthrough = settings.allowPassthrough,
                             enableShizukuIntegration = settings.enableShizukuIntegration,
-                            hideOnTextField = settings.hideOnTextField,
+                            hideOnKeyboardOpen = settings.hideOnKeyboardOpen,
+                            hideOnLauncherOpen = settings.hideOnLauncherOpen,
                             rotateButtonsWithOrientation = settings.rotateButtonsWithOrientation,
                             roundedCursorCorners = settings.roundedCursorCorners,
                             usePhysicalSize = settings.usePhysicalSize,
                             standardCursorHex = settings.standardCursorHex,
-                            standardCursorMatchBorder = settings.standardCursorMatchBorder
+                            standardCursorMatchBorder = settings.standardCursorMatchBorder,
+                            allowOverlappingGestures = settings.allowOverlappingGestures,
+                            forceSmootherGestures = settings.forceSmootherGestures
                         )
                     }
                 }
@@ -112,6 +116,7 @@ class SettingsViewModel(
 
     private fun createSettingsFromUiState(): OverlaySettings {
         return OverlaySettings(
+            activationDuration = _uiState.value.activationDuration,
             gridLevels = _uiState.value.gridLevels,
             overlayOpacity = _uiState.value.overlayOpacity,
             persistOverlay = _uiState.value.persistOverlay,
@@ -123,7 +128,8 @@ class SettingsViewModel(
             cursorSpeed = _uiState.value.cursorSpeed,
             cursorAcceleration = _uiState.value.cursorAcceleration,
             cursorSize = _uiState.value.cursorSize,
-            cursorAccelerationThreshold = _uiState.value.cursorAccelerationThreshold,
+            cursorAccelerationStart = _uiState.value.cursorAccelerationStart,
+            cursorAccelerationDuration = _uiState.value.cursorAccelerationDuration,
             gridActivationKey = _uiState.value.gridActivationKey,
             cursorActivationKey = _uiState.value.cursorActivationKey,
             controlScheme = _uiState.value.controlScheme,
@@ -134,12 +140,15 @@ class SettingsViewModel(
             scrollMultiplier = _uiState.value.scrollMultiplier,
             allowPassthrough = _uiState.value.allowPassthrough,
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
-            hideOnTextField = _uiState.value.hideOnTextField,
+            hideOnKeyboardOpen = _uiState.value.hideOnKeyboardOpen,
+            hideOnLauncherOpen = _uiState.value.hideOnLauncherOpen,
             rotateButtonsWithOrientation = _uiState.value.rotateButtonsWithOrientation,
             roundedCursorCorners = _uiState.value.roundedCursorCorners,
             usePhysicalSize = _uiState.value.usePhysicalSize,
             standardCursorHex = _uiState.value.standardCursorHex,
-            standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder
+            standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder,
+            allowOverlappingGestures = _uiState.value.allowOverlappingGestures,
+            forceSmootherGestures = _uiState.value.forceSmootherGestures
         )
     }
 
@@ -186,6 +195,7 @@ class SettingsViewModel(
 }
 
 data class SettingsUiState(
+    val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
     val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,
@@ -202,7 +212,8 @@ data class SettingsUiState(
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,
     val cursorAcceleration: Int = Defaults.Settings.CURSOR_ACCELERATION,
     val cursorSize: Int = Defaults.Settings.CURSOR_SIZE,
-    val cursorAccelerationThreshold: Long = Defaults.Settings.CURSOR_ACCELERATION_THRESHOLD,
+    val cursorAccelerationStart: Long = Defaults.Settings.CURSOR_ACCELERATION_START,
+    val cursorAccelerationDuration: Long = Defaults.Settings.CURSOR_ACCELERATION_DURATION,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
@@ -213,10 +224,13 @@ data class SettingsUiState(
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
-    val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
+    val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
+    val hideOnLauncherOpen: Boolean = Defaults.Settings.HIDE_ON_LAUNCHER_OPEN,
     val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
     val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
-    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER
+    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
+    val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
+    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES
 )

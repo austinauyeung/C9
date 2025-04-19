@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +70,7 @@ fun DebugOptionsScreen(
             PreferenceCategory(title = "Shizuku") {
                 SwitchPreferenceItem(
                     title = "Enable Shizuku Integration",
-                    subtitle = "Recommended for Android 8 and required for certain Android 11 devices",
+                    subtitle = "Required for certain Android devices",
                     checked = uiState.enableShizukuIntegration,
                     onCheckedChange = { newValue ->
                         if (newValue && !uiState.enableShizukuIntegration) {
@@ -106,6 +108,38 @@ fun DebugOptionsScreen(
                         }
                     }
                 )
+            }
+
+            PreferenceCategory(title = "Gestures") {
+                SwitchPreferenceItem(
+                    title = "Overlapping Gestures",
+                    subtitle = "Allow manual scrolls and zooms to overlap",
+                    checked = uiState.allowOverlappingGestures,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(allowOverlappingGestures = v)
+                        }
+                    },
+                )
+                SwitchPreferenceItem(
+                    title = "Improve Non-Shizuku Gestures",
+                    subtitle = "Currently recommended only for Android versions 8-10 as needed",
+                    checked = uiState.forceSmootherGestures,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(forceSmootherGestures = v)
+                        }
+                    },
+                )
+
+                if (uiState.forceSmootherGestures && Build.VERSION.SDK_INT !in Build.VERSION_CODES.O..Build.VERSION_CODES.Q) {
+                    NoteItem(
+                        title = "Not recommended for this device",
+                        icon = Icons.Default.Warning,
+                        contentDescription = "Warning",
+                        color = Color(0xFFFFF4E6),
+                    )
+                }
             }
 
             PreferenceCategory(title = "Display") {

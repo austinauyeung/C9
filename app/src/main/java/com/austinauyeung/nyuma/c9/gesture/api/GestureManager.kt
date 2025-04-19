@@ -113,12 +113,13 @@ class GestureManager(
         forceFixedGesture: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
     ): Boolean {
-        if (!getGestureReady()) return false
+        val settings = settingsFlow.value
+        if (!getGestureReady() && !settings.allowOverlappingGestures) return false
         setGestureReady(false)
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settingsFlow.value.gestureDuration * 3
+            val timeoutDuration = settings.gestureDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
@@ -177,12 +178,13 @@ class GestureManager(
         startY: Float,
         forceFixedGesture: Boolean = false
     ): Boolean {
-        if (!getGestureReady()) return false
+        val settings = settingsFlow.value
+        if (!getGestureReady() && !settings.allowOverlappingGestures) return false
         setGestureReady(false)
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settingsFlow.value.gestureDuration * 3
+            val timeoutDuration = settings.gestureDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")

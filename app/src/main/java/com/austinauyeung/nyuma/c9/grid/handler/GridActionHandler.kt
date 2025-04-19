@@ -3,9 +3,7 @@ package com.austinauyeung.nyuma.c9.grid.handler
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
-import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
@@ -150,6 +148,7 @@ class GridActionHandler(
 
     private fun handleActivationKey(event: KeyEvent): Boolean {
         cancelContinuousGesture()
+        val settings = settingsFlow.value
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
@@ -160,15 +159,13 @@ class GridActionHandler(
                 wasOverlayActivated = false
 
                 activationJob = backgroundScope.launch {
-                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
+                    delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
                             gridStateManager.toggleGridVisibility()
                             wasOverlayActivated = gridStateManager.isGridVisible()
 
-                            if (wasOverlayActivated) {
-                                OverlayAccessibilityService.getInstance()?.setHidingCursor(false)
-                            } else {
+                            if (!wasOverlayActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
                                 gestureManager.setGestureReady(true)
                             }
@@ -192,7 +189,7 @@ class GridActionHandler(
 
                 if (gridStateManager.isGridVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < settings.activationDuration) {
                         gridStateManager.resetToMainGrid()
                     }
                     return true

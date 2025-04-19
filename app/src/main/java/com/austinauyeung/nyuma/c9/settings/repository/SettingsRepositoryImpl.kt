@@ -10,7 +10,6 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -31,6 +30,7 @@ class SettingsRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
 ) : SettingsRepository {
     companion object {
+        private val ACTIVATION_DURATION = longPreferencesKey("activation_duration")
         private val GRID_LEVELS = intPreferencesKey("grid_levels")
         private val OVERLAY_OPACITY = intPreferencesKey("overlay_opacity")
         private val PERSIST_OVERLAY = booleanPreferencesKey("persist_overlay")
@@ -42,7 +42,8 @@ class SettingsRepositoryImpl(
         private val CURSOR_SPEED = intPreferencesKey("cursor_speed")
         private val CURSOR_ACCELERATION = intPreferencesKey("cursor_acceleration")
         private val CURSOR_SIZE = intPreferencesKey("cursor_size")
-        private val CURSOR_ACCELERATION_THRESHOLD = longPreferencesKey("cursor_acceleration_threshold")
+        private val CURSOR_ACCELERATION_START = longPreferencesKey("cursor_acceleration_start")
+        private val CURSOR_ACCELERATION_DURATION = longPreferencesKey("cursor_acceleration_duration")
         private val GRID_ACTIVATION_KEY = intPreferencesKey("grid_activation_key")
         private val CURSOR_ACTIVATION_KEY = intPreferencesKey("cursor_activation_key")
         private val CONTROL_SCHEME = stringPreferencesKey("control_scheme")
@@ -53,12 +54,15 @@ class SettingsRepositoryImpl(
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
-        private val HIDE_ON_TEXT_FIELD = stringPreferencesKey("hide_on_text_field")
+        private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
+        private val HIDE_ON_LAUNCHER_OPEN = booleanPreferencesKey("hide_on_launcher_open")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
         private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
         private val USE_PHYSICAL_SIZE = booleanPreferencesKey("use_physical_size")
         private val STANDARD_CURSOR_HEX = stringPreferencesKey("standard_cursor_hex")
         private val STANDARD_CURSOR_MATCH_BORDER = booleanPreferencesKey("standard_cursor_match_border")
+        private val ALLOW_OVERLAPPING_GESTURES = booleanPreferencesKey("allow_overlapping_gestures")
+        private val FORCE_SMOOTHER_GESTURES = booleanPreferencesKey("force_smoother_gestures")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -107,19 +111,6 @@ class SettingsRepositoryImpl(
                         OverlaySettings.DEFAULT.gridLineVisibility
                     }
 
-                val hideOnTextFieldStr = preferences[HIDE_ON_TEXT_FIELD]
-                val hideOnTextField =
-                    if (hideOnTextFieldStr != null) {
-                        try {
-                            AutoHideDetection.valueOf(hideOnTextFieldStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid hide on text field value: $hideOnTextFieldStr", e)
-                            OverlaySettings.DEFAULT.hideOnTextField
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.hideOnTextField
-                    }
-
                 val cursorEdgeBehaviorStr = preferences[CURSOR_EDGE_BEHAVIOR]
                 val cursorEdgeBehavior =
                     if (cursorEdgeBehaviorStr != null) {
@@ -134,6 +125,8 @@ class SettingsRepositoryImpl(
                     }
 
                 val settings = OverlaySettings(
+                    activationDuration = preferences[ACTIVATION_DURATION]
+                        ?: OverlaySettings.DEFAULT.activationDuration,
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
                     overlayOpacity = preferences[OVERLAY_OPACITY]
                         ?: OverlaySettings.DEFAULT.overlayOpacity,
@@ -150,8 +143,10 @@ class SettingsRepositoryImpl(
                     cursorAcceleration = preferences[CURSOR_ACCELERATION]
                         ?: OverlaySettings.DEFAULT.cursorAcceleration,
                     cursorSize = preferences[CURSOR_SIZE] ?: OverlaySettings.DEFAULT.cursorSize,
-                    cursorAccelerationThreshold = preferences[CURSOR_ACCELERATION_THRESHOLD]
-                        ?: OverlaySettings.DEFAULT.cursorAccelerationThreshold,
+                    cursorAccelerationStart = preferences[CURSOR_ACCELERATION_START]
+                        ?: OverlaySettings.DEFAULT.cursorAccelerationStart,
+                    cursorAccelerationDuration = preferences[CURSOR_ACCELERATION_DURATION]
+                        ?: OverlaySettings.DEFAULT.cursorAccelerationDuration,
                     gridActivationKey = preferences[GRID_ACTIVATION_KEY]
                         ?: OverlaySettings.DEFAULT.gridActivationKey,
                     cursorActivationKey = preferences[CURSOR_ACTIVATION_KEY]
@@ -168,7 +163,10 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
-                    hideOnTextField = hideOnTextField,
+                    hideOnKeyboardOpen = preferences[HIDE_ON_KEYBOARD_OPEN]
+                        ?: OverlaySettings.DEFAULT.hideOnKeyboardOpen,
+                    hideOnLauncherOpen = preferences[HIDE_ON_LAUNCHER_OPEN]
+                        ?: OverlaySettings.DEFAULT.hideOnLauncherOpen,
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
                         ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation,
                     roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
@@ -178,7 +176,11 @@ class SettingsRepositoryImpl(
                     standardCursorHex = preferences[STANDARD_CURSOR_HEX]
                         ?: OverlaySettings.DEFAULT.standardCursorHex,
                     standardCursorMatchBorder = preferences[STANDARD_CURSOR_MATCH_BORDER]
-                        ?: OverlaySettings.DEFAULT.standardCursorMatchBorder
+                        ?: OverlaySettings.DEFAULT.standardCursorMatchBorder,
+                    allowOverlappingGestures = preferences[ALLOW_OVERLAPPING_GESTURES]
+                        ?: OverlaySettings.DEFAULT.allowOverlappingGestures,
+                    forceSmootherGestures = preferences[FORCE_SMOOTHER_GESTURES]
+                        ?: OverlaySettings.DEFAULT.forceSmootherGestures
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -188,6 +190,7 @@ class SettingsRepositoryImpl(
     override suspend fun updateSettings(settings: OverlaySettings) {
         try {
             dataStore.edit { preferences ->
+                preferences[ACTIVATION_DURATION] = settings.activationDuration
                 preferences[GRID_LEVELS] = settings.gridLevels
                 preferences[OVERLAY_OPACITY] = settings.overlayOpacity
                 preferences[PERSIST_OVERLAY] = settings.persistOverlay
@@ -199,7 +202,8 @@ class SettingsRepositoryImpl(
                 preferences[CURSOR_SPEED] = settings.cursorSpeed
                 preferences[CURSOR_ACCELERATION] = settings.cursorAcceleration
                 preferences[CURSOR_SIZE] = settings.cursorSize
-                preferences[CURSOR_ACCELERATION_THRESHOLD] = settings.cursorAccelerationThreshold
+                preferences[CURSOR_ACCELERATION_START] = settings.cursorAccelerationStart
+                preferences[CURSOR_ACCELERATION_DURATION] = settings.cursorAccelerationDuration
                 preferences[GRID_ACTIVATION_KEY] = settings.gridActivationKey
                 preferences[CURSOR_ACTIVATION_KEY] = settings.cursorActivationKey
                 preferences[CONTROL_SCHEME] = settings.controlScheme.name
@@ -210,12 +214,15 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
-                preferences[HIDE_ON_TEXT_FIELD] = settings.hideOnTextField.name
+                preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
+                preferences[HIDE_ON_LAUNCHER_OPEN] = settings.hideOnLauncherOpen
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
                 preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
                 preferences[USE_PHYSICAL_SIZE] = settings.usePhysicalSize
                 preferences[STANDARD_CURSOR_HEX] = settings.standardCursorHex
                 preferences[STANDARD_CURSOR_MATCH_BORDER] = settings.standardCursorMatchBorder
+                preferences[ALLOW_OVERLAPPING_GESTURES] = settings.allowOverlappingGestures
+                preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

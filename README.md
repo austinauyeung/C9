@@ -96,7 +96,7 @@ All gestures are dispatched at the tip of the cursor's current location.
 | Cursor Movement | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled. |
 | Tap | Click D-pad center or numpad 5. ||
 | Double Tap | Double click D-pad center or numpad 5. ||
-| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
+| Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide Cursor in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
 | Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
@@ -105,8 +105,10 @@ All gestures are dispatched at the tip of the cursor's current location.
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
-- Use `C9 > Auto-Hide in Text Fields` to auto-hide the cursor in text fields. The standard cursor's last position is saved upon restore. See [Settings](#settings) for more information.
+- Use `C9 > Auto-Hide Cursor in Text Fields` to auto-hide the cursor in text fields and `C9 > Auto-Hide Cursor in Launchers` to auto-hide the cursor in launchers. See [Settings](#settings) for more information.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
+  - The standard cursor's last position is saved upon restore.
+  - `C9 > Auto-Hide Cursor in Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
 
 ## Settings
@@ -127,21 +129,25 @@ The following settings and `values` are available.
 | | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
 | | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
 | | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
-| | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
+| | Cursor Acceleration Start | Duration after which base speed begins accelerating if the cursor is still moving. |
+| | Cursor Acceleration Duration | Duration after which accelerated speed is reached after cursor begins acceleration. |
 | | Cursor Size | Size of the cursor. |
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
 | | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
-| | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black.
-| General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
+| | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black. |
+| General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers. If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
+| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
+| | Auto-Hide Cursor in Launchers | `On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
+| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
+| | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
-| | Auto-Hide in Text Fields | `Disabled`: Never auto-hide the cursor.<br />`Text field exit`: Hide the cursor when a text field is selected, and restore the cursor at any point the text field is exited.<br />`Text field submit`: Hide the cursor when a text field is selected, and restore the cursor only after pressing enter.<br /> |
-| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
+| | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends.
 | | Use Physical Size | `On`: Cursor will use the screen's physical dimensions to overlay.<br />`Off`: Cursor will not overlay on top of any navigation bars. |
 | | Allow Passthrough | `On`: Cursor will not intercept key presses. Not recommended.<br />`Off`: Cursor intercepts key presses. Default behavior. |
 
@@ -158,11 +164,15 @@ Install using adb:
 >> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 ```
 
-### Additional installation for Android 7, 8, and 11
-If any of the following is true, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
-- You are on Android 7.
-- You are on Android 8 and are experiencing poor scrolling performance.
-- You are on Android 11 and the application does not work as-is (i.e. no gestures can be dispatched), or you have had trouble in the past with other cursor apps.
+### Additional installation for certain Android versions
+Refer to the following table to determine if you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
+
+| Android Version | Shizuku Required | Notes |
+| --- | --- | --- |
+| 7 | Yes | Shizuku is needed specifically to support features such as long press and drag. |
+| 8, 9, 10 | Maybe | If you are experiencing poor ("blocky") scroll and zoom performance, first try `C9 > Developer Options > Improve Non-Shizuku Gestures`, which will attempt to dispatch smoother gestures but may stutter. For the most optimal gestures, Shizuku is needed. |
+| 11 | Maybe | Shizuku is needed if the application does not work as-is (i.e. no gestures can be dispatched) and/or you have had trouble in the past with other cursor apps. |
+| 12+ | No | |
 
 Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
@@ -176,6 +186,7 @@ The following devices have been confirmed by users and is not exhaustive.
 | Doro | `7080` | |
 | Freetel | `Mode 1 Retro II` | | 
 | Kyocera | `Cadence S2720` `Digno Keitai 4 A202KC` `DuraXE Epic E4830` `DuraXV Extreme E4810` `DuraXV Extreme+ E4811` `Gratina KYF42` | |
+| LG | `X100S` | |
 | QIN | `F21 Pro` | |
 | Sharp | `Aquos SH-02L` `Aquos Keitai 3 805SH` | The `Aquos SH-02L` may need Shizuku if running Android 8. | 
 | Sonim | `XP3 Plus XP3900` | The `XP3 Plus XP3900` may need Shizuku if running Android 11. |

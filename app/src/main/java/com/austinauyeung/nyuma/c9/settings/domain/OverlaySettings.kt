@@ -1,6 +1,5 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
@@ -12,6 +11,7 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
  * Represents default user preferences.
  */
 data class OverlaySettings(
+    val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
     val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,
@@ -23,7 +23,8 @@ data class OverlaySettings(
     val cursorSpeed: Int = Defaults.Settings.CURSOR_SPEED,
     val cursorAcceleration: Int = Defaults.Settings.CURSOR_ACCELERATION,
     val cursorSize: Int = Defaults.Settings.CURSOR_SIZE,
-    val cursorAccelerationThreshold: Long = Defaults.Settings.CURSOR_ACCELERATION_THRESHOLD,
+    val cursorAccelerationStart: Long = Defaults.Settings.CURSOR_ACCELERATION_START,
+    val cursorAccelerationDuration: Long = Defaults.Settings.CURSOR_ACCELERATION_DURATION,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
@@ -34,12 +35,15 @@ data class OverlaySettings(
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
-    val hideOnTextField: AutoHideDetection = Defaults.Settings.HIDE_ON_TEXT_FIELD,
+    val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
+    val hideOnLauncherOpen: Boolean = Defaults.Settings.HIDE_ON_LAUNCHER_OPEN,
     val rotateButtonsWithOrientation: Boolean = Defaults.Settings.ROTATE_BUTTONS_WITH_ORIENTATION,
     val roundedCursorCorners: Boolean = Defaults.Settings.ROUNDED_CURSOR_CORNERS,
     val usePhysicalSize: Boolean = Defaults.Settings.USE_PHYSICAL_SIZE,
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
-    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER
+    val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
+    val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
+    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

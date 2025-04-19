@@ -4,12 +4,10 @@ import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
-import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -275,15 +273,13 @@ class CursorActionHandler(
                 wasActivated = false
 
                 activationJob = backgroundScope.launch {
-                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
+                    delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                             cursorStateManager.toggleCursorVisibility()
                             wasActivated = cursorStateManager.isCursorVisible()
 
-                            if (wasActivated) {
-                                OverlayAccessibilityService.getInstance()?.setHidingCursor(false)
-                            } else {
+                            if (!wasActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
                                 gestureManager.setGestureReady(true)
                             }
@@ -307,7 +303,7 @@ class CursorActionHandler(
 
                 if (cursorStateManager.isCursorVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < settings.activationDuration) {
                         if (settings.controlScheme == ControlScheme.DPAD_TOGGLE || settings.controlScheme == ControlScheme.NUMPAD_TOGGLE) {
                             cursorStateManager.toggleScrollMode()
 

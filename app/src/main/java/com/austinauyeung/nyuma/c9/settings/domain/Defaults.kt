@@ -1,9 +1,9 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
 import android.view.KeyEvent
-import com.austinauyeung.nyuma.c9.common.domain.AutoHideDetection
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
@@ -16,6 +16,7 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 // Maybe reference constants file directly
 object Defaults {
     object Settings {
+        const val ACTIVATION_DURATION = ApplicationConstants.DEFAULT_ACTIVATION_HOLD_DURATION
         const val GRID_LEVELS = GridConstants.DEFAULT_LEVELS
         const val OVERLAY_OPACITY = GridConstants.DEFAULT_OPACITY
         const val PERSIST_OVERLAY = GridConstants.PERSIST_OVERLAY
@@ -27,7 +28,8 @@ object Defaults {
         const val CURSOR_SPEED = CursorConstants.DEFAULT_SPEED
         const val CURSOR_ACCELERATION = CursorConstants.DEFAULT_ACCELERATION
         const val CURSOR_SIZE = CursorConstants.DEFAULT_SIZE
-        const val CURSOR_ACCELERATION_THRESHOLD = CursorConstants.DEFAULT_ACCELERATION_THRESHOLD
+        const val CURSOR_ACCELERATION_START = CursorConstants.DEFAULT_ACCELERATION_START
+        const val CURSOR_ACCELERATION_DURATION = CursorConstants.DEFAULT_ACCELERATION_DURATION
         const val GRID_ACTIVATION_KEY = KeyEvent.KEYCODE_POUND
         const val CURSOR_ACTIVATION_KEY = KeyEvent.KEYCODE_STAR
         val CURSOR_EDGE_BEHAVIOR = ScreenEdgeBehavior.NONE
@@ -38,11 +40,14 @@ object Defaults {
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
-        val HIDE_ON_TEXT_FIELD = AutoHideDetection.NONE
+        const val HIDE_ON_KEYBOARD_OPEN = false
+        const val HIDE_ON_LAUNCHER_OPEN = false
         const val ROTATE_BUTTONS_WITH_ORIENTATION = false
         const val ROUNDED_CURSOR_CORNERS = true
         const val USE_PHYSICAL_SIZE = true
         const val STANDARD_CURSOR_HEX = CursorConstants.STANDARD_CURSOR_HEX
         const val STANDARD_CURSOR_MATCH_BORDER = false
+        const val ALLOW_OVERLAPPING_GESTURES = false
+        const val FORCE_SMOOTHER_GESTURES = false
     }
 }
