@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -65,6 +66,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private var lastKeyboardState = false
     private var lastLauncherState = false
+    private var autoHideJob: Job? = null
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -322,12 +324,16 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     private fun onAutoHideConditionChanged(visible: Boolean, application: String) {
-        if (visible && !hidingCursor) {
-            Logger.d("$application now visible, hiding cursor")
-            autoHideCursor()
-        } else if (!visible && hidingCursor) {
-            Logger.d("$application now hidden, attempting to restore cursor")
-            attemptCursorRestore()
+        autoHideJob?.cancel()
+        autoHideJob = mainScope.launch {
+            delay(100L)
+            if (visible && !hidingCursor) {
+                Logger.d("$application now visible, hiding cursor")
+                autoHideCursor()
+            } else if (!visible && hidingCursor) {
+                Logger.d("$application now hidden, attempting to restore cursor")
+                attemptCursorRestore()
+            }
         }
     }
 
