@@ -131,8 +131,36 @@ class CursorStateManager(
         val acceleratedSpeed = CursorConstants.MAX_SPEED.toFloat() * CursorConstants.DEFAULT_ACCELERATION_MULTIPLIER
         val currentSpeed = CursorConstants.DEFAULT_SPEED_MULTIPLIER * baseSpeed
 
-        val speed = if (timeHeld > settings.cursorAccelerationThreshold) {
-            currentSpeed + (acceleratedSpeed - baseSpeed) * (settings.cursorAcceleration - 1) / (CursorConstants.MAX_ACCELERATION - CursorConstants.MIN_ACCELERATION)
+        val startTime = settings.cursorAccelerationStart
+        val endTime = settings.cursorAccelerationStart + settings.cursorAccelerationDuration
+        val normalizedTime = when {
+            timeHeld <= startTime -> 0f
+            timeHeld >= endTime -> 1f
+            else -> (timeHeld - startTime) * 1f / (endTime - startTime)
+        }
+
+        val p0 = 0f
+        val p1 = 0.2f
+        val p2 = 0.8f
+        val p3 = 1f
+
+        fun cubicBezier(t: Float, p0: Float, p1: Float, p2: Float, p3: Float): Float {
+            val u = 1 - t
+            val tt = t * t
+            val uu = u * u
+            val uuu = uu * u
+            val ttt = tt * t
+
+            return uuu * p0 +
+                    3 * uu * t * p1 +
+                    3 * u * tt * p2 +
+                    ttt * p3
+        }
+
+        val accelerationFactor = cubicBezier(normalizedTime, p0, p1, p2, p3)
+
+        val speed = if (timeHeld > settings.cursorAccelerationStart) {
+            currentSpeed + accelerationFactor * (acceleratedSpeed - baseSpeed) * (settings.cursorAcceleration - 1) / (CursorConstants.MAX_ACCELERATION - CursorConstants.MIN_ACCELERATION)
         } else {
             currentSpeed
         }

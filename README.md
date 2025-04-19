@@ -129,7 +129,8 @@ The following settings and `values` are available.
 | | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
 | | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
 | | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
-| | Cursor Acceleration Threshold | Duration after which base speed is accelerated if the cursor is still moving. |
+| | Cursor Acceleration Start | Duration after which base speed begins accelerating if the cursor is still moving. |
+| | Cursor Acceleration Duration | Duration after which accelerated speed is reached after cursor begins acceleration. |
 | | Cursor Size | Size of the cursor. |
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
 | | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
