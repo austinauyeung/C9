@@ -97,11 +97,7 @@ All gestures are dispatched at the tip of the cursor's current location.
 | Tap | Click D-pad center or numpad 5. ||
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide Cursor in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
-<<<<<<< HEAD
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly unless `C9 > Developer Options > Overlapping Gestures` is enabled. |
-=======
-| Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly. In other words, overlapping gestures are not possible. |
->>>>>>> e41b07858120bc7e25f72d4d977844d6d5426c1f
 | Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
 
@@ -151,12 +147,8 @@ The following settings and `values` are available.
 | | Gesture Visualization Size | Size of visualization icon. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
-<<<<<<< HEAD
 | | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends. |
 | | Improve Non-Shizuku Gestures | This setting does not apply if Shizuku is active, and it is recommended only for Android versions 8-10 if poor gesture performance is observed.<br /><br />`On`: Scrolls and zooms become smoother at the expense of possible stutter.<br/>`Off`: Cursor will use the default gesture dispatch. |
-=======
-| | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends.
->>>>>>> e41b07858120bc7e25f72d4d977844d6d5426c1f
 | | Use Physical Size | `On`: Cursor will use the screen's physical dimensions to overlay.<br />`Off`: Cursor will not overlay on top of any navigation bars. |
 | | Allow Passthrough | `On`: Cursor will not intercept key presses. Not recommended.<br />`Off`: Cursor intercepts key presses. Default behavior. |
 
