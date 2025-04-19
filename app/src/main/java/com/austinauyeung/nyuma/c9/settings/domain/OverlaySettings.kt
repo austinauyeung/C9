@@ -11,6 +11,7 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
  * Represents default user preferences.
  */
 data class OverlaySettings(
+    val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
     val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,

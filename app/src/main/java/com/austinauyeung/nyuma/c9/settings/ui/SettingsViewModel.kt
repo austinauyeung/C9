@@ -50,6 +50,7 @@ class SettingsViewModel(
                 settingsRepository.getSettings().collect { settings ->
                     _uiState.update { currentState ->
                         currentState.copy(
+                            activationDuration = settings.activationDuration,
                             gridLevels = settings.gridLevels,
                             overlayOpacity = settings.overlayOpacity,
                             persistOverlay = settings.persistOverlay,
@@ -113,6 +114,7 @@ class SettingsViewModel(
 
     private fun createSettingsFromUiState(): OverlaySettings {
         return OverlaySettings(
+            activationDuration = _uiState.value.activationDuration,
             gridLevels = _uiState.value.gridLevels,
             overlayOpacity = _uiState.value.overlayOpacity,
             persistOverlay = _uiState.value.persistOverlay,
@@ -189,6 +191,7 @@ class SettingsViewModel(
 }
 
 data class SettingsUiState(
+    val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
     val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,

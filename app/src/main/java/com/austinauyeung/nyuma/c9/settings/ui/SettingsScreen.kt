@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
@@ -136,6 +137,34 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Behavior") {
+                SliderPreferenceItem(
+                    title = "Activation Duration",
+                    value = uiState.activationDuration.toFloat(),
+                    valueRange = ApplicationConstants.MIN_ACTIVATION_HOLD_DURATION.toFloat()..ApplicationConstants.MAX_ACTIVATION_HOLD_DURATION.toFloat(),
+                    valueText = "${uiState.activationDuration} ms",
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(activationDuration = v.toLong())
+                        }
+                    },
+                    steps = 4,
+                )
+
+                if (uiState.activationDuration == 0L) {
+                    NoteItem(
+                        title = "Activation keys will be fully intercepted",
+                        icon = Icons.Default.Warning,
+                        contentDescription = "Warning",
+                        color = Color(0xFFFFF4E6),
+                    )
+                    NoteItem(
+                        title = "Grid cursor reset and standard cursor control scheme toggle will be disabled",
+                        icon = Icons.Default.Warning,
+                        contentDescription = "Warning",
+                        color = Color(0xFFFFF4E6),
+                    )
+                }
+
                 SwitchPreferenceItem(
                     title = "Auto-Hide Cursor in Text Fields",
                     subtitle = "Hide on keyboard open, restore on keyboard close",

@@ -149,6 +149,7 @@ class GridActionHandler(
 
     private fun handleActivationKey(event: KeyEvent): Boolean {
         cancelContinuousGesture()
+        val settings = settingsFlow.value
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
@@ -159,7 +160,7 @@ class GridActionHandler(
                 wasOverlayActivated = false
 
                 activationJob = backgroundScope.launch {
-                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
+                    delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
                             gridStateManager.toggleGridVisibility()
@@ -189,7 +190,7 @@ class GridActionHandler(
 
                 if (gridStateManager.isGridVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < settings.activationDuration) {
                         gridStateManager.resetToMainGrid()
                     }
                     return true

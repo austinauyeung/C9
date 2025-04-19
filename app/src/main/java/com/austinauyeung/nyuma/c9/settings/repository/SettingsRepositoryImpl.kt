@@ -30,6 +30,7 @@ class SettingsRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
 ) : SettingsRepository {
     companion object {
+        private val ACTIVATION_DURATION = longPreferencesKey("activation_duration")
         private val GRID_LEVELS = intPreferencesKey("grid_levels")
         private val OVERLAY_OPACITY = intPreferencesKey("overlay_opacity")
         private val PERSIST_OVERLAY = booleanPreferencesKey("persist_overlay")
@@ -122,6 +123,8 @@ class SettingsRepositoryImpl(
                     }
 
                 val settings = OverlaySettings(
+                    activationDuration = preferences[ACTIVATION_DURATION]
+                        ?: OverlaySettings.DEFAULT.activationDuration,
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
                     overlayOpacity = preferences[OVERLAY_OPACITY]
                         ?: OverlaySettings.DEFAULT.overlayOpacity,
@@ -181,6 +184,7 @@ class SettingsRepositoryImpl(
     override suspend fun updateSettings(settings: OverlaySettings) {
         try {
             dataStore.edit { preferences ->
+                preferences[ACTIVATION_DURATION] = settings.activationDuration
                 preferences[GRID_LEVELS] = settings.gridLevels
                 preferences[OVERLAY_OPACITY] = settings.overlayOpacity
                 preferences[PERSIST_OVERLAY] = settings.persistOverlay

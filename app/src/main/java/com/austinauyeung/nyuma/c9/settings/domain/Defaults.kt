@@ -3,6 +3,7 @@ package com.austinauyeung.nyuma.c9.settings.domain
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
@@ -15,6 +16,7 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 // Maybe reference constants file directly
 object Defaults {
     object Settings {
+        const val ACTIVATION_DURATION = ApplicationConstants.DEFAULT_ACTIVATION_HOLD_DURATION
         const val GRID_LEVELS = GridConstants.DEFAULT_LEVELS
         const val OVERLAY_OPACITY = GridConstants.DEFAULT_OPACITY
         const val PERSIST_OVERLAY = GridConstants.PERSIST_OVERLAY

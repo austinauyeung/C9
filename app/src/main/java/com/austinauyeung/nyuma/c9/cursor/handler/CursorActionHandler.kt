@@ -274,7 +274,7 @@ class CursorActionHandler(
                 wasActivated = false
 
                 activationJob = backgroundScope.launch {
-                    delay(ApplicationConstants.ACTIVATION_HOLD_DURATION)
+                    delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
                         if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
                             cursorStateManager.toggleCursorVisibility()
@@ -304,7 +304,7 @@ class CursorActionHandler(
 
                 if (cursorStateManager.isCursorVisible()) {
                     val pressDuration = System.currentTimeMillis() - activationKeyPressStartTime
-                    if (pressDuration < ApplicationConstants.ACTIVATION_HOLD_DURATION) {
+                    if (pressDuration < settings.activationDuration) {
                         if (settings.controlScheme == ControlScheme.DPAD_TOGGLE || settings.controlScheme == ControlScheme.NUMPAD_TOGGLE) {
                             cursorStateManager.toggleScrollMode()
 
