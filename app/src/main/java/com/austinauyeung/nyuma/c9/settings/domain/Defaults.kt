@@ -48,5 +48,6 @@ object Defaults {
         const val STANDARD_CURSOR_HEX = CursorConstants.STANDARD_CURSOR_HEX
         const val STANDARD_CURSOR_MATCH_BORDER = false
         const val ALLOW_OVERLAPPING_GESTURES = false
+        const val FORCE_SMOOTHER_GESTURES = false
     }
 }

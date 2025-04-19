@@ -62,6 +62,7 @@ class SettingsRepositoryImpl(
         private val STANDARD_CURSOR_HEX = stringPreferencesKey("standard_cursor_hex")
         private val STANDARD_CURSOR_MATCH_BORDER = booleanPreferencesKey("standard_cursor_match_border")
         private val ALLOW_OVERLAPPING_GESTURES = booleanPreferencesKey("allow_overlapping_gestures")
+        private val FORCE_SMOOTHER_GESTURES = booleanPreferencesKey("force_smoother_gestures")
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -177,7 +178,9 @@ class SettingsRepositoryImpl(
                     standardCursorMatchBorder = preferences[STANDARD_CURSOR_MATCH_BORDER]
                         ?: OverlaySettings.DEFAULT.standardCursorMatchBorder,
                     allowOverlappingGestures = preferences[ALLOW_OVERLAPPING_GESTURES]
-                        ?: OverlaySettings.DEFAULT.allowOverlappingGestures
+                        ?: OverlaySettings.DEFAULT.allowOverlappingGestures,
+                    forceSmootherGestures = preferences[FORCE_SMOOTHER_GESTURES]
+                        ?: OverlaySettings.DEFAULT.forceSmootherGestures
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -219,6 +222,7 @@ class SettingsRepositoryImpl(
                 preferences[STANDARD_CURSOR_HEX] = settings.standardCursorHex
                 preferences[STANDARD_CURSOR_MATCH_BORDER] = settings.standardCursorMatchBorder
                 preferences[ALLOW_OVERLAPPING_GESTURES] = settings.allowOverlappingGestures
+                preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

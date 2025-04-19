@@ -165,10 +165,14 @@ Install using adb:
 ```
 
 ### Additional installation for certain Android versions
-If any of the following is true, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
-- You are on Android 7.
-- You are experiencing poor scrolling performance.
-- You are on Android 11 and the application does not work as-is (i.e. no gestures can be dispatched), or you have had trouble in the past with other cursor apps.
+Refer to the following table to determine if you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
+
+| Android Version | Shizuku Required | Notes |
+| --- | --- | --- |
+| 7 | Yes | Shizuku is needed specifically to support features such as long press and drag. |
+| 8, 9, 10 | Maybe | If you are experiencing poor ("blocky") scroll and zoom performance, first try `C9 > Developer Options > Improve Non-Shizuku Gestures`, which will attempt to dispatch smoother gestures but may stutter. For the most optimal gestures, Shizuku is needed. |
+| 11 | Maybe | Shizuku is needed if the application does not work as-is (i.e. no gestures can be dispatched) and/or you have had trouble in the past with other cursor apps. |
+| 12+ | No | |
 
 Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
@@ -182,6 +186,7 @@ The following devices have been confirmed by users and is not exhaustive.
 | Doro | `7080` | |
 | Freetel | `Mode 1 Retro II` | | 
 | Kyocera | `Cadence S2720` `Digno Keitai 4 A202KC` `DuraXE Epic E4830` `DuraXV Extreme E4810` `DuraXV Extreme+ E4811` `Gratina KYF42` | |
+| LG | `X100S` | |
 | QIN | `F21 Pro` | |
 | Sharp | `Aquos SH-02L` `Aquos Keitai 3 805SH` | The `Aquos SH-02L` may need Shizuku if running Android 8. | 
 | Sonim | `XP3 Plus XP3900` | The `XP3 Plus XP3900` may need Shizuku if running Android 11. |

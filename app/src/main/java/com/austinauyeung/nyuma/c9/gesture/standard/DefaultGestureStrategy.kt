@@ -138,28 +138,103 @@ class DefaultGestureStrategy(
 
             Logger.d("DefaultGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
 
-            scrollPath.reset()
-            scrollPath.moveTo(startX, startY)
-            scrollPath.lineTo(endX, endY)
+            if (!settings.forceSmootherGestures) {
+                scrollPath.reset()
+                scrollPath.moveTo(startX, startY)
+                scrollPath.lineTo(endX, endY)
 
-            val mainStrokeDescription =
-                GestureDescription.StrokeDescription(
-                    scrollPath,
-                    0,
-                    duration,
-                    willContinue
+                val mainStrokeDescription =
+                    GestureDescription.StrokeDescription(
+                        scrollPath,
+                        0,
+                        duration,
+                        willContinue
+                    )
+
+                val gesture =
+                    GestureDescription.Builder()
+                        .addStroke(mainStrokeDescription)
+                        .build()
+
+                service.dispatchGesture(
+                    gesture,
+                    pauseGestureCallback(
+                        mainStrokeDescription,
+                        endX,
+                        endY,
+                        willContinue,
+                        completionListener
+                    ),
+                    null
                 )
+            } else {
+                val steps = GestureConstants.calculateSteps(duration)
+                val dx = (endX - startX) / steps
+                val dy = (endY - startY) / steps
+                fun dispatchStep(i: Int, prevStroke: GestureDescription.StrokeDescription? = null) {
+                    if (i >= steps) return
 
-            val gesture =
-                GestureDescription.Builder()
-                    .addStroke(mainStrokeDescription)
-                    .build()
+                    val path = Path()
+                    val x0 = startX + dx * i
+                    val y0 = startY + dy * i
+                    val x1 = startX + dx * (i + 1)
+                    val y1 = startY + dy * (i + 1)
 
-            service.dispatchGesture(
-                gesture,
-                pauseGestureCallback(mainStrokeDescription, endX, endY, willContinue, completionListener),
-                null
-            )
+                    path.moveTo(x0, y0)
+                    path.lineTo(x1, y1)
+
+                    val stroke = if (prevStroke == null) {
+                        GestureDescription.StrokeDescription(
+                            path,
+                            0,
+                            duration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    } else {
+                        prevStroke.continueStroke(
+                            path,
+                            0,
+                            duration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    }
+
+                    val gesture = GestureDescription.Builder()
+                        .addStroke(stroke)
+                        .build()
+
+                    if (i < steps - 1) {
+                        service.dispatchGesture(
+                            gesture,
+                            object : AccessibilityService.GestureResultCallback() {
+                                override fun onCompleted(gestureDescription: GestureDescription?) {
+                                    dispatchStep(i + 1, stroke)
+                                }
+
+                                override fun onCancelled(gestureDescription: GestureDescription?) {
+                                    Logger.w("Gesture step $i was cancelled.")
+                                    completionListener?.onGestureCompleted(true)
+                                }
+                            },
+                            null
+                        )
+                    } else {
+                        service.dispatchGesture(
+                            gesture,
+                            pauseGestureCallback(
+                                stroke,
+                                endX,
+                                endY,
+                                willContinue,
+                                completionListener
+                            ),
+                            null
+                        )
+                    }
+                }
+
+                dispatchStep(0)
+            }
 
             return true
         } catch (e: Exception) {
@@ -183,40 +258,141 @@ class DefaultGestureStrategy(
 
             Logger.d("DefaultGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
 
-            val path1 = Path()
-            val path2 = Path()
+            if (!settings.forceSmootherGestures) {
+                val path1 = Path()
+                val path2 = Path()
 
-            path1.moveTo(startX1, startY1)
-            path1.lineTo(endX1, endY1)
+                path1.moveTo(startX1, startY1)
+                path1.lineTo(endX1, endY1)
 
-            path2.moveTo(startX2, startY2)
-            path2.lineTo(endX2, endY2)
+                path2.moveTo(startX2, startY2)
+                path2.lineTo(endX2, endY2)
 
-            val stroke1 = GestureDescription.StrokeDescription(
-                path1,
-                0,
-                settings.gestureDuration,
-                willContinue
-            )
+                val stroke1 = GestureDescription.StrokeDescription(
+                    path1,
+                    0,
+                    settings.gestureDuration,
+                    willContinue
+                )
 
-            val stroke2 = GestureDescription.StrokeDescription(
-                path2,
-                0,
-                settings.gestureDuration,
-                willContinue
-            )
+                val stroke2 = GestureDescription.StrokeDescription(
+                    path2,
+                    0,
+                    settings.gestureDuration,
+                    willContinue
+                )
 
-            val gestureBuilder = GestureDescription.Builder()
-                .addStroke(stroke1)
-                .addStroke(stroke2)
+                val gestureBuilder = GestureDescription.Builder()
+                    .addStroke(stroke1)
+                    .addStroke(stroke2)
 
-            val gesture = gestureBuilder.build()
+                val gesture = gestureBuilder.build()
 
-            service.dispatchGesture(
-                gesture,
-                pauseGestureCallback(stroke1, stroke2, endX1, endY1, endX2, endY2, willContinue, completionListener),
-                null
-            )
+                service.dispatchGesture(
+                    gesture,
+                    pauseGestureCallback(
+                        stroke1,
+                        stroke2,
+                        endX1,
+                        endY1,
+                        endX2,
+                        endY2,
+                        willContinue,
+                        completionListener
+                    ),
+                    null
+                )
+            } else {
+                val steps = GestureConstants.calculateSteps(settings.gestureDuration)
+                val dx1 = (endX1 - startX1) / steps
+                val dy1 = (endY1 - startY1) / steps
+                val dx2 = (endX2 - startX2) / steps
+                val dy2 = (endY2 - startY2) / steps
+
+                fun dispatchStep(i: Int, prevStroke1: GestureDescription.StrokeDescription? = null, prevStroke2: GestureDescription.StrokeDescription? = null) {
+                    if (i >= steps) return
+
+                    val path1 = Path()
+                    val path2 = Path()
+
+                    path1.moveTo(startX1 + dx1 * i, startY1 + dy1 * i)
+                    path1.lineTo(startX1 + dx1 * (i + 1), startY1 + dy1 * (i + 1))
+
+                    path2.moveTo(startX2 + dx2 * i, startY2 + dy2 * i)
+                    path2.lineTo(startX2 + dx2 * (i + 1), startY2 + dy2 * (i + 1))
+
+                    val stroke1 = if (prevStroke1 == null) {
+                        GestureDescription.StrokeDescription(
+                            path1,
+                            0,
+                            settings.gestureDuration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    } else {
+                        prevStroke1.continueStroke(
+                            path1,
+                            0,
+                            settings.gestureDuration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    }
+
+                    val stroke2 = if (prevStroke2 == null) {
+                        GestureDescription.StrokeDescription(
+                            path2,
+                            0,
+                            settings.gestureDuration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    } else {
+                        prevStroke2.continueStroke(
+                            path2,
+                            0,
+                            settings.gestureDuration / steps,
+                            willContinue || (i < steps - 1)
+                        )
+                    }
+
+                    val gesture = GestureDescription.Builder()
+                        .addStroke(stroke1)
+                        .addStroke(stroke2)
+                        .build()
+
+                    if (i < steps - 1) {
+                        service.dispatchGesture(
+                            gesture,
+                            object : AccessibilityService.GestureResultCallback() {
+                                override fun onCompleted(gestureDescription: GestureDescription?) {
+                                    dispatchStep(i + 1, stroke1, stroke2)
+                                }
+
+                                override fun onCancelled(gestureDescription: GestureDescription?) {
+                                    Logger.w("Gesture step $i was cancelled.")
+                                    completionListener?.onGestureCompleted(true)
+                                }
+                            },
+                            null
+                        )
+                    } else {
+                        service.dispatchGesture(
+                            gesture,
+                            pauseGestureCallback(
+                                stroke1,
+                                stroke2,
+                                endX1,
+                                endY1,
+                                endX2,
+                                endY2,
+                                willContinue,
+                                completionListener
+                            ),
+                            null
+                        )
+                    }
+                }
+
+                dispatchStep(0)
+            }
 
             return true
 
