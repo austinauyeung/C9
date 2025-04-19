@@ -134,15 +134,15 @@ The following settings and `values` are available.
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
 | | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
 | | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black.
-| General | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
+| General | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
+| | Auto-Hide Cursor in Launchers | `On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
+| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
+| | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
-| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
-| | Auto-Hide Cursor in Launchers | `On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
-| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
 | | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends.

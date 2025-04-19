@@ -135,6 +135,39 @@ fun SettingsScreen(
                 )
             }
 
+            PreferenceCategory(title = "Behavior") {
+                SwitchPreferenceItem(
+                    title = "Auto-Hide Cursor in Text Fields",
+                    subtitle = "Hide on keyboard open, restore on keyboard close",
+                    checked = uiState.hideOnKeyboardOpen,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideOnKeyboardOpen = v)
+                        }
+                    },
+                )
+                SwitchPreferenceItem(
+                    title = "Auto-Hide Cursor in Launchers",
+                    subtitle = "Hide on launcher open, restore on launcher close",
+                    checked = uiState.hideOnLauncherOpen,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(hideOnLauncherOpen = v)
+                        }
+                    },
+                )
+                SwitchPreferenceItem(
+                    title = "Rotate Buttons With Orientation",
+                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
+                    checked = uiState.rotateButtonsWithOrientation,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(rotateButtonsWithOrientation = v)
+                        }
+                    },
+                )
+            }
+
             PreferenceCategory(title = "Gestures") {
                 SwitchPreferenceItem(
                     title = "Natural Scrolling",
@@ -216,39 +249,6 @@ fun SettingsScreen(
                     },
                     steps = 8,
                     enabled = uiState.showGestureVisualization
-                )
-            }
-
-            PreferenceCategory(title = "Behavior") {
-                SwitchPreferenceItem(
-                    title = "Auto-Hide Cursor in Text Fields",
-                    subtitle = "Hide on keyboard open, restore on keyboard close",
-                    checked = uiState.hideOnKeyboardOpen,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnKeyboardOpen = v)
-                        }
-                    },
-                )
-                SwitchPreferenceItem(
-                    title = "Auto-Hide Cursor in Launchers",
-                    subtitle = "Hide on launcher open, restore on launcher close",
-                    checked = uiState.hideOnLauncherOpen,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnLauncherOpen = v)
-                        }
-                    },
-                )
-                SwitchPreferenceItem(
-                    title = "Rotate Buttons With Orientation",
-                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
-                    checked = uiState.rotateButtonsWithOrientation,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(rotateButtonsWithOrientation = v)
-                        }
-                    },
                 )
             }
 
