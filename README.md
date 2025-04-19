@@ -162,10 +162,10 @@ Install using adb:
 >> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 ```
 
-### Additional installation for Android 7, 8, and 11
+### Additional installation for certain Android versions
 If any of the following is true, you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
 - You are on Android 7.
-- You are on Android 8 and are experiencing poor scrolling performance.
+- You are experiencing poor scrolling performance.
 - You are on Android 11 and the application does not work as-is (i.e. no gestures can be dispatched), or you have had trouble in the past with other cursor apps.
 
 Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
