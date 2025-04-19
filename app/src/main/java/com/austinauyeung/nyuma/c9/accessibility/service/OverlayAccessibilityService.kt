@@ -1,6 +1,7 @@
 package com.austinauyeung.nyuma.c9.accessibility.service
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -61,11 +62,17 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private var hidingCursor: Boolean = false
 
     private val keysPressed: MutableSet<Int> = mutableSetOf()
-    private var isTextField: Boolean = false
 
     private var lastKeyboardState = false
     private var lastLauncherState = false
     private var autoHideJob: Job? = null
+    private val imeKeywords = listOf("inputmethod", "ime", "io.github.sspanak.tt9")
+    private val launcherPackages: Set<String> by lazy {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        val resolveInfos = packageManager.queryIntentActivities(intent, 0)
+        resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -228,27 +235,24 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private fun attemptCursorRestore(): Boolean {
         Logger.d("Restoring cursor overlay")
 
-        val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.hideOnKeyboardOpen) {
-            if (keysPressed.isNotEmpty() || isTextField) return false
+        if (keysPressed.isNotEmpty()) return false
 
-            if (hidingCursor) {
-                when (lastOverlayType) {
-                    OverlayModeCoordinator.OverlayMode.GRID -> {
-                        serviceManager.activateGridMode(toggle = false)
-                    }
-
-                    OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                        serviceManager.activateCursorMode(toggle = false)
-                    }
-
-                    else -> {}
+        if (hidingCursor) {
+            when (lastOverlayType) {
+                OverlayModeCoordinator.OverlayMode.GRID -> {
+                    serviceManager.activateGridMode(toggle = false)
                 }
-                lastOverlayType = null
-                hidingCursor = false
 
-                return true
+                OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                    serviceManager.activateCursorMode(toggle = false)
+                }
+
+                else -> {}
             }
+            lastOverlayType = null
+            hidingCursor = false
+
+            return true
         }
 
         return false
@@ -256,11 +260,19 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.hideOnKeyboardOpen) {
-            checkKeyboardVisibility()
-        }
-        if (settings.hideOnLauncherOpen) {
-            checkLauncherVisibility()
+        event?.let {
+            when (event.eventType) {
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
+                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+                    if (settings.hideOnKeyboardOpen) {
+                        checkKeyboardVisibility()
+                    }
+                    if (settings.hideOnLauncherOpen) {
+                        checkLauncherVisibility()
+                    }
+                }
+                else -> {}
+            }
         }
     }
 
@@ -278,11 +290,10 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun isImeWindowPresent(): Boolean {
         for (window in windows) {
-            val pkg = window.root?.packageName?.toString() ?: ""
+            val pkg = window.root?.packageName?.toString() ?: continue
+            val pkgLower = pkg.lowercase()
 
-            if (pkg.contains("inputmethod", true) ||
-                pkg.contains("ime", true) ||
-                pkg.contains("io.github.sspanak.tt9", true)) {
+            if (imeKeywords.any { it in pkgLower }) {
                 return true
             }
         }
@@ -303,23 +314,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun isLauncherPresent(): Boolean {
         for (window in windows) {
-            val pkg = window.root?.packageName?.toString() ?: continue
-            if (isLauncherPackage(pkg)) {
+            val pkg = window.root?.packageName.toString() ?: continue
+            if (pkg in launcherPackages) {
                 return true
             }
         }
         return false
-    }
-
-    private fun isLauncherPackage(pkg: String): Boolean {
-        return launcherPackages.contains(pkg)
-    }
-
-    private val launcherPackages: Set<String> by lazy {
-        val intent = Intent(Intent.ACTION_MAIN)
-        intent.addCategory(Intent.CATEGORY_HOME)
-        val resolveInfos = packageManager.queryIntentActivities(intent, 0)
-        resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
     }
 
     private fun onAutoHideConditionChanged(visible: Boolean, application: String) {
