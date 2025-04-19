@@ -4,6 +4,13 @@
 
     <uses-permission android:name="rikka.shizuku.permission.API" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.HOME" />
+        </intent>
+    </queries>
+
     <application
         android:name=".C9"
         android:allowBackup="true"

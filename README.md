@@ -105,9 +105,10 @@ All gestures are dispatched at the tip of the cursor's current location.
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
-- Use `C9 > Auto-Hide Cursor in Text Fields` to auto-hide the cursor in text fields. The standard cursor's last position is saved upon restore. See [Settings](#settings) for more information.
+- Use `C9 > Auto-Hide Cursor in Text Fields` to auto-hide the cursor in text fields and `C9 > Auto-Hide Cursor in Launchers` to auto-hide the cursor in launchers. See [Settings](#settings) for more information.
   - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
-  - This setting is only compatible with keyboards that have a non-zero height when open. [TT9](https://github.com/sspanak/tt9) is compatible.
+  - The standard cursor's last position is saved upon restore.
+  - `C9 > Auto-Hide Cursor in Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
 
 ## Settings
@@ -139,7 +140,8 @@ The following settings and `values` are available.
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
-| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor. |
+| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
+| | Auto-Hide Cursor in Launchers | `On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |

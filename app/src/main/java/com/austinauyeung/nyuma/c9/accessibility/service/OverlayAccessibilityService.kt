@@ -63,8 +63,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private val keysPressed: MutableSet<Int> = mutableSetOf()
     private var isTextField: Boolean = false
 
-    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
-    private var keyboardHeight = 0
+    private var lastKeyboardState = false
+    private var lastLauncherState = false
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -254,17 +254,80 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        // https://stackoverflow.com/a/52171843
-        val windowHeightMethod = InputMethodManager::class.java.getMethod("getInputMethodWindowVisibleHeight")
-        keyboardHeight = windowHeightMethod.invoke(imm) as Int
-
         val settings = C9.getInstance().getSettingsFlow().value
         if (settings.hideOnKeyboardOpen) {
-            if (keyboardHeight > 0 && !hidingCursor) {
-                autoHideCursor()
-            } else if (keyboardHeight == 0 && hidingCursor && keysPressed.isEmpty()) {
-                attemptCursorRestore()
+            checkKeyboardVisibility()
+        }
+        if (settings.hideOnLauncherOpen) {
+            checkLauncherVisibility()
+        }
+    }
+
+    private fun checkKeyboardVisibility() {
+        try {
+            val isKeyboardVisible = isImeWindowPresent()
+            if (isKeyboardVisible != lastKeyboardState) {
+                lastKeyboardState = isKeyboardVisible
+                onAutoHideConditionChanged(isKeyboardVisible, "Keyboard")
             }
+        } catch (e: Exception) {
+            Logger.e("Error checking keyboard visibility", e)
+        }
+    }
+
+    private fun isImeWindowPresent(): Boolean {
+        for (window in windows) {
+            val pkg = window.root?.packageName?.toString() ?: ""
+
+            if (pkg.contains("inputmethod", true) ||
+                pkg.contains("ime", true) ||
+                pkg.contains("io.github.sspanak.tt9", true)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkLauncherVisibility() {
+        try {
+            val isLauncherVisible = isLauncherPresent()
+            if (isLauncherVisible != lastLauncherState) {
+                lastLauncherState = isLauncherVisible
+                onAutoHideConditionChanged(isLauncherVisible, "Launcher")
+            }
+        } catch (e: Exception) {
+            Logger.e("Error checking launcher visibility", e)
+        }
+    }
+
+    private fun isLauncherPresent(): Boolean {
+        for (window in windows) {
+            val pkg = window.root?.packageName?.toString() ?: continue
+            if (isLauncherPackage(pkg)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isLauncherPackage(pkg: String): Boolean {
+        return launcherPackages.contains(pkg)
+    }
+
+    private val launcherPackages: Set<String> by lazy {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        val resolveInfos = packageManager.queryIntentActivities(intent, 0)
+        resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
+    }
+
+    private fun onAutoHideConditionChanged(visible: Boolean, application: String) {
+        if (visible && !hidingCursor) {
+            Logger.d("$application now visible, hiding cursor")
+            autoHideCursor()
+        } else if (!visible && hidingCursor) {
+            Logger.d("$application now hidden, attempting to restore cursor")
+            attemptCursorRestore()
         }
     }
 

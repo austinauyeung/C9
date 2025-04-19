@@ -53,6 +53,7 @@ class SettingsRepositoryImpl(
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
+        private val HIDE_ON_LAUNCHER_OPEN = booleanPreferencesKey("hide_on_launcher_open")
         private val ROTATE_BUTTONS_WITH_ORIENTATION = booleanPreferencesKey("rotate_buttons_with_orientation")
         private val ROUNDED_CURSOR_CORNERS = booleanPreferencesKey("rounded_cursor_corners")
         private val USE_PHYSICAL_SIZE = booleanPreferencesKey("use_physical_size")
@@ -157,6 +158,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
                     hideOnKeyboardOpen = preferences[HIDE_ON_KEYBOARD_OPEN]
                         ?: OverlaySettings.DEFAULT.hideOnKeyboardOpen,
+                    hideOnLauncherOpen = preferences[HIDE_ON_LAUNCHER_OPEN]
+                        ?: OverlaySettings.DEFAULT.hideOnLauncherOpen,
                     rotateButtonsWithOrientation = preferences[ROTATE_BUTTONS_WITH_ORIENTATION]
                         ?: OverlaySettings.DEFAULT.rotateButtonsWithOrientation,
                     roundedCursorCorners = preferences[ROUNDED_CURSOR_CORNERS]
@@ -201,6 +204,7 @@ class SettingsRepositoryImpl(
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
+                preferences[HIDE_ON_LAUNCHER_OPEN] = settings.hideOnLauncherOpen
                 preferences[ROTATE_BUTTONS_WITH_ORIENTATION] = settings.rotateButtonsWithOrientation
                 preferences[ROUNDED_CURSOR_CORNERS] = settings.roundedCursorCorners
                 preferences[USE_PHYSICAL_SIZE] = settings.usePhysicalSize

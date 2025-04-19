@@ -38,6 +38,7 @@ object Defaults {
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
         const val HIDE_ON_KEYBOARD_OPEN = false
+        const val HIDE_ON_LAUNCHER_OPEN = false
         const val ROTATE_BUTTONS_WITH_ORIENTATION = false
         const val ROUNDED_CURSOR_CORNERS = true
         const val USE_PHYSICAL_SIZE = true
