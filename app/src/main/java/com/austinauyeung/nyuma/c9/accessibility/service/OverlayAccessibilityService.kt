@@ -10,6 +10,7 @@ import android.os.Build
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -75,6 +76,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
     }
     private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
+    private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+    private val windowHeightMethod by lazy { InputMethodManager::class.java.getMethod("getInputMethodWindowVisibleHeight")}
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -285,7 +288,8 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun checkKeyboardVisibility() {
         try {
-            val isKeyboardVisible = isImeWindowPresent()
+            val isKeyboardVisible = isImeWindowPresent() ||
+                    windowHeightMethod.invoke(imm) as Int > 0
             if (isKeyboardVisible != lastKeyboardState) {
                 lastKeyboardState = isKeyboardVisible
             }
