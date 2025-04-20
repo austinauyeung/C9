@@ -19,7 +19,7 @@ C9 is a dual-cursor application that takes inspiration from T9 to provide clicks
 - 🖱️ Standard cursor to provide a traditional proxy for touchscreen gestures
 - ⚙️ Remappable cursor activation keys and integration with button mappers
 - 🔀 Translation of key presses into near-native taps, double taps, long press (and drag), scrolling, and zoom
-- ✨ Additional quality-of-life features such as landscape orientation support and cursor auto-hide in text fields and launchers
+- ✨ Additional quality-of-life features such as cursor auto-hide and landscape orientation support
 
 ## Table of Contents
 - [Overview](#overview)
@@ -104,11 +104,11 @@ All gestures are dispatched at the tip of the cursor's current location.
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
-- In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
-- Use `C9 > Auto-Hide Cursor in Text Fields` to auto-hide the cursor in text fields and `C9 > Auto-Hide Cursor in Launchers` to auto-hide the cursor in launchers. See [Settings](#settings) for more information.
-  - Automatic restoration is cancelled if any cursor is manually activated while inside the text field.
+- Use `C9 > Auto-Hide Cursor Options` to auto-hide the cursor in select locations. See [Settings](#settings) for more information.
+  - Automatic restoration is cancelled if any cursor is manually reactivated.
   - The standard cursor's last position is saved upon restore.
-  - `C9 > Auto-Hide Cursor in Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
+  - `Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
+- In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
 
 ## Settings
@@ -135,9 +135,10 @@ The following settings and `values` are available.
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
 | | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
 | | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black. |
+| Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
+| | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
+| | Lock Screen | This setting applies only when a screen lock has been configured.<br /><br />`On`: Hide the cursor when the device locks, and restore the cursor when the device unlocks.<br />`Off`: Never auto-hide the cursor in the lock screen. |
 | General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers. If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
-| | Auto-Hide Cursor in Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
-| | Auto-Hide Cursor in Launchers | `On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
 | | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
