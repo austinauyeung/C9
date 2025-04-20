@@ -67,7 +67,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateToGridSettings: () -> Unit,
     onNavigateToCursorSettings: () -> Unit,
-    onNavigateToDebugOptions: () -> Unit
+    onNavigateToDebugOptions: () -> Unit,
+    onNavigateToAutoHideSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -137,6 +138,12 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Behavior") {
+                SimplePreferenceItem(
+                    title = "Auto-Hide Cursor Options",
+                    subtitle = "Automatically hide and restore the cursor",
+                    onClick = onNavigateToAutoHideSettings
+                )
+
                 SliderPreferenceItem(
                     title = "Activation Duration",
                     value = uiState.activationDuration.toFloat(),
@@ -165,26 +172,6 @@ fun SettingsScreen(
                     )
                 }
 
-                SwitchPreferenceItem(
-                    title = "Auto-Hide Cursor in Text Fields",
-                    subtitle = "Hide on keyboard open, restore on keyboard close",
-                    checked = uiState.hideOnKeyboardOpen,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnKeyboardOpen = v)
-                        }
-                    },
-                )
-                SwitchPreferenceItem(
-                    title = "Auto-Hide Cursor in Launchers",
-                    subtitle = "Hide on launcher open, restore on launcher close",
-                    checked = uiState.hideOnLauncherOpen,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnLauncherOpen = v)
-                        }
-                    },
-                )
                 SwitchPreferenceItem(
                     title = "Rotate Buttons With Orientation",
                     subtitle = "Rotate certain D-pad and numpad buttons with the screen",

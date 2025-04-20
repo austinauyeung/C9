@@ -54,6 +54,11 @@ class SettingsActivity : ComponentActivity() {
                         val intent = Intent(this, DebugOptionsActivity::class.java)
                         val options = ActivityOptionsCompat.makeBasic()
                         startActivity(intent, options.toBundle())
+                    },
+                    onNavigateToAutoHideSettings = {
+                        val intent = Intent(this, AutoHideSettingsActivity::class.java)
+                        val options = ActivityOptionsCompat.makeBasic()
+                        startActivity(intent, options.toBundle())
                     }
                 )
             }

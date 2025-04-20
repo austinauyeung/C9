@@ -1,7 +1,7 @@
 package com.austinauyeung.nyuma.c9.accessibility.service
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -65,6 +65,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private var lastKeyboardState = false
     private var lastLauncherState = false
+    private var lastLockScreenState = false
     private var autoHideJob: Job? = null
     private val imeKeywords = listOf("inputmethod", "ime", "io.github.sspanak.tt9")
     private val launcherPackages: Set<String> by lazy {
@@ -73,6 +74,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         val resolveInfos = packageManager.queryIntentActivities(intent, 0)
         resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
     }
+    private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -270,6 +272,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                     if (settings.hideOnLauncherOpen) {
                         checkLauncherVisibility()
                     }
+                    if (settings.hideOnLockScreen) {
+                        checkLockScreenVisibility()
+                    }
+
+                    onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState)
                 }
                 else -> {}
             }
@@ -281,7 +288,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val isKeyboardVisible = isImeWindowPresent()
             if (isKeyboardVisible != lastKeyboardState) {
                 lastKeyboardState = isKeyboardVisible
-                onAutoHideConditionChanged(isKeyboardVisible, "Keyboard")
             }
         } catch (e: Exception) {
             Logger.e("Error checking keyboard visibility", e)
@@ -305,7 +311,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val isLauncherVisible = isLauncherPresent()
             if (isLauncherVisible != lastLauncherState) {
                 lastLauncherState = isLauncherVisible
-                onAutoHideConditionChanged(isLauncherVisible, "Launcher")
             }
         } catch (e: Exception) {
             Logger.e("Error checking launcher visibility", e)
@@ -314,7 +319,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun isLauncherPresent(): Boolean {
         for (window in windows) {
-            val pkg = window.root?.packageName.toString() ?: continue
+            val pkg = window.root?.packageName?.toString() ?: continue
             if (pkg in launcherPackages) {
                 return true
             }
@@ -322,15 +327,26 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         return false
     }
 
-    private fun onAutoHideConditionChanged(visible: Boolean, application: String) {
+    private fun checkLockScreenVisibility() {
+        try {
+            val isLockScreenVisible = keyguardManager.isKeyguardLocked
+            if (isLockScreenVisible != lastLockScreenState) {
+                lastLockScreenState = isLockScreenVisible
+            }
+        } catch (e: Exception) {
+            Logger.e("Error checking launcher visibility", e)
+        }
+    }
+
+    private fun onAutoHideConditionChanged(visible: Boolean) {
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
             if (visible && !hidingCursor) {
-                Logger.d("$application now visible, hiding cursor")
+                Logger.d("Auto-hide condition changed: hiding cursor")
                 autoHideCursor()
             } else if (!visible && hidingCursor) {
-                Logger.d("$application now hidden, attempting to restore cursor")
+                Logger.d("Auto-hide condition changed: attempting to restore cursor")
                 attemptCursorRestore()
             }
         }
