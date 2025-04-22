@@ -121,7 +121,7 @@ class ShizukuGestureStrategy(
             mainScope.launch {
                 val downTime = SystemClock.uptimeMillis()
                 val steps = GestureConstants.calculateSteps(duration)
-                val pausing = settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedGesture
+                val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
 
                 // Initial touch down event
                 val downEvent =
@@ -213,7 +213,7 @@ class ShizukuGestureStrategy(
                 val steps = GestureConstants.calculateSteps(duration)
                 val stepDuration = duration / steps
                 val interEventDelayMs = 20L
-                val pausing = settingsFlow.value.gestureStyle == GestureStyle.FIXED || forceFixedGesture
+                val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
 
                 val firstFingerEvent = createMotionEvent(
                     downTime, downTime,

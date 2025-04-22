@@ -5,5 +5,6 @@ package com.austinauyeung.nyuma.c9.common.domain
  */
 enum class GestureStyle {
     FIXED,      // Fixed distance
+    FIXED_2,
     INERTIA,    // Momentum-based
 }

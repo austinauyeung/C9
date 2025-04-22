@@ -200,13 +200,15 @@ fun SettingsScreen(
                     title = "Gesture Style",
                     subtitle =
                     when (uiState.gestureStyle) {
-                        GestureStyle.FIXED -> "Fixed distance"
+                        GestureStyle.FIXED -> "Fixed distance, implementation 1"
+                        GestureStyle.FIXED_2 -> "Fixed distance, implementation 2"
                         GestureStyle.INERTIA -> "Momentum-based"
                     },
                     selectedOption = uiState.gestureStyle,
                     options =
                     listOf(
-                        GestureStyle.FIXED to "Fixed",
+                        GestureStyle.FIXED to "Fixed 1",
+                        GestureStyle.FIXED_2 to "Fixed 2",
                         GestureStyle.INERTIA to "Inertia",
                     ),
                     onOptionSelected = { value ->
