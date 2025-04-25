@@ -77,7 +77,11 @@ fun CursorOverlay(
             color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (settings?.useCustomCursorIcon != true || scrollToggleIconImageUri == null)) 1f else 0f),
         )
     ) {
-        if (settings?.useCustomCursorIcon != true || iconImageUri == null) {
+        if (
+            settings?.useCustomCursorIcon != true ||
+            (!cursorState.inScrollMode && iconImageUri == null) ||
+            (cursorState.inScrollMode && scrollToggleIconImageUri == null)
+            ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawDefaultCursor(
                     position = position,
@@ -113,21 +117,19 @@ fun CursorOverlay(
 //                }
                 )
             } else {
-                if (scrollToggleIconImageUri != null) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(scrollToggleIconImageUri)
-                            .build(),
-                        contentDescription = "Custom Scroll Toggle Cursor Icon",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .size(cursorSize.dp)
-                            .offset(
-                                x = offsetX,
-                                y = offsetY
-                            )
-                    )
-                }
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(scrollToggleIconImageUri)
+                        .build(),
+                    contentDescription = "Custom Scroll Toggle Cursor Icon",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(cursorSize.dp)
+                        .offset(
+                            x = offsetX,
+                            y = offsetY
+                        )
+                )
             }
         }
     }
