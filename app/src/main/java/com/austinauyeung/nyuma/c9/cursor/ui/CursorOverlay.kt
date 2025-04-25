@@ -77,11 +77,7 @@ fun CursorOverlay(
             color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (settings?.useCustomCursorIcon != true || scrollToggleIconImageUri == null)) 1f else 0f),
         )
     ) {
-        if (
-            settings?.useCustomCursorIcon != true ||
-            (!cursorState.inScrollMode && iconImageUri == null) ||
-            (cursorState.inScrollMode && scrollToggleIconImageUri == null)
-            ) {
+        if (settings?.useCustomCursorIcon != true || iconImageUri == null) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawDefaultCursor(
                     position = position,
@@ -94,7 +90,7 @@ fun CursorOverlay(
                 )
             }
         } else {
-            if (!cursorState.inScrollMode) {
+            if (!cursorState.inScrollMode || scrollToggleIconImageUri == null) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(iconImageUri)
