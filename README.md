@@ -104,12 +104,18 @@ All gestures are dispatched at the tip of the cursor's current location.
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
+- Enable `C9 > Gesture Visualization` to learn what each gesture is doing.
 - Use `C9 > Auto-Hide Cursor Options` to auto-hide the cursor in select locations. See [Settings](#settings) for more information.
   - Automatic restoration is cancelled if any cursor is manually reactivated.
   - The standard cursor's last position is saved upon restore.
   - `Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
 - In the grid cursor mode, quickly navigate to the center of any cell in the current subgrid by pressing that cell's number followed by quick, successive presses of numpad 5.
+- When using custom icons for the standard cursor, the following should be noted:
+  - The top left of the file corresponds to the cursor's position. A tight crop is recommended.
+  - Cursor performance may be impacted by file size and cursor size. If you are experiencing performance issues, try a smaller cursor size and/or compressing the file.
+  - Because the file is scaled to fit within a square box, a 1:1 aspect ratio would fit the best, but other aspect ratios can be compensated for by adjusting the cursor size.
+
 
 ## Settings
 The following settings and `values` are available.
@@ -125,7 +131,7 @@ The following settings and `values` are available.
 | | Grid Lines | `Show`: Always show grid lines.<br />`Final`: Only show grid lines in the final grid level.<br />`Hide`: Never show grid lines. |
 | Standard Cursor | Set Activation Key | Sets the standard cursor activation key.<br />Can be cleared if a button mapper is used instead.<br />Can be cleared to disable the standard cursor. |
 | | Clear Activation Key | Clears the standard cursor activation key. |
-| | Control Scheme | `Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br />`Numpad`: Use numpad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br /> |
+| | Control Scheme | In the `D-pad` and `Numpad` control schemes, toggling is disabled if `Activation Duration` is `0ms`. Scroll mode is indicated by a screen border indicator with a color determined by the `Cursor Color` setting.<br /><br />`Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br />`Numpad`: Use numpad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br /> |
 | | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
 | | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
 | | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
@@ -133,15 +139,20 @@ The following settings and `values` are available.
 | | Cursor Acceleration Duration | Duration after which accelerated speed is reached after cursor begins acceleration. |
 | | Cursor Size | Size of the cursor. |
 | | Smooth Cursor Corners | `On`: Round out the corners of the cursor.<br />`Off`: Use default icon. |
-| | Cursor Color | Color of the cursor's body with a set opacity of `70%`. Specified as a hex value. |
+| | Cursor Color | Color of the cursor's body with a fixed opacity of `70%`. Specified as a hex value. |
 | | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black. |
+| | Custom Cursor Icons | `On`: Enables user to set custom icons.<br />`Off`: Cursor icon is set to the default icon. |
+| | Change Cursor Icon | Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Clear Cursor Icon | Deletes the saved file from the application and falls back to the default cursor icon. |
+| | Change Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Clear Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Deletes the saved file from the application and falls back to the default screen border indicator. |
 | Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
 | | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
 | | Lock Screen | This setting applies only when a screen lock has been configured.<br /><br />`On`: Hide the cursor when the device locks, and restore the cursor when the device unlocks.<br />`Off`: Never auto-hide the cursor in the lock screen. |
-| General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers. If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
+| General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
-| | Gesture Style | `Fixed`: Scrolls are controlled and fixed distance.<br />`Inertia`: Scrolls resemble flicks.<br /> |
+| | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. May work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. May work better in browsers and other places.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
@@ -259,7 +270,7 @@ If you are unable to deactivate the cursor, clear the internal activation key, w
 
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
-Thanks for using and testing C9! You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs [using the built-in logger](#generating-cursor-logs) or `adb logcat C9App:V *:S`.
+You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both. For bugs, please provide logs [using the built-in logger](#generating-cursor-logs) or `adb logcat C9App:V *:S`.
 
 ### How else can I contribute?
 Please feel free to submit a pull request, create a video walkthrough, [confirm your device's compatibility](#device-compatibility), or provide anything else you think would be helpful!
@@ -270,12 +281,30 @@ Shizuku allows applications in general to perform actions that require elevated 
 ### What does it mean for the cursor to intercept button presses?
 The cursors sit between your button presses and the underlying application. If a button is used by the cursor, the cursor will consume it and prevent the underlying application from receiving the button press.
 
+### What does C9 stand for?
+Officially, it stands for "Click on 9 keys" as homage to T9's "Text on 9 keys". 
+
+Unofficially, I think it now encapsulates these 9 goals and themes:
+- Cursor 1 and Cursor 2
+- Cascading grid cursor
+- Continuity with modern application interfaces
+- Context awareness
+- Compatibility across Android versions
+- Customization options
+- Compact size
+- Convenience
+- Community
+
+The last one is especially important as this application has become a product of feedback from the dumbphone/flipphone community. Thank you to those who have used C9!
+
+Finally, there's the saying that cats have nine lives. As the [package name](#option-2) would suggest, this application is dedicated to my late cat, [Nyuma](./docs/imgs/IMG_3226.jpg).
+
 ## License
 [Apache License Version 2.0](./LICENSE)
 
 ## Acknowledgments
-- Allegra, [Arlie](./docs/imgs/IMG_5199.jpg), and [Nyuma](./docs/imgs/IMG_3226.jpg) for their support
-- Everyone on the [releases](https://github.com/austinauyeung/C9/releases) page for their feature suggestions
-- `sam-club` for extensive testing
-- `Dev-in-the-BM` for testing and the Shizuku suggestion
-- `anonymousfliphones` for testing
+- Allegra and [Arlie](./docs/imgs/IMG_5199.jpg) for their support
+- Everyone on the [releases](https://github.com/austinauyeung/C9/releases) page for their feature suggestions and bug reports
+- `sam-club` for extensive initial testing
+- `Dev-in-the-BM` for initial testing and the Shizuku suggestion
+- `anonymousfliphones` for initial testing

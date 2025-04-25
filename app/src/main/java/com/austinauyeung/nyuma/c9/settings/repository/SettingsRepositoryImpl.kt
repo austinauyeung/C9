@@ -10,12 +10,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.VersionUtil
-import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
-import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -64,6 +60,28 @@ class SettingsRepositoryImpl(
         private val STANDARD_CURSOR_MATCH_BORDER = booleanPreferencesKey("standard_cursor_match_border")
         private val ALLOW_OVERLAPPING_GESTURES = booleanPreferencesKey("allow_overlapping_gestures")
         private val FORCE_SMOOTHER_GESTURES = booleanPreferencesKey("force_smoother_gestures")
+        private val CURSOR_IMAGE_PATH = stringPreferencesKey("cursor_image_path")
+        private val SCROLL_TOGGLE_IMAGE_PATH = stringPreferencesKey("scroll_toggle_image_path")
+        private val USE_CUSTOM_CURSOR_ICON = booleanPreferencesKey("use_custom_cursor_icon")
+    }
+
+    private inline fun <reified T : Enum<T>> getEnumPreference(
+        preferences: Preferences,
+        preferencesKey: Preferences.Key<String>,
+        defaultValue: T,
+        logTag: String
+    ): T {
+        val valueStr = preferences[preferencesKey]
+        return if (valueStr != null) {
+            try {
+                enumValueOf<T>(valueStr)
+            } catch (e: Exception) {
+                Logger.w("Invalid $logTag value: $valueStr", e)
+                defaultValue
+            }
+        } else {
+            defaultValue
+        }
     }
 
     override fun getSettings(): Flow<OverlaySettings> {
@@ -73,57 +91,33 @@ class SettingsRepositoryImpl(
                 emit(emptyPreferences())
             }
             .map { preferences ->
-                val controlSchemeStr = preferences[CONTROL_SCHEME]
-                val controlScheme =
-                    if (controlSchemeStr != null) {
-                        try {
-                            ControlScheme.valueOf(controlSchemeStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid control scheme value: $controlSchemeStr", e)
-                            OverlaySettings.DEFAULT.controlScheme
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.controlScheme
-                    }
+                val controlScheme = getEnumPreference(
+                    preferences,
+                    CONTROL_SCHEME,
+                    OverlaySettings.DEFAULT.controlScheme,
+                    "control scheme"
+                )
 
-                val gestureStyleStr = preferences[GESTURE_STYLE]
-                val gestureStyle =
-                    if (gestureStyleStr != null) {
-                        try {
-                            GestureStyle.valueOf(gestureStyleStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid scroll mode value: $gestureStyleStr", e)
-                            OverlaySettings.DEFAULT.gestureStyle
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.gestureStyle
-                    }
+                val gestureStyle = getEnumPreference(
+                    preferences,
+                    GESTURE_STYLE,
+                    OverlaySettings.DEFAULT.gestureStyle,
+                    "gesture style"
+                )
 
-                val gridLineVisibilityStr = preferences[GRID_LINE_VISIBILITY]
-                val gridLineVisibility =
-                    if (gridLineVisibilityStr != null) {
-                        try {
-                            GridLineVisibility.valueOf(gridLineVisibilityStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid grid line visibility value: $gridLineVisibilityStr", e)
-                            OverlaySettings.DEFAULT.gridLineVisibility
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.gridLineVisibility
-                    }
+                val gridLineVisibility = getEnumPreference(
+                    preferences,
+                    GRID_LINE_VISIBILITY,
+                    OverlaySettings.DEFAULT.gridLineVisibility,
+                    "grid line visibility"
+                )
 
-                val cursorEdgeBehaviorStr = preferences[CURSOR_EDGE_BEHAVIOR]
-                val cursorEdgeBehavior =
-                    if (cursorEdgeBehaviorStr != null) {
-                        try {
-                            ScreenEdgeBehavior.valueOf(cursorEdgeBehaviorStr)
-                        } catch (e: Exception) {
-                            Logger.w("Invalid hide on text field value: $cursorEdgeBehaviorStr", e)
-                            OverlaySettings.DEFAULT.cursorEdgeBehavior
-                        }
-                    } else {
-                        OverlaySettings.DEFAULT.cursorEdgeBehavior
-                    }
+                val cursorEdgeBehavior = getEnumPreference(
+                    preferences,
+                    CURSOR_EDGE_BEHAVIOR,
+                    OverlaySettings.DEFAULT.cursorEdgeBehavior,
+                    "cursor edge behavior"
+                )
 
                 val settings = OverlaySettings(
                     activationDuration = preferences[ACTIVATION_DURATION]
@@ -183,7 +177,13 @@ class SettingsRepositoryImpl(
                     allowOverlappingGestures = preferences[ALLOW_OVERLAPPING_GESTURES]
                         ?: OverlaySettings.DEFAULT.allowOverlappingGestures,
                     forceSmootherGestures = preferences[FORCE_SMOOTHER_GESTURES]
-                        ?: OverlaySettings.DEFAULT.forceSmootherGestures
+                        ?: OverlaySettings.DEFAULT.forceSmootherGestures,
+                    cursorImagePath = preferences[CURSOR_IMAGE_PATH]
+                        ?: OverlaySettings.DEFAULT.cursorImagePath,
+                    scrollToggleImagePath = preferences[SCROLL_TOGGLE_IMAGE_PATH]
+                        ?: OverlaySettings.DEFAULT.scrollToggleImagePath,
+                    useCustomCursorIcon = preferences[USE_CUSTOM_CURSOR_ICON]
+                        ?: OverlaySettings.DEFAULT.useCustomCursorIcon
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -227,6 +227,19 @@ class SettingsRepositoryImpl(
                 preferences[STANDARD_CURSOR_MATCH_BORDER] = settings.standardCursorMatchBorder
                 preferences[ALLOW_OVERLAPPING_GESTURES] = settings.allowOverlappingGestures
                 preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
+                preferences[USE_CUSTOM_CURSOR_ICON] = settings.useCustomCursorIcon
+
+                if (settings.cursorImagePath != null) {
+                    preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath
+                } else {
+                    preferences.remove(CURSOR_IMAGE_PATH)
+                }
+
+                if (settings.scrollToggleImagePath != null) {
+                    preferences[SCROLL_TOGGLE_IMAGE_PATH] = settings.scrollToggleImagePath
+                } else {
+                    preferences.remove(SCROLL_TOGGLE_IMAGE_PATH)
+                }
             }
         } catch (e: Exception) {
             Logger.e("Error updating settings", e)

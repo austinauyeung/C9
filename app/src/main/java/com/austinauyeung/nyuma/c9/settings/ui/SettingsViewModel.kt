@@ -83,7 +83,10 @@ class SettingsViewModel(
                             standardCursorHex = settings.standardCursorHex,
                             standardCursorMatchBorder = settings.standardCursorMatchBorder,
                             allowOverlappingGestures = settings.allowOverlappingGestures,
-                            forceSmootherGestures = settings.forceSmootherGestures
+                            forceSmootherGestures = settings.forceSmootherGestures,
+                            cursorImagePath = settings.cursorImagePath,
+                            scrollToggleImagePath = settings.scrollToggleImagePath,
+                            useCustomCursorIcon = settings.useCustomCursorIcon
                         )
                     }
                 }
@@ -150,7 +153,10 @@ class SettingsViewModel(
             standardCursorHex = _uiState.value.standardCursorHex,
             standardCursorMatchBorder = _uiState.value.standardCursorMatchBorder,
             allowOverlappingGestures = _uiState.value.allowOverlappingGestures,
-            forceSmootherGestures = _uiState.value.forceSmootherGestures
+            forceSmootherGestures = _uiState.value.forceSmootherGestures,
+            cursorImagePath = _uiState.value.cursorImagePath,
+            scrollToggleImagePath = _uiState.value.scrollToggleImagePath,
+            useCustomCursorIcon = _uiState.value.useCustomCursorIcon
         )
     }
 
@@ -235,5 +241,8 @@ data class SettingsUiState(
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
     val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
     val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
-    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES
+    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES,
+    val cursorImagePath: String? = Defaults.Settings.CURSOR_IMAGE_PATH,
+    val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
+    val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON
 )

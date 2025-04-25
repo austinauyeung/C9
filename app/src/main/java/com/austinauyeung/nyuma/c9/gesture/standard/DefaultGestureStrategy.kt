@@ -51,7 +51,6 @@ class DefaultGestureStrategy(
                         when (settings.gestureStyle) {
                             GestureStyle.FIXED -> moveTo(endX, endY)
                             GestureStyle.FIXED_2 -> moveTo(endX / 2, endY / 2)
-                            GestureStyle.FIXED_3 -> moveTo(endX * 0.99f, endY * 0.99f)
                             else -> moveTo(endX, endY)
                         }
                     }

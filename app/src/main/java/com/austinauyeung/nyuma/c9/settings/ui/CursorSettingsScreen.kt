@@ -1,7 +1,16 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
 import KeyCaptureOverlay
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.view.KeyEvent
+import android.webkit.MimeTypeMap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -32,17 +41,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.IOException
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.Locale
+import java.util.UUID
 
 /**
  * Standard cursor settings screen.
@@ -57,6 +77,87 @@ fun CursorSettingsScreen(
     var showCursorKeyCaptureOverlay by remember { mutableStateOf(false) }
     var reservedKeys by remember { mutableStateOf(emptyMap<Int, String>()) }
     var showColorPickerDialog by remember { mutableStateOf(false) }
+    val inToggleControlScheme = (uiState.controlScheme == ControlScheme.DPAD_TOGGLE || uiState.controlScheme == ControlScheme.NUMPAD_TOGGLE)
+
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+            type = "image/*"
+            putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 1)
+        }
+    } else {
+        Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+    }
+
+    // Can make more DRY
+    val clearIcon = {
+        viewModel.updatePreference(null) { settings, v ->
+            settings.copy(cursorImagePath = v)
+        }
+    }
+    val clearScrollToggleIcon = {
+        viewModel.updatePreference(null) { settings, v ->
+            settings.copy(scrollToggleImagePath = v)
+        }
+    }
+
+    fun clearImage(
+        imagePath: String?,
+        updateSetting: () -> Unit
+    ) {
+        if (!imagePath.isNullOrEmpty()) {
+            val file = File(imagePath)
+            if (file.exists()) {
+                file.delete()
+                Logger.d("Custom icon deleted")
+            }
+        }
+        updateSetting()
+    }
+
+    val iconPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                coroutineScope.launch {
+                    try {
+                        clearImage(uiState.cursorImagePath, clearIcon)
+                        val savedImagePath = saveImageToAppStorage(context, uri)
+                        viewModel.updatePreference(savedImagePath) { settings, v ->
+                            settings.copy(cursorImagePath = v)
+                        }
+                    } catch (e: Exception) {
+                        Logger.e("Failed to process cursor image", e)
+                    }
+                }
+            }
+        }
+    }
+
+    val scrollToggleIconPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                coroutineScope.launch {
+                    try {
+                        clearImage(uiState.scrollToggleImagePath, clearScrollToggleIcon)
+                        val savedImagePath = saveImageToAppStorage(context, uri)
+                        viewModel.updatePreference(savedImagePath) { settings, v ->
+                            settings.copy(scrollToggleImagePath = v)
+                        }
+                    } catch (e: Exception) {
+                        Logger.e("Failed to process cursor image", e)
+                    }
+                }
+            }
+        }
+    }
 
     when (uiState.controlScheme) {
         ControlScheme.STANDARD -> {
@@ -388,6 +489,45 @@ fun CursorSettingsScreen(
                     )
                 }
             }
+
+            PreferenceCategory(title = "Custom Icon") {
+                SwitchPreferenceItem(
+                    title = "Custom Cursor Icons",
+                    subtitle = "Replace the default cursor icon with an image or gif",
+                    checked = uiState.useCustomCursorIcon,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(useCustomCursorIcon = v)
+                        }
+                    },
+                )
+
+                SimplePreferenceItem(
+                    title = if (!uiState.cursorImagePath.isNullOrEmpty() && File(uiState.cursorImagePath!!).exists() ) "Change Cursor Icon" else "Set Cursor Icon",
+                    subtitle = "Supported formats: png, gif, jpg, bmp, webp",
+                    onClick = { iconPicker.launch(intent) },
+                    enabled = uiState.useCustomCursorIcon
+                )
+                SimplePreferenceItem(
+                    title = "Clear Cursor Icon",
+                    subtitle = "Fallback to default icon",
+                    onClick = { clearImage(uiState.cursorImagePath, clearIcon) },
+                    enabled = uiState.useCustomCursorIcon
+                )
+
+                SimplePreferenceItem(
+                    title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Scroll Toggle Icon" else "Set Scroll Toggle Icon",
+                    subtitle = if (!inToggleControlScheme) "Applies only in D-pad and numpad control schemes" else "Supported formats: png, gif, jpg, bmp, webp",
+                    onClick = { scrollToggleIconPicker.launch(intent) },
+                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
+                )
+                SimplePreferenceItem(
+                    title = "Clear Scroll Toggle Icon",
+                    subtitle = "Fallback to default screen border indicator",
+                    onClick = { clearImage(uiState.scrollToggleImagePath, clearScrollToggleIcon) },
+                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
+                )
+            }
         }
     }
 }
@@ -507,4 +647,36 @@ fun ColorPickerDialog(
             }
         }
     )
+}
+
+suspend fun saveImageToAppStorage(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
+    val mimeType = context.contentResolver.getType(uri)
+
+    val extension = MimeTypeMap.getSingleton()
+        .getExtensionFromMimeType(mimeType)
+        ?.lowercase(Locale.getDefault())
+        ?.takeIf {
+            it in listOf("jpg", "jpeg", "png", "gif", "bmp", "webp")
+        } ?: run {
+        val uriPath = uri.path
+        uriPath?.substringAfterLast('.')?.lowercase(Locale.getDefault())?.takeIf {
+            it in listOf("jpg", "jpeg", "png", "gif", "bmp", "webp")
+        } ?: "png"
+    }
+
+    val fileName = "cursor_${UUID.randomUUID()}.$extension"
+    val file = File(context.filesDir, fileName)
+
+    try {
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+    } catch (e: IOException) {
+        Logger.e("Failed to save image from uri $uri to file ${file.name}", e)
+        throw e
+    }
+
+    return@withContext file.absolutePath
 }
