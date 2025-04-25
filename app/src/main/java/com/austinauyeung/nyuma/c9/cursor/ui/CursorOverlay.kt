@@ -74,23 +74,23 @@ fun CursorOverlay(
         .fillMaxSize()
         .border(
             width = if (cursorState.inScrollMode) 2.dp else 0.dp,
-            color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (scrollToggleIconImageUri == null || !settings.useCustomCursorIcon)) 1f else 0f),
+            color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (settings?.useCustomCursorIcon != true || scrollToggleIconImageUri == null)) 1f else 0f),
         )
     ) {
-        if (!cursorState.inScrollMode) {
-            if (iconImageUri == null || !settings.useCustomCursorIcon) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawDefaultCursor(
-                        position = position,
-                        cursorSize = cursorSize,
-                        opacity = opacity,
-                        cursorColor = cursorColor,
-                        matchBorder = matchBorder,
-                        roundedCorners = settings?.roundedCursorCorners ?: false,
-                        isHoldActive = cursorState.isHoldActive
-                    )
-                }
-            } else {
+        if (settings?.useCustomCursorIcon != true || iconImageUri == null) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawDefaultCursor(
+                    position = position,
+                    cursorSize = cursorSize,
+                    opacity = opacity,
+                    cursorColor = cursorColor,
+                    matchBorder = matchBorder,
+                    roundedCorners = settings?.roundedCursorCorners ?: false,
+                    isHoldActive = cursorState.isHoldActive
+                )
+            }
+        } else {
+            if (!cursorState.inScrollMode) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(iconImageUri)
@@ -112,22 +112,22 @@ fun CursorOverlay(
 //                    customImageLoaded = false
 //                }
                 )
-            }
-        } else {
-            if (scrollToggleIconImageUri != null && settings.useCustomCursorIcon) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(scrollToggleIconImageUri)
-                        .build(),
-                    contentDescription = "Custom Scroll Toggle Cursor Icon",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(cursorSize.dp)
-                        .offset(
-                            x = offsetX,
-                            y = offsetY
-                        )
-                )
+            } else {
+                if (scrollToggleIconImageUri != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(scrollToggleIconImageUri)
+                            .build(),
+                        contentDescription = "Custom Scroll Toggle Cursor Icon",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(cursorSize.dp)
+                            .offset(
+                                x = offsetX,
+                                y = offsetY
+                            )
+                    )
+                }
             }
         }
     }
