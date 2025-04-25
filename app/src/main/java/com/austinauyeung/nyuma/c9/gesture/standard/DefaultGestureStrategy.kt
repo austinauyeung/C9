@@ -45,9 +45,14 @@ class DefaultGestureStrategy(
     ): AccessibilityService.GestureResultCallback {
         return object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription?) {
+                val settings = settingsFlow.value
                 if (willContinue) {
                     val pausePath = Path().apply {
-                        moveTo(endX / 2, endY / 2)
+                        when (settings.gestureStyle) {
+                            GestureStyle.FIXED -> moveTo(endX, endY)
+                            GestureStyle.FIXED_2 -> moveTo(endX / 2, endY / 2)
+                            else -> moveTo(endX, endY)
+                        }
                     }
 
                     val pauseStrokeDescription = stroke.continueStroke(
@@ -134,7 +139,7 @@ class DefaultGestureStrategy(
     ): Boolean {
         try {
             val settings = settingsFlow.value
-            val willContinue = (settings.gestureStyle == GestureStyle.FIXED) || forceFixedGesture
+            val willContinue = (settings.gestureStyle != GestureStyle.INERTIA) || forceFixedGesture
 
             Logger.d("DefaultGestureStrategy: performing scroll from ($startX, $startY) to ($endX, $endY)")
 
@@ -254,7 +259,7 @@ class DefaultGestureStrategy(
     ): Boolean {
         try {
             val settings = settingsFlow.value
-            val willContinue = settings.gestureStyle == GestureStyle.FIXED || forceFixedGesture
+            val willContinue = settings.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
 
             Logger.d("DefaultGestureStrategy: performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture")
 

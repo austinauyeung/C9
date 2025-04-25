@@ -200,13 +200,15 @@ fun SettingsScreen(
                     title = "Gesture Style",
                     subtitle =
                     when (uiState.gestureStyle) {
-                        GestureStyle.FIXED -> "Fixed distance"
+                        GestureStyle.FIXED -> "Fixed distance, implementation 1"
+                        GestureStyle.FIXED_2 -> "Fixed distance, implementation 2"
                         GestureStyle.INERTIA -> "Momentum-based"
                     },
                     selectedOption = uiState.gestureStyle,
                     options =
                     listOf(
-                        GestureStyle.FIXED to "Fixed",
+                        GestureStyle.FIXED to "Fixed 1",
+                        GestureStyle.FIXED_2 to "Fixed 2",
                         GestureStyle.INERTIA to "Inertia",
                     ),
                     onOptionSelected = { value ->
@@ -580,7 +582,7 @@ fun SetKeyPreferenceItem(
             "Current: ${KeyEvent.keyCodeToString(currentKeyCode)}"
         }
 
-    PreferenceItem(
+    SimplePreferenceItem(
         title = title,
         subtitle = subtitle,
         onClick = onCaptureKey,
@@ -594,10 +596,10 @@ fun ClearKeyPreferenceItem(
     isEnabled: Boolean,
     onClearKey: () -> Unit,
 ) {
-    PreferenceItem(
+    SimplePreferenceItem(
         title = title,
         subtitle = "Unmaps $mode mode",
-        onClick = if (isEnabled) onClearKey else null,
+        onClick = onClearKey,
     )
 }
 
@@ -606,11 +608,27 @@ fun SimplePreferenceItem(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
+    enabled: Boolean? = true
 ) {
+    val itemEnabled = enabled ?: true
+
+    val titleColor = if (itemEnabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+    }
+
+    val subtitleColor = if (itemEnabled) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    }
+
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
+        enabled = itemEnabled
     ) {
         Row(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_standard)),
@@ -618,11 +636,11 @@ fun SimplePreferenceItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title)
+                Text(text = title, color = titleColor)
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = subtitleColor,
                 )
             }
         }

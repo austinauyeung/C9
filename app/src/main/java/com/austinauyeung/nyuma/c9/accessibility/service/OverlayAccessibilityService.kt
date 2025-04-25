@@ -267,8 +267,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         val settings = C9.getInstance().getSettingsFlow().value
         event?.let {
             when (event.eventType) {
-                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                AccessibilityEvent.TYPE_VIEW_SCROLLED,
+                AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED,
+                AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED -> {}
+
+                else -> {
                     if (settings.hideOnKeyboardOpen) {
                         checkKeyboardVisibility()
                     }
@@ -281,7 +285,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
                     onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState)
                 }
-                else -> {}
             }
         }
     }

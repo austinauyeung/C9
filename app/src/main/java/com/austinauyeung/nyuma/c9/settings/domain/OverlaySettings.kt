@@ -44,7 +44,10 @@ data class OverlaySettings(
     val standardCursorHex: String = Defaults.Settings.STANDARD_CURSOR_HEX,
     val standardCursorMatchBorder: Boolean = Defaults.Settings.STANDARD_CURSOR_MATCH_BORDER,
     val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
-    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES
+    val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES,
+    val cursorImagePath: String? = Defaults.Settings.CURSOR_IMAGE_PATH,
+    val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
+    val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

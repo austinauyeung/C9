@@ -50,5 +50,8 @@ object Defaults {
         const val STANDARD_CURSOR_MATCH_BORDER = false
         const val ALLOW_OVERLAPPING_GESTURES = false
         const val FORCE_SMOOTHER_GESTURES = false
+        val CURSOR_IMAGE_PATH = null
+        val SCROLL_TOGGLE_IMAGE_PATH = null
+        const val USE_CUSTOM_CURSOR_ICON = false
     }
 }
