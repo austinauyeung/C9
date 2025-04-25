@@ -285,10 +285,10 @@ The cursors sit between your button presses and the underlying application. If a
 Officially, it stands for "Click on 9 keys" as homage to T9's "Text on 9 keys". 
 
 Unofficially, I think it now encapsulates these 9 goals and themes:
-- Cursor 1 and Cursor 2
+- Cursor paradigms
 - Cascading grid cursor
-- Continuity with modern application interfaces
-- Context awareness
+- Continuity with modern applications
+- Context-aware auto-hide
 - Compatibility across Android versions
 - Customization options
 - Compact size
