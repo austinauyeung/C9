@@ -205,10 +205,12 @@ fun SettingsScreen(
                         GestureStyle.INERTIA -> "Momentum-based"
                     },
                     selectedOption = uiState.gestureStyle,
-                    options =
-                    listOf(
+                    options = if (!uiState.enableShizukuIntegration) listOf(
                         GestureStyle.FIXED to "Fixed 1",
                         GestureStyle.FIXED_2 to "Fixed 2",
+                        GestureStyle.INERTIA to "Inertia",
+                    ) else listOf(
+                        GestureStyle.FIXED to "Fixed 1",
                         GestureStyle.INERTIA to "Inertia",
                     ),
                     onOptionSelected = { value ->
