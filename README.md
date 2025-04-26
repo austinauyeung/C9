@@ -73,7 +73,8 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly unless `C9 > Developer Options > Overlapping Gestures` is enabled. |
-| Zoom | Click star (*) and numpad 0. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | Zoom distance is not currently user-configurable. |
+| Zoom | Click star (*) and numpad 0. Hold for continuous zooming. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | Zoom distance is not currently user-configurable. |
+| Zoom Fallback | Double click D-pad center and hold, followed by a D-pad up or down scroll gesture. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | This corresonds to a one-finger zoom, with a zoom distance determined by `C9 > Scroll Distance`. |
 
 ### Standard Cursor
 
@@ -98,8 +99,9 @@ All gestures are dispatched at the tip of the cursor's current location.
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide Cursor in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly unless `C9 > Developer Options > Overlapping Gestures` is enabled. |
-| Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
+| Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
+| Zoom Fallback | Double click D-pad center and hold, followed by a D-pad up or down move gesture. | This corresonds to a one-finger zoom, with a zoom distance determined by how much the cursor moves up or down. |
 
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
@@ -115,7 +117,7 @@ All gestures are dispatched at the tip of the cursor's current location.
   - The top left of the file corresponds to the cursor's position. A tight crop is recommended.
   - Cursor performance may be impacted by file size and cursor size. If you are experiencing performance issues, try a smaller cursor size and/or compressing the file.
   - Because the file is scaled to fit within a square box, a 1:1 aspect ratio would fit the best, but other aspect ratios can be compensated for by adjusting the cursor size.
-
+- The zoom fallback gestures can be used if an application does not interpret a regular zoom gesture correctly.
 
 ## Settings
 The following settings and `values` are available.
@@ -143,8 +145,10 @@ The following settings and `values` are available.
 | | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black. |
 | | Custom Cursor Icons | `On`: Enables user to set custom icons.<br />`Off`: Cursor icon is set to the default icon. |
 | | Change Cursor Icon | Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Cursor Icon Alignment | `Top left`: Cursor is aligned to the top-left of the cursor icon.<br />`Center`: Cursor is aligned to the center of the cursor icon. |
 | | Clear Cursor Icon | Deletes the saved file from the application and falls back to the default cursor icon. |
 | | Change Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Scroll Toggle Icon Alignment | `Top left`: Cursor is aligned to the top-left of the scroll toggle icon.<br />`Center`: Cursor is aligned to the center of the scroll toggle icon. |
 | | Clear Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Deletes the saved file from the application and falls back to the default screen border indicator. |
 | Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
 | | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
@@ -152,7 +156,7 @@ The following settings and `values` are available.
 | General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
-| | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. May work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. May work better in browsers and other places.<br />`Inertia`: Scrolls resemble flicks.<br /> |
+| | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. In non-Shizuku scrolling, this may work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. In non-Shizuku scrolling, this may work better in browsers and other places. Not applicable when Shizuku integration is enabled.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
 | | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |

@@ -205,10 +205,12 @@ fun SettingsScreen(
                         GestureStyle.INERTIA -> "Momentum-based"
                     },
                     selectedOption = uiState.gestureStyle,
-                    options =
-                    listOf(
+                    options = if (!uiState.enableShizukuIntegration) listOf(
                         GestureStyle.FIXED to "Fixed 1",
                         GestureStyle.FIXED_2 to "Fixed 2",
+                        GestureStyle.INERTIA to "Inertia",
+                    ) else listOf(
+                        GestureStyle.FIXED to "Fixed 1",
                         GestureStyle.INERTIA to "Inertia",
                     ),
                     onOptionSelected = { value ->
@@ -444,13 +446,28 @@ fun <T> DropdownPreferenceItem(
     selectedOption: T,
     options: List<Pair<T, String>>,
     onOptionSelected: (T) -> Unit,
+    enabled: Boolean? = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selectedText = options.find { it.first == selectedOption }?.second ?: "Select"
+    val itemEnabled = enabled ?: true
+
+    val titleColor = if (itemEnabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+    }
+
+    val subtitleColor = if (itemEnabled) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    }
 
     Surface(
         onClick = { expanded = true },
         modifier = Modifier.fillMaxWidth(),
+        enabled = itemEnabled
     ) {
         Row(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_standard)),
@@ -458,12 +475,12 @@ fun <T> DropdownPreferenceItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title)
+                Text(text = title, color = titleColor)
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = subtitleColor,
                     )
                 }
             }
@@ -476,12 +493,12 @@ fun <T> DropdownPreferenceItem(
                     Text(
                         text = selectedText,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = subtitleColor,
                     )
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Select",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = if (itemEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                     )
                 }
 
@@ -593,7 +610,6 @@ fun SetKeyPreferenceItem(
 fun ClearKeyPreferenceItem(
     title: String = "Clear Activation Key",
     mode: String,
-    isEnabled: Boolean,
     onClearKey: () -> Unit,
 ) {
     SimplePreferenceItem(

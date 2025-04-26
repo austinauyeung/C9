@@ -7,6 +7,7 @@ import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityServ
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.Defaults
@@ -86,7 +87,9 @@ class SettingsViewModel(
                             forceSmootherGestures = settings.forceSmootherGestures,
                             cursorImagePath = settings.cursorImagePath,
                             scrollToggleImagePath = settings.scrollToggleImagePath,
-                            useCustomCursorIcon = settings.useCustomCursorIcon
+                            useCustomCursorIcon = settings.useCustomCursorIcon,
+                            cursorImageAlignment = settings.cursorImageAlignment,
+                            scrollToggleImageAlignment = settings.scrollToggleImageAlignment
                         )
                     }
                 }
@@ -156,7 +159,9 @@ class SettingsViewModel(
             forceSmootherGestures = _uiState.value.forceSmootherGestures,
             cursorImagePath = _uiState.value.cursorImagePath,
             scrollToggleImagePath = _uiState.value.scrollToggleImagePath,
-            useCustomCursorIcon = _uiState.value.useCustomCursorIcon
+            useCustomCursorIcon = _uiState.value.useCustomCursorIcon,
+            cursorImageAlignment = _uiState.value.cursorImageAlignment,
+            scrollToggleImageAlignment = _uiState.value.scrollToggleImageAlignment
         )
     }
 
@@ -244,5 +249,7 @@ data class SettingsUiState(
     val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES,
     val cursorImagePath: String? = Defaults.Settings.CURSOR_IMAGE_PATH,
     val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
-    val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON
+    val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON,
+    val cursorImageAlignment: IconAlignment = Defaults.Settings.CURSOR_IMAGE_ALIGNMENT,
+    val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT
 )

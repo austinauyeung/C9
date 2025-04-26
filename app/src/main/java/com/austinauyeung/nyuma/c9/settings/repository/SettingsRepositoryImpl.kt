@@ -63,6 +63,8 @@ class SettingsRepositoryImpl(
         private val CURSOR_IMAGE_PATH = stringPreferencesKey("cursor_image_path")
         private val SCROLL_TOGGLE_IMAGE_PATH = stringPreferencesKey("scroll_toggle_image_path")
         private val USE_CUSTOM_CURSOR_ICON = booleanPreferencesKey("use_custom_cursor_icon")
+        private val CURSOR_IMAGE_ALIGNMENT = stringPreferencesKey("cursor_image_alignment")
+        private val SCROLL_TOGGLE_IMAGE_ALIGNMENT = stringPreferencesKey("scroll_toggle_image_alignment")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -117,6 +119,20 @@ class SettingsRepositoryImpl(
                     CURSOR_EDGE_BEHAVIOR,
                     OverlaySettings.DEFAULT.cursorEdgeBehavior,
                     "cursor edge behavior"
+                )
+
+                val cursorImageAlignment = getEnumPreference(
+                    preferences,
+                    CURSOR_IMAGE_ALIGNMENT,
+                    OverlaySettings.DEFAULT.cursorImageAlignment,
+                    "cursor image alignment"
+                )
+
+                val scrollToggleImageAlignment = getEnumPreference(
+                    preferences,
+                    SCROLL_TOGGLE_IMAGE_ALIGNMENT,
+                    OverlaySettings.DEFAULT.scrollToggleImageAlignment,
+                    "scroll toggle image alignment"
                 )
 
                 val settings = OverlaySettings(
@@ -183,7 +199,9 @@ class SettingsRepositoryImpl(
                     scrollToggleImagePath = preferences[SCROLL_TOGGLE_IMAGE_PATH]
                         ?: OverlaySettings.DEFAULT.scrollToggleImagePath,
                     useCustomCursorIcon = preferences[USE_CUSTOM_CURSOR_ICON]
-                        ?: OverlaySettings.DEFAULT.useCustomCursorIcon
+                        ?: OverlaySettings.DEFAULT.useCustomCursorIcon,
+                    cursorImageAlignment = cursorImageAlignment,
+                    scrollToggleImageAlignment = scrollToggleImageAlignment
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -228,6 +246,8 @@ class SettingsRepositoryImpl(
                 preferences[ALLOW_OVERLAPPING_GESTURES] = settings.allowOverlappingGestures
                 preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
                 preferences[USE_CUSTOM_CURSOR_ICON] = settings.useCustomCursorIcon
+                preferences[CURSOR_IMAGE_ALIGNMENT] = settings.cursorImageAlignment.name
+                preferences[SCROLL_TOGGLE_IMAGE_ALIGNMENT] = settings.scrollToggleImageAlignment.name
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

@@ -54,6 +54,7 @@ import androidx.datastore.core.IOException
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.Dispatchers
@@ -305,7 +306,6 @@ fun CursorSettingsScreen(
                 )
 
                 ClearKeyPreferenceItem(
-                    isEnabled = true,
                     mode = "standard cursor",
                     onClearKey = {
                         viewModel.requestHideAllOverlays()
@@ -508,6 +508,26 @@ fun CursorSettingsScreen(
                     onClick = { iconPicker.launch(intent) },
                     enabled = uiState.useCustomCursorIcon
                 )
+                DropdownPreferenceItem(
+                    title = "Cursor Icon Alignment",
+                    subtitle =
+                    when (uiState.cursorImageAlignment) {
+                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
+                        IconAlignment.CENTER -> "Align to center of icon"
+                    },
+                    selectedOption = uiState.cursorImageAlignment,
+                    options =
+                    listOf(
+                        IconAlignment.TOP_LEFT to "Top left",
+                        IconAlignment.CENTER to "Center"
+                    ),
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(cursorImageAlignment = v)
+                        }
+                    },
+                    enabled = uiState.useCustomCursorIcon
+                )
                 SimplePreferenceItem(
                     title = "Clear Cursor Icon",
                     subtitle = "Fallback to default icon",
@@ -519,6 +539,26 @@ fun CursorSettingsScreen(
                     title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Scroll Toggle Icon" else "Set Scroll Toggle Icon",
                     subtitle = if (!inToggleControlScheme) "Applies only in D-pad and numpad control schemes" else "Supported formats: png, gif, jpg, bmp, webp",
                     onClick = { scrollToggleIconPicker.launch(intent) },
+                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
+                )
+                DropdownPreferenceItem(
+                    title = "Scroll Toggle Icon Alignment",
+                    subtitle =
+                    when (uiState.scrollToggleImageAlignment) {
+                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
+                        IconAlignment.CENTER -> "Align to center of icon"
+                    },
+                    selectedOption = uiState.scrollToggleImageAlignment,
+                    options =
+                    listOf(
+                        IconAlignment.TOP_LEFT to "Top left",
+                        IconAlignment.CENTER to "Center"
+                    ),
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(scrollToggleImageAlignment = v)
+                        }
+                    },
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
                 SimplePreferenceItem(
