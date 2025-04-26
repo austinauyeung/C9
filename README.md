@@ -73,7 +73,8 @@ The grid cursor trades precision for efficiency, taking advantage of the fact th
 | Tap | Click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Double Tap | Double click D-pad center. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False ||
 | Scroll | Click D-pad directions. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly unless `C9 > Developer Options > Overlapping Gestures` is enabled. |
-| Zoom | Click star (*) and numpad 0. Hold for continuous scrolling. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | Zoom distance is not currently user-configurable. |
+| Zoom | Click star (*) and numpad 0. Hold for continuous zooming. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | Zoom distance is not currently user-configurable. |
+| Zoom Fallback | Double click D-pad center and hold, followed by a D-pad up or down scroll gesture. | If a number is first held, the center of its cell in the current grid. Else, center of the screen. | False | This corresonds to a one-finger zoom, with a zoom distance determined by `C9 > Scroll Distance`. |
 
 ### Standard Cursor
 
@@ -98,8 +99,9 @@ All gestures are dispatched at the tip of the cursor's current location.
 | Double Tap | Double click D-pad center or numpad 5. ||
 | Long Press/Drag | Hold D-pad center or numpad 5 to long press, then move cursor to drag. Release D-pad center or numpad 5 to end the gesture. | If `C9 > Auto-Hide Cursor in Text Fields` is enabled, the cursor needs to be manually restored in order to begin a long press/drag. |
 | Scroll | Click D-pad directions or numpad 2/4/6/8 (depends on control scheme). Hold for continuous scrolling. | These buttons rotate with the screen if `C9 > Rotate Buttons With Orientation` is enabled.<br /><br />Only one scroll gesture will be dispatched at at time even if the button is press repeatedly unless `C9 > Developer Options > Overlapping Gestures` is enabled. |
-| Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
 | Toggle Move/Scroll | Press the internal activation key or use a button mapper to map the "Toggle Cursor Scroll" shortcut. | This only applies to the control schemes `D-pad` and `Numpad`. |
+| Zoom | Numpad 1 and 3. Hold for continuous zooming. | Zoom distance is not currently user-configurable. |
+| Zoom Fallback | Double click D-pad center and hold, followed by a D-pad up or down move gesture. | This corresonds to a one-finger zoom, with a zoom distance determined by how much the cursor moves up or down. |
 
 ### Recommendations
 - For precise clicks, you can use a) grid cursor mode or b) standard cursor with a low cursor speed and high cursor acceleration.
@@ -115,7 +117,7 @@ All gestures are dispatched at the tip of the cursor's current location.
   - The top left of the file corresponds to the cursor's position. A tight crop is recommended.
   - Cursor performance may be impacted by file size and cursor size. If you are experiencing performance issues, try a smaller cursor size and/or compressing the file.
   - Because the file is scaled to fit within a square box, a 1:1 aspect ratio would fit the best, but other aspect ratios can be compensated for by adjusting the cursor size.
-
+- The zoom fallback gestures can be used if an application does not interpret a regular zoom gesture correctly.
 
 ## Settings
 The following settings and `values` are available.
