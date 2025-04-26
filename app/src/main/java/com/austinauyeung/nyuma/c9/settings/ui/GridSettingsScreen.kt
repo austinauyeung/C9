@@ -114,7 +114,6 @@ fun GridSettingsScreen(
                 )
 
                 ClearKeyPreferenceItem(
-                    isEnabled = true,
                     mode = "grid cursor",
                     onClearKey = {
                         viewModel.requestHideAllOverlays()

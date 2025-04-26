@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -26,6 +22,7 @@ import coil3.request.ImageRequest
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
+import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import java.io.File
 import kotlin.math.atan2
@@ -66,8 +63,6 @@ fun CursorOverlay(
 //    var customImageLoaded by remember { mutableStateOf(false) }
     val position = cursorState.position
     val density = LocalDensity.current
-    val offsetX = with(density) { position.x.toDp() }
-    val offsetY = with(density) { position.y.toDp() }
 
     val context = LocalContext.current
     Box(modifier = modifier
@@ -100,9 +95,9 @@ fun CursorOverlay(
                     modifier = Modifier
                         .size(cursorSize.dp)
                         .offset(
-                            x = offsetX,
-                            y = offsetY
-                        ),
+                            x = with(density) { position.x.toDp() } - if (settings?.cursorImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.cursorImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
+                        )
 //                onSuccess = {
 //                    Logger.d("Successfully loaded custom cursor image")
 //                    customImageLoaded = true
@@ -122,8 +117,8 @@ fun CursorOverlay(
                     modifier = Modifier
                         .size(cursorSize.dp)
                         .offset(
-                            x = offsetX,
-                            y = offsetY
+                            x = with(density) { position.x.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
                         )
                 )
             }

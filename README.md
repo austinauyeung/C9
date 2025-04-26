@@ -143,8 +143,10 @@ The following settings and `values` are available.
 | | Match Border to Body | `On`: Cursor border is set to cursor body color except with `100%`.<br />`Off`: Cursor border is set to black. |
 | | Custom Cursor Icons | `On`: Enables user to set custom icons.<br />`Off`: Cursor icon is set to the default icon. |
 | | Change Cursor Icon | Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Cursor Icon Alignment | `Top left`: Cursor is aligned to the top-left of the cursor icon.<br />`Center`: Cursor is aligned to the center of the cursor icon. |
 | | Clear Cursor Icon | Deletes the saved file from the application and falls back to the default cursor icon. |
 | | Change Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Opens system picker for file selection and saves the selected file inside the application. Supported formats include png, gif, jpg/jpeg, bmp, and webp. See [Recommendations](#recommendations) for more information. |
+| | Scroll Toggle Icon Alignment | `Top left`: Cursor is aligned to the top-left of the scroll toggle icon.<br />`Center`: Cursor is aligned to the center of the scroll toggle icon. |
 | | Clear Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Deletes the saved file from the application and falls back to the default screen border indicator. |
 | Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
 | | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |

@@ -7,6 +7,7 @@ import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
 /**
@@ -53,5 +54,7 @@ object Defaults {
         val CURSOR_IMAGE_PATH = null
         val SCROLL_TOGGLE_IMAGE_PATH = null
         const val USE_CUSTOM_CURSOR_ICON = false
+        val CURSOR_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
+        val SCROLL_TOGGLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
     }
 }
