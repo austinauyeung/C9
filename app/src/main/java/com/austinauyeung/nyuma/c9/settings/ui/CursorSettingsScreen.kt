@@ -10,6 +10,8 @@ import android.provider.MediaStore
 import android.view.KeyEvent
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,6 +59,7 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -82,19 +85,7 @@ fun CursorSettingsScreen(
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Intent(MediaStore.ACTION_PICK_IMAGES).apply {
-            type = "image/*"
-            putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 1)
-        }
-    } else {
-        Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "image/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }
-    }
 
-    // Can make more DRY
     val clearIcon = {
         viewModel.updatePreference(null) { settings, v ->
             settings.copy(cursorImagePath = v)
@@ -106,59 +97,25 @@ fun CursorSettingsScreen(
         }
     }
 
-    fun clearImage(
-        imagePath: String?,
-        updateSetting: () -> Unit
-    ) {
-        if (!imagePath.isNullOrEmpty()) {
-            val file = File(imagePath)
-            if (file.exists()) {
-                file.delete()
-                Logger.d("Custom icon deleted")
-            }
+    val cursorImagePicker = rememberUnifiedImagePickerLauncher(
+        coroutineScope = coroutineScope,
+        context = context,
+        oldPath = uiState.cursorImagePath,
+        onCleared = clearIcon,
+        updatePreference = { path ->
+            viewModel.updatePreference(path) { settings, v -> settings.copy(cursorImagePath = v) }
         }
-        updateSetting()
-    }
+    )
 
-    val iconPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                coroutineScope.launch {
-                    try {
-                        clearImage(uiState.cursorImagePath, clearIcon)
-                        val savedImagePath = saveImageToAppStorage(context, uri)
-                        viewModel.updatePreference(savedImagePath) { settings, v ->
-                            settings.copy(cursorImagePath = v)
-                        }
-                    } catch (e: Exception) {
-                        Logger.e("Failed to process cursor image", e)
-                    }
-                }
-            }
+    val scrollToggleImagePicker = rememberUnifiedImagePickerLauncher(
+        coroutineScope = coroutineScope,
+        context = context,
+        oldPath = uiState.scrollToggleImagePath,
+        onCleared = clearScrollToggleIcon,
+        updatePreference = { path ->
+            viewModel.updatePreference(path) { settings, v -> settings.copy(scrollToggleImagePath = v) }
         }
-    }
-
-    val scrollToggleIconPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                coroutineScope.launch {
-                    try {
-                        clearImage(uiState.scrollToggleImagePath, clearScrollToggleIcon)
-                        val savedImagePath = saveImageToAppStorage(context, uri)
-                        viewModel.updatePreference(savedImagePath) { settings, v ->
-                            settings.copy(scrollToggleImagePath = v)
-                        }
-                    } catch (e: Exception) {
-                        Logger.e("Failed to process cursor image", e)
-                    }
-                }
-            }
-        }
-    }
+    )
 
     when (uiState.controlScheme) {
         ControlScheme.STANDARD -> {
@@ -505,7 +462,7 @@ fun CursorSettingsScreen(
                 SimplePreferenceItem(
                     title = if (!uiState.cursorImagePath.isNullOrEmpty() && File(uiState.cursorImagePath!!).exists() ) "Change Cursor Icon" else "Set Cursor Icon",
                     subtitle = "Supported formats: png, gif, jpg, bmp, webp",
-                    onClick = { iconPicker.launch(intent) },
+                    onClick = { cursorImagePicker.launch(context) },
                     enabled = uiState.useCustomCursorIcon
                 )
                 DropdownPreferenceItem(
@@ -538,7 +495,7 @@ fun CursorSettingsScreen(
                 SimplePreferenceItem(
                     title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Scroll Toggle Icon" else "Set Scroll Toggle Icon",
                     subtitle = if (!inToggleControlScheme) "Applies only in D-pad and numpad control schemes" else "Supported formats: png, gif, jpg, bmp, webp",
-                    onClick = { scrollToggleIconPicker.launch(intent) },
+                    onClick = { scrollToggleImagePicker.launch(context) },
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
                 DropdownPreferenceItem(
@@ -689,6 +646,26 @@ fun ColorPickerDialog(
     )
 }
 
+fun clearImage(imagePath: String?, onCleared: () -> Unit) {
+    imagePath?.takeIf { it.isNotEmpty() }?.let { path ->
+        File(path).takeIf { it.exists() }?.delete()
+        Logger.d("Custom icon deleted")
+    }
+    onCleared()
+}
+
+suspend fun savePickedImage(
+    context: Context,
+    uri: Uri,
+    oldPath: String?,
+    onCleared: () -> Unit,
+    updatePreference: (String) -> Unit
+) {
+    clearImage(oldPath, onCleared)
+    val savedImagePath = saveImageToAppStorage(context, uri)
+    updatePreference(savedImagePath)
+}
+
 suspend fun saveImageToAppStorage(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
     val mimeType = context.contentResolver.getType(uri)
 
@@ -719,4 +696,92 @@ suspend fun saveImageToAppStorage(context: Context, uri: Uri): String = withCont
     }
 
     return@withContext file.absolutePath
+}
+
+@Composable
+fun rememberUnifiedImagePickerLauncher(
+    coroutineScope: CoroutineScope,
+    context: Context,
+    oldPath: String?,
+    onCleared: () -> Unit,
+    updatePreference: (String) -> Unit
+): UnifiedImagePickerLauncher {
+    val intentLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                coroutineScope.launch {
+                    try {
+                        savePickedImage(context, uri, oldPath, onCleared, updatePreference)
+                    } catch (e: Exception) {
+                        Logger.e("Failed to process picked image (Intent)", e)
+                    }
+                }
+            }
+        }
+    }
+
+    val pickVisualMediaLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            coroutineScope.launch {
+                try {
+                    savePickedImage(context, it, oldPath, onCleared, updatePreference)
+                } catch (e: Exception) {
+                    Logger.e("Failed to process picked image (PickVisualMedia)", e)
+                }
+            }
+        }
+    }
+
+    return remember(intentLauncher, pickVisualMediaLauncher) {
+        UnifiedImagePickerLauncher(intentLauncher, pickVisualMediaLauncher)
+    }
+}
+
+class UnifiedImagePickerLauncher(
+    private val intentLauncher: ActivityResultLauncher<Intent>,
+    private val pickVisualMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
+) {
+    fun launch(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            try {
+                Logger.d("Launching PickVisualMedia")
+                pickVisualMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                return
+            } catch (e: Exception) {
+                Logger.e("PickVisualMedia launch failed, falling back to Intent", e)
+            }
+        }
+
+        val intents = listOf(
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                type = "image/*"
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 1)
+            },
+            Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            },
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+                type = "image/*"
+            }
+        )
+
+        for (intent in intents) {
+            try {
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    Logger.d("Launching fallback intent: $intent")
+                    intentLauncher.launch(intent)
+                    return
+                }
+            } catch (e: Exception) {
+                Logger.e("Failed to launch fallback intent", e)
+            }
+        }
+
+        Logger.e("No available image pickers found")
+    }
 }
