@@ -130,7 +130,7 @@ data class OverlaySettings(
                 CursorConstants.MAX_ACCELERATION,
                 CursorConstants.MAX_ACCELERATION
             ),
-            cursorSize = cursorSpeed.coerceIn(CursorConstants.MIN_SIZE, CursorConstants.MAX_SIZE),
+            cursorSize = cursorSize.coerceIn(CursorConstants.MIN_SIZE, CursorConstants.MAX_SIZE),
             gridActivationKey = if (isValidRemappableKey(gridActivationKey)) gridActivationKey else KEY_NONE,
             cursorActivationKey = if (isValidRemappableKey(cursorActivationKey)) cursorActivationKey else KEY_NONE,
             continuousScrollDuration = continuousScrollDuration.coerceIn(

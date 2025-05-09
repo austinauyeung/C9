@@ -50,13 +50,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
-import kotlin.math.round
 
 /**
  * Main settings screen.

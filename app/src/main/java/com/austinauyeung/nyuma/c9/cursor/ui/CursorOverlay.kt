@@ -98,6 +98,7 @@ fun CursorOverlay(
                             x = with(density) { position.x.toDp() } - if (settings?.cursorImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
                             y = with(density) { position.y.toDp() } - if (settings?.cursorImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
                         )
+//                        .border(1.dp, Color.Black)
 //                onSuccess = {
 //                    Logger.d("Successfully loaded custom cursor image")
 //                    customImageLoaded = true
