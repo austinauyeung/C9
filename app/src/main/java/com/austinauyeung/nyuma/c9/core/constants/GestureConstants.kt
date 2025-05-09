@@ -6,23 +6,25 @@ object GestureConstants {
     const val DRAG_SEGMENT_DURATION = 10L
     private const val FRAMES_PER_SECOND = 60
     private const val FRAME_DURATION_MS = 1000f / FRAMES_PER_SECOND
-
-    const val MIN_GESTURE_DURATION = 100L
-    const val MAX_GESTURE_DURATION = 500L
-    const val DEFAULT_GESTURE_DURATION = 300L
     const val GESTURE_PAUSE = 50L
-    const val SLOW_SCROLL_DURATION = 150L
 
     // Scroll
     const val MIN_SCROLL_MULTIPLIER = 0.1f
-    const val MAX_SCROLL_MULTIPLIER = 0.8f
+    const val MAX_SCROLL_MULTIPLIER = 1.0f
     const val DEFAULT_SCROLL_MULTIPLIER = 0.3f
     const val USE_NATURAL_SCROLLING = false
     const val SLOW_SCROLL_MULTIPLIER = 0.1f
+    const val SLOW_SCROLL_DURATION = 150L
+    const val MIN_SCROLL_DURATION = 100L
+    const val MAX_SCROLL_DURATION = 500L
+    const val DEFAULT_SCROLL_DURATION = 300L
 
     // Zoom
     const val ZOOM_DISTANCE_FACTOR = 0.2f
     const val ZOOM_DISTANCE_OFFSET = ZOOM_DISTANCE_FACTOR / 3
+    const val MIN_ZOOM_DURATION = 100L
+    const val MAX_ZOOM_DURATION = 500L
+    const val DEFAULT_ZOOM_DURATION = 300L
 
     // Visualization
     const val SHOW_GESTURE_VISUAL = true

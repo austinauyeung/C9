@@ -259,7 +259,7 @@ class GridActionHandler(
                     continuousGestureJob = launchContinuousGesture(
                         backgroundScope = backgroundScope,
                         gestureManager = gestureManager,
-                        initialDelay = settings.gestureDuration,
+                        initialDelay = settings.scrollDuration,
                         condition = { currentScrollDirection == direction },
                         action = { gestureManager.performScroll(direction, startX = x, startY = y, forceFixedGesture = true) }
                     )
@@ -299,7 +299,7 @@ class GridActionHandler(
                 continuousGestureJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = settings.gestureDuration,
+                    initialDelay = settings.zoomDuration,
                     condition = { currentZoomDirection == isZoomIn },
                     action = { gestureManager.performZoom(isZoomIn, x, y, forceFixedGesture = true) }
                 )

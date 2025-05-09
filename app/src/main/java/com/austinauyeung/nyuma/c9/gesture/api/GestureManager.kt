@@ -108,7 +108,7 @@ class GestureManager(
         direction: ScrollDirection,
         startX: Float = dimensionsFlow.value.width / 2f,
         startY: Float = dimensionsFlow.value.height / 2f,
-        duration: Long = settingsFlow.value.gestureDuration,
+        duration: Long = settingsFlow.value.scrollDuration,
         useNaturalScrolling: Boolean = settingsFlow.value.useNaturalScrolling,
         forceFixedGesture: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
@@ -119,7 +119,7 @@ class GestureManager(
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settings.gestureDuration * 3
+            val timeoutDuration = settings.scrollDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
@@ -184,7 +184,7 @@ class GestureManager(
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settings.gestureDuration * 3
+            val timeoutDuration = settings.zoomDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
@@ -357,7 +357,7 @@ class GestureManager(
             gestureId = gestureId1,
             startPosition = Offset(finger1StartX, finger1StartY),
             endPosition = Offset(finger1EndX, finger1EndY),
-            duration = settings.gestureDuration,
+            duration = settings.zoomDuration,
             type = GestureType.ZOOM_FINGER1,
             pathsFlow = _gesturePaths,
             coroutineScope = serviceScope
@@ -367,7 +367,7 @@ class GestureManager(
             gestureId = gestureId2,
             startPosition = Offset(finger2StartX, finger2StartY),
             endPosition = Offset(finger2EndX, finger2EndY),
-            duration = settings.gestureDuration,
+            duration = settings.zoomDuration,
             type = GestureType.ZOOM_FINGER2,
             pathsFlow = _gesturePaths,
             coroutineScope = serviceScope

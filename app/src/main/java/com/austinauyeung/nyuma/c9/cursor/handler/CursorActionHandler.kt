@@ -370,7 +370,7 @@ class CursorActionHandler(
                     continuousGestureJob = launchContinuousGesture(
                         backgroundScope = backgroundScope,
                         gestureManager = gestureManager,
-                        initialDelay = settings.gestureDuration,
+                        initialDelay = settings.scrollDuration,
                         condition = { currentScrollDirection == direction },
                         action = { performScroll(direction, true) }
                     )
@@ -404,7 +404,7 @@ class CursorActionHandler(
                 continuousGestureJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = settings.gestureDuration,
+                    initialDelay = settings.zoomDuration,
                     condition = { currentZoomDirection == isZoomIn },
                     action = { performZoom(isZoomIn, true) }
                 )
@@ -501,7 +501,7 @@ class CursorActionHandler(
                 slowScrollJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = settings.gestureDuration,
+                    initialDelay = settings.scrollDuration,
                     condition = { currentScreenEdge != ScreenEdge.NONE },
                     action = {
                         performSlowScroll(

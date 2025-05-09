@@ -68,7 +68,10 @@ fun SettingsScreen(
     onNavigateToGridSettings: () -> Unit,
     onNavigateToCursorSettings: () -> Unit,
     onNavigateToDebugOptions: () -> Unit,
-    onNavigateToAutoHideSettings: () -> Unit
+    onNavigateToAutoHideSettings: () -> Unit,
+    onNavigateToCommonGestureSettings: () -> Unit,
+    onNavigateToScrollSettings: () -> Unit,
+    onNavigateToZoomSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -185,90 +188,22 @@ fun SettingsScreen(
             }
 
             PreferenceCategory(title = "Gestures") {
-                SwitchPreferenceItem(
-                    title = "Natural Scrolling",
-                    subtitle = "Use content-based scrolling instead of standard scrolling",
-                    checked = uiState.useNaturalScrolling,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(useNaturalScrolling = v)
-                        }
-                    }
+                SimplePreferenceItem(
+                    title = "Common Gesture Settings",
+                    subtitle = "Applies to both scrolls and zooms",
+                    onClick = onNavigateToCommonGestureSettings
                 )
 
-                DropdownPreferenceItem(
-                    title = "Gesture Style",
-                    subtitle =
-                    when (uiState.gestureStyle) {
-                        GestureStyle.FIXED -> "Fixed distance, implementation 1"
-                        GestureStyle.FIXED_2 -> "Fixed distance, implementation 2"
-                        GestureStyle.INERTIA -> "Momentum-based"
-                    },
-                    selectedOption = uiState.gestureStyle,
-                    options = if (!uiState.enableShizukuIntegration) listOf(
-                        GestureStyle.FIXED to "Fixed 1",
-                        GestureStyle.FIXED_2 to "Fixed 2",
-                        GestureStyle.INERTIA to "Inertia",
-                    ) else listOf(
-                        GestureStyle.FIXED to "Fixed 1",
-                        GestureStyle.INERTIA to "Inertia",
-                    ),
-                    onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(gestureStyle = v)
-                        }
-                    },
+                SimplePreferenceItem(
+                    title = "Scroll Settings",
+                    subtitle = "Settings specific to scrolling",
+                    onClick = onNavigateToScrollSettings
                 )
 
-                SliderPreferenceItem(
-                    title = "Gesture Duration",
-                    value = uiState.gestureDuration.toFloat(),
-                    valueRange = GestureConstants.MIN_GESTURE_DURATION.toFloat()..GestureConstants.MAX_GESTURE_DURATION.toFloat(),
-                    valueText = "${uiState.gestureDuration} ms",
-                    onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(gestureDuration = v.toLong())
-                        }
-                    },
-                    steps = 3,
-                )
-
-                SliderPreferenceItem(
-                    title = "Scroll Distance",
-                    value = uiState.scrollMultiplier,
-                    valueRange = GestureConstants.MIN_SCROLL_MULTIPLIER..GestureConstants.MAX_SCROLL_MULTIPLIER,
-                    valueText = "${round(uiState.scrollMultiplier * 100).toInt()}% of axis at most",
-                    onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(scrollMultiplier = v)
-                        }
-                    },
-                    steps = 6,
-                )
-
-                SwitchPreferenceItem(
-                    title = "Gesture Visualization",
-                    subtitle = "Show gestures on screen",
-                    checked = uiState.showGestureVisualization,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(showGestureVisualization = v)
-                        }
-                    },
-                )
-
-                SliderPreferenceItem(
-                    title = "Gesture Visualization Size",
-                    value = uiState.visualSize.toFloat(),
-                    valueRange = GestureConstants.MIN_SIZE.toFloat()..GestureConstants.MAX_SIZE.toFloat(),
-                    valueText = uiState.visualSize.toString(),
-                    onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(visualSize = v.toInt())
-                        }
-                    },
-                    steps = 8,
-                    enabled = uiState.showGestureVisualization
+                SimplePreferenceItem(
+                    title = "Zoom Settings",
+                    subtitle = "Settings specific to zoom",
+                    onClick = onNavigateToZoomSettings
                 )
             }
 

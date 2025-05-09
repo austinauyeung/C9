@@ -37,8 +37,9 @@ object Defaults {
         val CONTROL_SCHEME = ControlScheme.STANDARD
         val GESTURE_STYLE = GestureStyle.FIXED
         const val TOGGLE_HOLD = CursorConstants.TOGGLE_HOLD
-        const val GESTURE_DURATION = GestureConstants.DEFAULT_GESTURE_DURATION
+        const val SCROLL_DURATION = GestureConstants.DEFAULT_SCROLL_DURATION
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
+        const val ZOOM_DURATION = GestureConstants.DEFAULT_ZOOM_DURATION
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
         const val HIDE_ON_KEYBOARD_OPEN = false
