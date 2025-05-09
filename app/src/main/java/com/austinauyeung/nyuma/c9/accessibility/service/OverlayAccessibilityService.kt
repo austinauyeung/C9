@@ -283,7 +283,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                         checkLockScreenVisibility()
                     }
 
-                    onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState)
+                    onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState, lastKeyboardState)
                 }
             }
         }
@@ -345,11 +345,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
-    private fun onAutoHideConditionChanged(visible: Boolean) {
+    private fun onAutoHideConditionChanged(visible: Boolean, force: Boolean = false) {
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
-            if (visible && !hidingCursor) {
+            if ((visible && !hidingCursor) || force) {
                 Logger.d("Auto-hide condition changed: hiding cursor")
                 autoHideCursor()
             } else if (!visible && hidingCursor) {
