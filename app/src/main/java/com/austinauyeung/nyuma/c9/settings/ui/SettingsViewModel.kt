@@ -90,7 +90,16 @@ class SettingsViewModel(
                             scrollToggleImagePath = settings.scrollToggleImagePath,
                             useCustomCursorIcon = settings.useCustomCursorIcon,
                             cursorImageAlignment = settings.cursorImageAlignment,
-                            scrollToggleImageAlignment = settings.scrollToggleImageAlignment
+                            scrollToggleImageAlignment = settings.scrollToggleImageAlignment,
+                            useAdvancedScrolling = settings.useAdvancedScrolling,
+                            continuousScrollDuration = settings.continuousScrollDuration,
+                            continuousScrollMultiplier = settings.continuousScrollMultiplier,
+                            continuousScrollAccelerationStart = settings.continuousScrollAccelerationStart,
+                            continuousScrollAccelerationDuration = settings.continuousScrollAccelerationDuration,
+                            edgeScrollDuration = settings.edgeScrollDuration,
+                            edgeScrollMultiplier = settings.edgeScrollMultiplier,
+                            edgeScrollAccelerationStart = settings.edgeScrollAccelerationStart,
+                            edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
                         )
                     }
                 }
@@ -163,7 +172,16 @@ class SettingsViewModel(
             scrollToggleImagePath = _uiState.value.scrollToggleImagePath,
             useCustomCursorIcon = _uiState.value.useCustomCursorIcon,
             cursorImageAlignment = _uiState.value.cursorImageAlignment,
-            scrollToggleImageAlignment = _uiState.value.scrollToggleImageAlignment
+            scrollToggleImageAlignment = _uiState.value.scrollToggleImageAlignment,
+            useAdvancedScrolling = _uiState.value.useAdvancedScrolling,
+            continuousScrollDuration = _uiState.value.continuousScrollDuration,
+            continuousScrollMultiplier = _uiState.value.continuousScrollMultiplier,
+            continuousScrollAccelerationStart = _uiState.value.continuousScrollAccelerationStart,
+            continuousScrollAccelerationDuration = _uiState.value.continuousScrollAccelerationDuration,
+            edgeScrollDuration = _uiState.value.edgeScrollDuration,
+            edgeScrollMultiplier = _uiState.value.edgeScrollMultiplier,
+            edgeScrollAccelerationStart = _uiState.value.edgeScrollAccelerationStart,
+            edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
         )
     }
 
@@ -254,5 +272,14 @@ data class SettingsUiState(
     val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
     val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON,
     val cursorImageAlignment: IconAlignment = Defaults.Settings.CURSOR_IMAGE_ALIGNMENT,
-    val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT
+    val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT,
+    val useAdvancedScrolling: Boolean = Defaults.Settings.USE_ADVANCED_SCROLLING,
+    val continuousScrollDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_DURATION,
+    val continuousScrollMultiplier: Float = Defaults.Settings.CONTINUOUS_SCROLL_MULTIPLIER,
+    val continuousScrollAccelerationStart: Long = Defaults.Settings.CONTINUOUS_SCROLL_ACCELERATION_START,
+    val continuousScrollAccelerationDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_ACCELERATION_DURATION,
+    val edgeScrollDuration: Long = Defaults.Settings.EDGE_SCROLL_DURATION,
+    val edgeScrollMultiplier: Float = Defaults.Settings.EDGE_SCROLL_MULTIPLIER,
+    val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
+    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION
 )

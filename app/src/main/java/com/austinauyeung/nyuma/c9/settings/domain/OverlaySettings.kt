@@ -4,6 +4,7 @@ import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -51,7 +52,16 @@ data class OverlaySettings(
     val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
     val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON,
     val cursorImageAlignment: IconAlignment = Defaults.Settings.CURSOR_IMAGE_ALIGNMENT,
-    val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT
+    val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT,
+    val useAdvancedScrolling: Boolean = Defaults.Settings.USE_ADVANCED_SCROLLING,
+    val continuousScrollDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_DURATION,
+    val continuousScrollMultiplier: Float = Defaults.Settings.CONTINUOUS_SCROLL_MULTIPLIER,
+    val continuousScrollAccelerationStart: Long = Defaults.Settings.CONTINUOUS_SCROLL_ACCELERATION_START,
+    val continuousScrollAccelerationDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_ACCELERATION_DURATION,
+    val edgeScrollDuration: Long = Defaults.Settings.EDGE_SCROLL_DURATION,
+    val edgeScrollMultiplier: Float = Defaults.Settings.EDGE_SCROLL_MULTIPLIER,
+    val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
+    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION
 ) {
     companion object {
         val DEFAULT = OverlaySettings()
@@ -84,6 +94,22 @@ data class OverlaySettings(
                 ) {
                     add("Grid and cursor activation keys must be different")
                 }
+
+                if (continuousScrollDuration > scrollDuration) {
+                    add("For acceleration, continuous scroll duration should be less than scroll duration")
+                }
+
+                if (continuousScrollMultiplier < scrollMultiplier) {
+                    add("For acceleration, continuous scroll multiplier should be greater than scroll multiplier")
+                }
+
+                if (edgeScrollDuration < scrollDuration) {
+                    add("For deceleration, edge scroll duration should be greater than scroll duration")
+                }
+
+                if (edgeScrollMultiplier > scrollMultiplier) {
+                    add("For deceleration, edge scroll multiplier should be less than scroll multiplier")
+                }
             }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -107,6 +133,22 @@ data class OverlaySettings(
             cursorSize = cursorSpeed.coerceIn(CursorConstants.MIN_SIZE, CursorConstants.MAX_SIZE),
             gridActivationKey = if (isValidRemappableKey(gridActivationKey)) gridActivationKey else KEY_NONE,
             cursorActivationKey = if (isValidRemappableKey(cursorActivationKey)) cursorActivationKey else KEY_NONE,
+            continuousScrollDuration = continuousScrollDuration.coerceIn(
+                GestureConstants.MIN_SCROLL_DURATION,
+                scrollDuration
+            ),
+            continuousScrollMultiplier = continuousScrollMultiplier.coerceIn(
+                scrollMultiplier,
+                GestureConstants.MAX_SCROLL_MULTIPLIER
+            ),
+            edgeScrollDuration = edgeScrollDuration.coerceIn(
+                scrollDuration,
+                GestureConstants.MAX_SCROLL_DURATION
+            ),
+            edgeScrollMultiplier = edgeScrollMultiplier.coerceIn(
+                GestureConstants.MIN_SCROLL_MULTIPLIER,
+                scrollMultiplier
+            )
         )
     }
 

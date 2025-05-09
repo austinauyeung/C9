@@ -29,8 +29,8 @@ object Defaults {
         const val CURSOR_SPEED = CursorConstants.DEFAULT_SPEED
         const val CURSOR_ACCELERATION = CursorConstants.DEFAULT_ACCELERATION
         const val CURSOR_SIZE = CursorConstants.DEFAULT_SIZE
-        const val CURSOR_ACCELERATION_START = CursorConstants.DEFAULT_ACCELERATION_START
-        const val CURSOR_ACCELERATION_DURATION = CursorConstants.DEFAULT_ACCELERATION_DURATION
+        const val CURSOR_ACCELERATION_START = GestureConstants.DEFAULT_ACCELERATION_START
+        const val CURSOR_ACCELERATION_DURATION = GestureConstants.DEFAULT_ACCELERATION_DURATION
         const val GRID_ACTIVATION_KEY = KeyEvent.KEYCODE_POUND
         const val CURSOR_ACTIVATION_KEY = KeyEvent.KEYCODE_STAR
         val CURSOR_EDGE_BEHAVIOR = ScreenEdgeBehavior.NONE
@@ -57,5 +57,16 @@ object Defaults {
         const val USE_CUSTOM_CURSOR_ICON = false
         val CURSOR_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         val SCROLL_TOGGLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
+        const val USE_ADVANCED_SCROLLING = false
+
+        const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
+        const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER
+        const val CONTINUOUS_SCROLL_ACCELERATION_START = GestureConstants.DEFAULT_ACCELERATION_START
+        const val CONTINUOUS_SCROLL_ACCELERATION_DURATION = GestureConstants.DEFAULT_ACCELERATION_DURATION
+
+        const val EDGE_SCROLL_DURATION = GestureConstants.MAX_SCROLL_DURATION
+        const val EDGE_SCROLL_MULTIPLIER = GestureConstants.MIN_SCROLL_MULTIPLIER
+        const val EDGE_SCROLL_ACCELERATION_START = GestureConstants.DEFAULT_ACCELERATION_START
+        const val EDGE_SCROLL_ACCELERATION_DURATION = GestureConstants.DEFAULT_ACCELERATION_DURATION
     }
 }

@@ -32,7 +32,7 @@ fun ZoomSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Zoom Settings") },
+                title = { Text("Zoom Options") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(

@@ -32,7 +32,7 @@ fun CommonGestureSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Common Gesture Settings") },
+                title = { Text("Common Gesture Options") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(

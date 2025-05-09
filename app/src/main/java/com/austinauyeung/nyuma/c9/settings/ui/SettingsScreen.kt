@@ -189,19 +189,19 @@ fun SettingsScreen(
 
             PreferenceCategory(title = "Gestures") {
                 SimplePreferenceItem(
-                    title = "Common Gesture Settings",
-                    subtitle = "Applies to both scrolls and zooms",
+                    title = "Common Gesture Options",
+                    subtitle = "Settings that apply to both scrolls and zooms",
                     onClick = onNavigateToCommonGestureSettings
                 )
 
                 SimplePreferenceItem(
-                    title = "Scroll Settings",
+                    title = "Scroll Options",
                     subtitle = "Settings specific to scrolling",
                     onClick = onNavigateToScrollSettings
                 )
 
                 SimplePreferenceItem(
-                    title = "Zoom Settings",
+                    title = "Zoom Options",
                     subtitle = "Settings specific to zoom",
                     onClick = onNavigateToZoomSettings
                 )

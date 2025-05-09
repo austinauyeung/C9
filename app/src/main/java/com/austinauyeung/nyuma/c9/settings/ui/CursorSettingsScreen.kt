@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.core.IOException
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
@@ -67,6 +68,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
 import java.util.UUID
+import kotlin.math.round
 
 /**
  * Standard cursor settings screen.
@@ -345,33 +347,33 @@ fun CursorSettingsScreen(
                     title = "Cursor Acceleration",
                     value = uiState.cursorAcceleration.toFloat(),
                     valueRange = CursorConstants.MIN_ACCELERATION.toFloat()..CursorConstants.MAX_ACCELERATION.toFloat(),
-                    valueText = "${uiState.cursorAcceleration}${if (uiState.cursorAcceleration == 1) " (no acceleration)" else ""}",
+                    valueText = "${uiState.cursorAcceleration}${if (uiState.cursorAcceleration == 0) " (no acceleration)" else ""}",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
                             settings.copy(cursorAcceleration = v.toInt())
                         }
                     },
-                    steps = 8,
+                    steps = 9,
                 )
 
                 SliderPreferenceItem(
                     title = "Cursor Acceleration Start",
                     value = uiState.cursorAccelerationStart.toFloat(),
-                    valueRange = CursorConstants.MIN_ACCELERATION_START.toFloat()..CursorConstants.MAX_ACCELERATION_START.toFloat(),
-                    valueText = "${uiState.cursorAccelerationStart} ms",
+                    valueRange = GestureConstants.MIN_ACCELERATION_START.toFloat()..GestureConstants.MAX_ACCELERATION_START.toFloat(),
+                    valueText = "${round(uiState.cursorAccelerationStart / 100.0).toInt() * 100} ms",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
                             settings.copy(cursorAccelerationStart = v.toLong())
                         }
                     },
-                    steps = 8,
+                    steps = 9,
                 )
 
                 SliderPreferenceItem(
                     title = "Cursor Acceleration Duration",
                     value = uiState.cursorAccelerationDuration.toFloat(),
-                    valueRange = CursorConstants.MIN_ACCELERATION_DURATION.toFloat()..CursorConstants.MAX_ACCELERATION_DURATION.toFloat(),
-                    valueText = "${uiState.cursorAccelerationDuration} ms",
+                    valueRange = GestureConstants.MIN_ACCELERATION_DURATION.toFloat()..GestureConstants.MAX_ACCELERATION_DURATION.toFloat(),
+                    valueText = "${round(uiState.cursorAccelerationDuration / 100.0).toInt() * 100} ms",
                     onValueChange = { value ->
                         viewModel.updatePreference(value) { settings, v ->
                             settings.copy(cursorAccelerationDuration = v.toLong())

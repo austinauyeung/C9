@@ -5,6 +5,8 @@ import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
+import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGesture
@@ -38,6 +40,7 @@ class GridActionHandler(
 
     private var currentScrollDirection: ScrollDirection? = null
     private var currentZoomDirection: Boolean? = null
+    private var lastScrollTime: Long? = null
 
     private fun cancelActivationJob() {
         activationJob?.cancel()
@@ -49,6 +52,7 @@ class GridActionHandler(
         currentZoomDirection = null
         continuousGestureJob?.cancel()
         continuousGestureJob = null
+        lastScrollTime = null
     }
 
     fun cleanup() {
@@ -253,7 +257,7 @@ class GridActionHandler(
                 if (direction != null) {
                     currentScrollDirection = direction
                     backgroundScope.launch {
-                        gestureManager.performScroll(direction, startX = x, startY = y)
+                        performScroll(direction, startX = x, startY = y)
                     }
 
                     continuousGestureJob = launchContinuousGesture(
@@ -261,7 +265,7 @@ class GridActionHandler(
                         gestureManager = gestureManager,
                         initialDelay = settings.scrollDuration,
                         condition = { currentScrollDirection == direction },
-                        action = { gestureManager.performScroll(direction, startX = x, startY = y, forceFixedGesture = true) }
+                        action = { performScroll(direction, startX = x, startY = y, forceFixedGesture = true) }
                     )
                 }
             }
@@ -271,6 +275,36 @@ class GridActionHandler(
             }
         }
 
+        return true
+    }
+
+    private suspend fun performScroll(direction: ScrollDirection, startX: Float, startY: Float, forceFixedGesture: Boolean = false): Boolean {
+        val settings = settingsFlow.value
+
+        if (!settings.useAdvancedScrolling) {
+            gestureManager.performScroll(direction, startX = startX, startY = startY)
+        } else {
+            // Currently, forceFixedGesture = true indicates continuous scrolling
+            if (lastScrollTime == null && forceFixedGesture) {
+                lastScrollTime = System.currentTimeMillis()
+            }
+
+            val currentTime = System.currentTimeMillis()
+            val timeHeld = currentTime - (lastScrollTime ?: currentTime)
+            val startTime = settings.continuousScrollAccelerationStart
+            val endTime = settings.continuousScrollAccelerationStart + settings.continuousScrollAccelerationDuration
+            val normalizedTime = normalizeValue(timeHeld, startTime, endTime)
+            val accelerationFactor = cubicBezier(normalizedTime)
+
+            gestureManager.performScroll(
+                direction,
+                startX = startX,
+                startY = startY,
+                duration = (settings.scrollDuration + accelerationFactor * (settings.continuousScrollDuration - settings.scrollDuration)).toLong(),
+                forceFixedGesture = forceFixedGesture,
+                distanceFactor = settings.scrollMultiplier + accelerationFactor * (settings.continuousScrollMultiplier - settings.scrollMultiplier)
+            )
+        }
         return true
     }
 
@@ -293,7 +327,7 @@ class GridActionHandler(
 
                 currentZoomDirection = isZoomIn
                 backgroundScope.launch {
-                    gestureManager.performZoom(isZoomIn, x, y)
+                    performZoom(isZoomIn, x, y)
                 }
 
                 continuousGestureJob = launchContinuousGesture(
@@ -301,7 +335,7 @@ class GridActionHandler(
                     gestureManager = gestureManager,
                     initialDelay = settings.zoomDuration,
                     condition = { currentZoomDirection == isZoomIn },
-                    action = { gestureManager.performZoom(isZoomIn, x, y, forceFixedGesture = true) }
+                    action = { performZoom(isZoomIn, x, y, forceFixedGesture = true) }
                 )
             }
 
@@ -309,6 +343,15 @@ class GridActionHandler(
                 cancelContinuousGesture()
             }
         }
+        return true
+    }
+
+    private fun performZoom(isZoomIn: Boolean, x: Float, y: Float, forceFixedGesture: Boolean = false): Boolean {
+        val orientation = orientationProvider()
+        backgroundScope.launch {
+            gestureManager.performZoom(isZoomIn, x, y, orientation, forceFixedGesture = forceFixedGesture)
+        }
+
         return true
     }
 
