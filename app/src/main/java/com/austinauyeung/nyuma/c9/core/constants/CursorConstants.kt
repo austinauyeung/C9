@@ -8,16 +8,10 @@ object CursorConstants {
     const val DEFAULT_SPEED_MULTIPLIER = 15
 
     // Accelerated speed
-    const val MIN_ACCELERATION = 1
+    const val MIN_ACCELERATION = 0
     const val MAX_ACCELERATION = 10
     const val DEFAULT_ACCELERATION = 5
     const val DEFAULT_ACCELERATION_MULTIPLIER = 400
-    const val MIN_ACCELERATION_START = 100L
-    const val MAX_ACCELERATION_START = 1000L
-    const val DEFAULT_ACCELERATION_START = 300L
-    const val MIN_ACCELERATION_DURATION = 0L
-    const val MAX_ACCELERATION_DURATION = 1000L
-    const val DEFAULT_ACCELERATION_DURATION = 0L
 
     // Size
     const val MIN_SIZE = 1

@@ -30,6 +30,11 @@ data class ScreenDimensions(
         return smallerDimension * percent
     }
 
+    fun percentOfLargerDimension(percent: Float): Float {
+        val smallerDimension = maxOf(width, height)
+        return smallerDimension * percent
+    }
+
     fun percentOfDimension(vertical: Boolean, percent: Float): Float {
         return percent * if (vertical) height else width
     }

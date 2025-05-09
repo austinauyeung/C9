@@ -46,8 +46,9 @@ class SettingsRepositoryImpl(
         private val CURSOR_EDGE_BEHAVIOR = stringPreferencesKey("cursor_edge_behavior")
         private val GESTURE_STYLE = stringPreferencesKey("gesture_style")
         private val TOGGLE_HOLD = booleanPreferencesKey("toggle_hold")
-        private val GESTURE_DURATION = longPreferencesKey("gesture_duration")
+        private val SCROLL_DURATION = longPreferencesKey("scroll_duration")
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
+        private val ZOOM_DURATION = longPreferencesKey("zoom_duration")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
@@ -65,6 +66,15 @@ class SettingsRepositoryImpl(
         private val USE_CUSTOM_CURSOR_ICON = booleanPreferencesKey("use_custom_cursor_icon")
         private val CURSOR_IMAGE_ALIGNMENT = stringPreferencesKey("cursor_image_alignment")
         private val SCROLL_TOGGLE_IMAGE_ALIGNMENT = stringPreferencesKey("scroll_toggle_image_alignment")
+        private val USE_ADVANCED_SCROLLING = booleanPreferencesKey("use_advanced_scrolling")
+        private val CONTINUOUS_SCROLL_DURATION = longPreferencesKey("continuous_scroll_duration")
+        private val CONTINUOUS_SCROLL_MULTIPLIER = floatPreferencesKey("continuous_scroll_multiplier")
+        private val CONTINUOUS_SCROLL_ACCELERATION_START = longPreferencesKey("continuous_scroll_acceleration_start")
+        private val CONTINUOUS_SCROLL_ACCELERATION_DURATION = longPreferencesKey("continuous_scroll_acceleration_duration")
+        private val EDGE_SCROLL_DURATION = longPreferencesKey("edge_scroll_duration")
+        private val EDGE_SCROLL_MULTIPLIER = floatPreferencesKey("edge_scroll_multiplier")
+        private val EDGE_SCROLL_ACCELERATION_START = longPreferencesKey("edge_scroll_acceleration_start")
+        private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -166,10 +176,12 @@ class SettingsRepositoryImpl(
                     cursorEdgeBehavior = cursorEdgeBehavior,
                     gestureStyle = gestureStyle,
                     toggleHold = preferences[TOGGLE_HOLD] ?: OverlaySettings.DEFAULT.toggleHold,
-                    gestureDuration = preferences[GESTURE_DURATION]
-                        ?: OverlaySettings.DEFAULT.gestureDuration,
+                    scrollDuration = preferences[SCROLL_DURATION]
+                        ?: OverlaySettings.DEFAULT.scrollDuration,
                     scrollMultiplier = preferences[SCROLL_MULTIPLIER]
                         ?: OverlaySettings.DEFAULT.scrollMultiplier,
+                    zoomDuration = preferences[ZOOM_DURATION]
+                        ?: OverlaySettings.DEFAULT.zoomDuration,
                     allowPassthrough = preferences[ALLOW_PASSTHROUGH]
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
@@ -201,7 +213,25 @@ class SettingsRepositoryImpl(
                     useCustomCursorIcon = preferences[USE_CUSTOM_CURSOR_ICON]
                         ?: OverlaySettings.DEFAULT.useCustomCursorIcon,
                     cursorImageAlignment = cursorImageAlignment,
-                    scrollToggleImageAlignment = scrollToggleImageAlignment
+                    scrollToggleImageAlignment = scrollToggleImageAlignment,
+                    useAdvancedScrolling = preferences[USE_ADVANCED_SCROLLING]
+                        ?: OverlaySettings.DEFAULT.useAdvancedScrolling,
+                    continuousScrollDuration = preferences[CONTINUOUS_SCROLL_DURATION]
+                        ?: OverlaySettings.DEFAULT.continuousScrollDuration,
+                    continuousScrollMultiplier = preferences[CONTINUOUS_SCROLL_MULTIPLIER]
+                        ?: OverlaySettings.DEFAULT.continuousScrollMultiplier,
+                    continuousScrollAccelerationStart = preferences[CONTINUOUS_SCROLL_ACCELERATION_START]
+                        ?: OverlaySettings.DEFAULT.continuousScrollAccelerationStart,
+                    continuousScrollAccelerationDuration = preferences[CONTINUOUS_SCROLL_ACCELERATION_DURATION]
+                        ?: OverlaySettings.DEFAULT.continuousScrollAccelerationDuration,
+                    edgeScrollDuration = preferences[EDGE_SCROLL_DURATION]
+                        ?: OverlaySettings.DEFAULT.edgeScrollDuration,
+                    edgeScrollMultiplier = preferences[EDGE_SCROLL_MULTIPLIER]
+                        ?: OverlaySettings.DEFAULT.edgeScrollMultiplier,
+                    edgeScrollAccelerationStart = preferences[EDGE_SCROLL_ACCELERATION_START]
+                        ?: OverlaySettings.DEFAULT.edgeScrollAccelerationStart,
+                    edgeScrollAccelerationDuration = preferences[EDGE_SCROLL_ACCELERATION_DURATION]
+                        ?: OverlaySettings.DEFAULT.edgeScrollAccelerationDuration
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -231,8 +261,9 @@ class SettingsRepositoryImpl(
                 preferences[CURSOR_EDGE_BEHAVIOR] = settings.cursorEdgeBehavior.name
                 preferences[GESTURE_STYLE] = settings.gestureStyle.name
                 preferences[TOGGLE_HOLD] = settings.toggleHold
-                preferences[GESTURE_DURATION] = settings.gestureDuration
+                preferences[SCROLL_DURATION] = settings.scrollDuration
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
+                preferences[ZOOM_DURATION] = settings.zoomDuration
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
@@ -248,6 +279,15 @@ class SettingsRepositoryImpl(
                 preferences[USE_CUSTOM_CURSOR_ICON] = settings.useCustomCursorIcon
                 preferences[CURSOR_IMAGE_ALIGNMENT] = settings.cursorImageAlignment.name
                 preferences[SCROLL_TOGGLE_IMAGE_ALIGNMENT] = settings.scrollToggleImageAlignment.name
+                preferences[USE_ADVANCED_SCROLLING] = settings.useAdvancedScrolling
+                preferences[CONTINUOUS_SCROLL_DURATION] = settings.continuousScrollDuration
+                preferences[CONTINUOUS_SCROLL_MULTIPLIER] = settings.continuousScrollMultiplier
+                preferences[CONTINUOUS_SCROLL_ACCELERATION_START] = settings.continuousScrollAccelerationStart
+                preferences[CONTINUOUS_SCROLL_ACCELERATION_DURATION] = settings.continuousScrollAccelerationDuration
+                preferences[EDGE_SCROLL_DURATION] = settings.edgeScrollDuration
+                preferences[EDGE_SCROLL_MULTIPLIER] = settings.edgeScrollMultiplier
+                preferences[EDGE_SCROLL_ACCELERATION_START] = settings.edgeScrollAccelerationStart
+                preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

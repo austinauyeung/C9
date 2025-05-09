@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
+import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
 import android.os.Bundle
@@ -21,6 +22,12 @@ class SettingsActivity : ComponentActivity() {
     private lateinit var viewModel: SettingsViewModel
     private lateinit var accessibilitySettingsObserver: ContentObserver
 
+    private fun startCustomActivity(context: Context, activityClass: Class<*>) {
+        val intent = Intent(context, activityClass)
+        val options = ActivityOptionsCompat.makeBasic()
+        context.startActivity(intent, options.toBundle())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,26 +47,13 @@ class SettingsActivity : ComponentActivity() {
             C9Theme {
                 SettingsScreen(
                     viewModel = viewModel,
-                    onNavigateToGridSettings = {
-                        val intent = Intent(this, GridSettingsActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
-                    },
-                    onNavigateToCursorSettings = {
-                        val intent = Intent(this, CursorSettingsActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
-                    },
-                    onNavigateToDebugOptions = {
-                        val intent = Intent(this, DebugOptionsActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
-                    },
-                    onNavigateToAutoHideSettings = {
-                        val intent = Intent(this, AutoHideSettingsActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
-                    }
+                    onNavigateToGridSettings = { startCustomActivity(this, GridSettingsActivity::class.java) },
+                    onNavigateToCursorSettings = { startCustomActivity(this, CursorSettingsActivity::class.java) },
+                    onNavigateToDebugOptions = { startCustomActivity(this, DebugOptionsActivity::class.java) },
+                    onNavigateToAutoHideSettings = { startCustomActivity(this, AutoHideSettingsActivity::class.java) },
+                    onNavigateToCommonGestureSettings = { startCustomActivity(this, CommonGestureSettingsActivity::class.java) },
+                    onNavigateToScrollSettings = { startCustomActivity(this, ScrollSettingsActivity::class.java) },
+                    onNavigateToZoomSettings = { startCustomActivity(this, ZoomSettingsActivity::class.java) }
                 )
             }
         }

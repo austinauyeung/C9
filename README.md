@@ -118,6 +118,7 @@ All gestures are dispatched at the tip of the cursor's current location.
   - Cursor performance may be impacted by file size and cursor size. If you are experiencing performance issues, try a smaller cursor size and/or compressing the file.
   - Because the file is scaled to fit within a square box, a 1:1 aspect ratio would fit the best, but other aspect ratios can be compensated for by adjusting the cursor size.
 - The zoom fallback gestures can be used if an application does not interpret a regular zoom gesture correctly.
+- Scroll distance will not exceed the edges of the screen; this behavior can be used on the fly to perform a scroll gesture with a distance smaller than the configured distance.
 
 ## Settings
 The following settings and `values` are available.
@@ -136,7 +137,7 @@ The following settings and `values` are available.
 | | Control Scheme | In the `D-pad` and `Numpad` control schemes, toggling is disabled if `Activation Duration` is `0ms`. Scroll mode is indicated by a screen border indicator with a color determined by the `Cursor Color` setting.<br /><br />`Standard`: Use D-pad to move and numpad to scroll.<br />`Swapped`: Use D-pad to scroll and numpad to move.<br />`D-pad`: Use D-pad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br />`Numpad`: Use numpad to move and scroll. Toggle between the two using the activation key or the button mapper shortcut.<br /> |
 | | Screen Edge Behavior | `None`: Cursor remains at the edge of the screen.<br />`Wrap`: Cursor wraps to the opposite side.<br />`Scroll`: Continuously scroll slowly in the direction of the edge. |
 | | Cursor Speed | Cursor's base speed without acceleration. Maximum base speed of `10`. |
-| | Cursor Acceleration | Cursor's accelerated speed. `1` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
+| | Cursor Acceleration | Cursor's accelerated speed. `0` denotes no acceleration of base speed. Maximum acceleration of `10`. All base speeds have the same maximum accelerated speed. |
 | | Cursor Acceleration Start | Duration after which base speed begins accelerating if the cursor is still moving. |
 | | Cursor Acceleration Duration | Duration after which accelerated speed is reached after cursor begins acceleration. |
 | | Cursor Size | Size of the cursor. |
@@ -153,14 +154,22 @@ The following settings and `values` are available.
 | Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
 | | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
 | | Lock Screen | This setting applies only when a screen lock has been configured.<br /><br />`On`: Hide the cursor when the device locks, and restore the cursor when the device unlocks.<br />`Off`: Never auto-hide the cursor in the lock screen. |
-| General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
-| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
-| | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
-| | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. In non-Shizuku scrolling, this may work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. In non-Shizuku scrolling, this may work better in browsers and other places. Not applicable when Shizuku integration is enabled.<br />`Inertia`: Scrolls resemble flicks.<br /> |
-| | Gesture Duration | Duration of all scroll and zoom gestures (excluding standard cursor's `Scroll` screen edge behavior). |
-| | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
+| Common Gesture Options | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. In non-Shizuku scrolling, this may work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. In non-Shizuku scrolling, this may work better in browsers and other places. Not applicable when Shizuku integration is enabled.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
+| Scroll Options | Natural Scrolling | `On`: Pressing up will cause content to scroll down, etc.<br />`Off`: Pressing up will cause content to scroll up, etc. |
+| | Scroll Duration | Duration of scroll gestures. The standard cursor's `Scroll` screen edge behavior defaults to the maximum of this range. |
+| | Scroll Distance | Distance scrolled in proportion to the corresponding axis.<br />Example: If set to `50%` and when scrolling up, the cursor will attempt to scroll 50% of the screen's height but will not exceed the top of the screen. |
+| | Advanced Scrolling | `On`: Enables settings to accelerate continuous scrolling decelerate edge scrolling.<br />`Off`: Returns continuous scrolling and edge scrolling to their default behavior and hides their settings. |
+| | Continuous Scroll Duration | This setting requires `Advanced Scrolling` to be enabled.<br /><br />Duration of scroll gestures during continuous scrolling. This is <ins>upper bounded</ins> by `Scroll Duration` for accelerated scrolling. |
+| | Continuous Scroll Distance | This setting requires `Advanced Scrolling` to be enabled.<br /><br />Distance scrolled in proportion to the corresponding axis during continuous scrolling. This is <ins>lower bounded</ins> by `Scroll Distance` for accelerated scrolling. |
+| | Acceleration Start | Duration after which scroll duration and scroll distance begin accelerating towards continuous scroll duration and continuous scroll distance, respectively, once continuous scrolling is active. |
+| | Acceleration Duration | Duration after which continuous scroll duration and continuous scroll distance are reached after scrolling begins acceleration. |
+| | Edge Scroll Duration | This setting requires `Advanced Scrolling` to be enabled and the standard cursor's screen edge behavior set to `Scroll`.<br /><br />Duration of scroll gestures during edge scrolling. This is <ins>lower bounded</ins> by `Scroll Duration` for decelerated scrolling. |
+| | Edge Scroll Distance | This setting requires `Advanced Scrolling` to be enabled and the standard cursor's screen edge behavior set to `Scroll`.<br /><br />Distance scrolled in proportion to the corresponding axis during edge scrolling. This is <ins>upper bounded</ins> `Scroll Distance` for decelerated scrolling. |
+| Zoom Options | Zoom Duration | Duration of zoom gestures. |
+| General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
+| | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
 | Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
 | | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends. |

@@ -276,14 +276,14 @@ class DefaultGestureStrategy(
                 val stroke1 = GestureDescription.StrokeDescription(
                     path1,
                     0,
-                    settings.gestureDuration,
+                    settings.zoomDuration,
                     willContinue
                 )
 
                 val stroke2 = GestureDescription.StrokeDescription(
                     path2,
                     0,
-                    settings.gestureDuration,
+                    settings.zoomDuration,
                     willContinue
                 )
 
@@ -308,7 +308,7 @@ class DefaultGestureStrategy(
                     null
                 )
             } else {
-                val steps = GestureConstants.calculateSteps(settings.gestureDuration)
+                val steps = GestureConstants.calculateSteps(settings.zoomDuration)
                 val dx1 = (endX1 - startX1) / steps
                 val dy1 = (endY1 - startY1) / steps
                 val dx2 = (endX2 - startX2) / steps
@@ -330,14 +330,14 @@ class DefaultGestureStrategy(
                         GestureDescription.StrokeDescription(
                             path1,
                             0,
-                            settings.gestureDuration / steps,
+                            settings.zoomDuration / steps,
                             willContinue || (i < steps - 1)
                         )
                     } else {
                         prevStroke1.continueStroke(
                             path1,
                             0,
-                            settings.gestureDuration / steps,
+                            settings.zoomDuration / steps,
                             willContinue || (i < steps - 1)
                         )
                     }
@@ -346,14 +346,14 @@ class DefaultGestureStrategy(
                         GestureDescription.StrokeDescription(
                             path2,
                             0,
-                            settings.gestureDuration / steps,
+                            settings.zoomDuration / steps,
                             willContinue || (i < steps - 1)
                         )
                     } else {
                         prevStroke2.continueStroke(
                             path2,
                             0,
-                            settings.gestureDuration / steps,
+                            settings.zoomDuration / steps,
                             willContinue || (i < steps - 1)
                         )
                     }

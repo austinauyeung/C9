@@ -209,7 +209,7 @@ class ShizukuGestureStrategy(
         try {
             mainScope.launch {
                 val downTime = SystemClock.uptimeMillis()
-                val duration = settingsFlow.value.gestureDuration
+                val duration = settingsFlow.value.zoomDuration
                 val steps = GestureConstants.calculateSteps(duration)
                 val stepDuration = duration / steps
                 val interEventDelayMs = 20L

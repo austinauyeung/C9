@@ -11,6 +11,8 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
+import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
@@ -49,6 +51,7 @@ class CursorActionHandler(
 
     private val activeDirections = mutableSetOf<CursorDirection>()
     private var lastMovementTime = 0L
+    private var lastScrollTime: Long? = null
 
     private var isLongPressing = false
     private var lastDragPosition: Offset? = null
@@ -66,6 +69,7 @@ class CursorActionHandler(
         currentZoomDirection = null
         continuousGestureJob?.cancel()
         continuousGestureJob = null
+        lastScrollTime = null
     }
 
     private fun cancelMovementJob() {
@@ -78,6 +82,7 @@ class CursorActionHandler(
         slowScrollJob?.cancel()
         slowScrollJob = null
         currentScreenEdge = null
+        lastScrollTime = null
     }
 
     fun cleanup() {
@@ -370,7 +375,7 @@ class CursorActionHandler(
                     continuousGestureJob = launchContinuousGesture(
                         backgroundScope = backgroundScope,
                         gestureManager = gestureManager,
-                        initialDelay = settings.gestureDuration,
+                        initialDelay = settings.scrollDuration,
                         condition = { currentScrollDirection == direction },
                         action = { performScroll(direction, true) }
                     )
@@ -404,7 +409,7 @@ class CursorActionHandler(
                 continuousGestureJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = settings.gestureDuration,
+                    initialDelay = settings.zoomDuration,
                     condition = { currentZoomDirection == isZoomIn },
                     action = { performZoom(isZoomIn, true) }
                 )
@@ -501,25 +506,23 @@ class CursorActionHandler(
                 slowScrollJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
                     gestureManager = gestureManager,
-                    initialDelay = settings.gestureDuration,
+                    initialDelay = settings.scrollDuration,
                     condition = { currentScreenEdge != ScreenEdge.NONE },
                     action = {
-                        performSlowScroll(
-                            currentScreenEdge!!,
-                            GestureConstants.SLOW_SCROLL_DURATION
-                        )
+                        performSlowScroll(currentScreenEdge!!)
                     }
                 )
             }
         }
     }
 
-    private suspend fun performSlowScroll(edge: ScreenEdge, duration: Long): Boolean {
+    private suspend fun performSlowScroll(edge: ScreenEdge): Boolean {
         var direction: ScrollDirection? = null
         val dimensions = dimensionsFlow.value
         var x = dimensions.width / 2f
         var y = dimensions.height / 2f
         val cursorState = cursorStateManager.cursorState.value
+        val settings = settingsFlow.value
 
         when (edge) {
             ScreenEdge.TOP -> {
@@ -541,21 +544,56 @@ class CursorActionHandler(
             ScreenEdge.NONE -> null
         }
 
-        if (direction != null) gestureManager.performScroll(direction, startX = x, startY = y, duration = duration, useNaturalScrolling = false, forceFixedGesture = true, distanceFactor = GestureConstants.SLOW_SCROLL_MULTIPLIER)
+        if (direction != null) {
+            gestureManager.performScroll(
+                direction,
+                startX = x,
+                startY = y,
+                duration = if (settings.useAdvancedScrolling) settings.edgeScrollDuration else GestureConstants.DEFAULT_EDGE_SCROLL_DURATION,
+                useNaturalScrolling = false,
+                forceFixedGesture = true,
+                distanceFactor = if (settings.useAdvancedScrolling) settings.edgeScrollMultiplier else GestureConstants.DEFAULT_EDGE_SCROLL_MULTIPLIER
+            )
+        }
         return true
     }
 
     private suspend fun performScroll(direction: ScrollDirection, forceFixedGesture: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
-        gestureManager.performScroll(direction, startX = cursorState.position.x, startY = cursorState.position.y, forceFixedGesture = forceFixedGesture)
+        val settings = settingsFlow.value
 
+        if (!settings.useAdvancedScrolling) {
+            gestureManager.performScroll(direction, startX = cursorState.position.x, startY = cursorState.position.y, forceFixedGesture = forceFixedGesture)
+        } else {
+            // Currently, forceFixedGesture = true indicates continuous scrolling
+            if (lastScrollTime == null && forceFixedGesture) {
+                lastScrollTime = System.currentTimeMillis()
+            }
+
+            val currentTime = System.currentTimeMillis()
+            val timeHeld = currentTime - (lastScrollTime ?: currentTime)
+            val startTime = settings.continuousScrollAccelerationStart
+            val endTime = settings.continuousScrollAccelerationStart + settings.continuousScrollAccelerationDuration
+            val normalizedTime = normalizeValue(timeHeld, startTime, endTime)
+            val accelerationFactor = cubicBezier(normalizedTime)
+
+            gestureManager.performScroll(
+                direction,
+                startX = cursorState.position.x,
+                startY = cursorState.position.y,
+                duration = (settings.scrollDuration + accelerationFactor * (settings.continuousScrollDuration - settings.scrollDuration)).toLong(),
+                forceFixedGesture = forceFixedGesture,
+                distanceFactor = settings.scrollMultiplier + accelerationFactor * (settings.continuousScrollMultiplier - settings.scrollMultiplier)
+            )
+        }
         return true
     }
 
     private fun performZoom(isZoomIn: Boolean, forceFixedGesture: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
+        val orientation = orientationProvider()
         backgroundScope.launch {
-            gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y, forceFixedGesture = forceFixedGesture)
+            gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y, orientation, forceFixedGesture = forceFixedGesture)
         }
 
         return true

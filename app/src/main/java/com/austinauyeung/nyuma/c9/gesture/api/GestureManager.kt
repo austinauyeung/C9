@@ -7,6 +7,7 @@ import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
+import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureType
@@ -108,7 +109,7 @@ class GestureManager(
         direction: ScrollDirection,
         startX: Float = dimensionsFlow.value.width / 2f,
         startY: Float = dimensionsFlow.value.height / 2f,
-        duration: Long = settingsFlow.value.gestureDuration,
+        duration: Long = settingsFlow.value.scrollDuration,
         useNaturalScrolling: Boolean = settingsFlow.value.useNaturalScrolling,
         forceFixedGesture: Boolean = false,
         distanceFactor: Float = settingsFlow.value.scrollMultiplier
@@ -119,7 +120,7 @@ class GestureManager(
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settings.gestureDuration * 3
+            val timeoutDuration = settings.scrollDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
@@ -176,6 +177,7 @@ class GestureManager(
         isZoomIn: Boolean,
         startX: Float,
         startY: Float,
+        orientation: OrientationUtil.Orientation,
         forceFixedGesture: Boolean = false
     ): Boolean {
         val settings = settingsFlow.value
@@ -184,7 +186,7 @@ class GestureManager(
 
         gestureTimeoutJob?.cancel()
         gestureTimeoutJob = serviceScope.launch {
-            val timeoutDuration = settings.gestureDuration * 3
+            val timeoutDuration = settings.zoomDuration * 3
             delay(timeoutDuration)
             if (!getGestureReady()) {
                 Logger.w("Gesture timed out after ${timeoutDuration}ms, resetting ready state")
@@ -196,9 +198,9 @@ class GestureManager(
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
             val zoomDistance =
-                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR)
+                dimensions.percentOfLargerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR)
             val zoomOffset =
-                dimensions.percentOfSmallerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET)
+                dimensions.percentOfLargerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET)
 
             var startX1 = startX - if (isZoomIn) zoomOffset else zoomDistance
             var startY1 = startY + if (isZoomIn) zoomOffset else zoomDistance
@@ -219,21 +221,40 @@ class GestureManager(
             endX2 = endX2.coerceIn(0f, dimensions.width.toFloat())
             endY2 = endY2.coerceIn(0f, dimensions.height.toFloat())
 
+            val portrait = (orientation == OrientationUtil.Orientation.PORTRAIT || orientation == OrientationUtil.Orientation.PORTRAIT_UPSIDE_DOWN)
+
             if (shouldShowGestures) {
-                visualizeZoomGesture(
-                    startX1, startY,
-                    startX2, startY,
-                    endX1, startY,
-                    endX2, startY
-                )
+                if (!portrait) {
+                    visualizeZoomGesture(
+                        startX1, startY,
+                        startX2, startY,
+                        endX1, startY,
+                        endX2, startY
+                    )
+                } else {
+                    visualizeZoomGesture(
+                        startX, startY1,
+                        startX, startY2,
+                        startX, endY1,
+                        startX, endY2
+                    )
+                }
             }
 
-            return currentStrategy.performZoom(
+            return if (!portrait) currentStrategy.performZoom(
                 isZoomIn,
                 startX1, startY,
                 startX2, startY,
                 endX1, startY,
                 endX2, startY,
+                forceFixedGesture,
+                completionListener
+            ) else currentStrategy.performZoom(
+                isZoomIn,
+                startX, startY1,
+                startX, startY2,
+                startX, endY1,
+                startX, endY2,
                 forceFixedGesture,
                 completionListener
             )
@@ -357,7 +378,7 @@ class GestureManager(
             gestureId = gestureId1,
             startPosition = Offset(finger1StartX, finger1StartY),
             endPosition = Offset(finger1EndX, finger1EndY),
-            duration = settings.gestureDuration,
+            duration = settings.zoomDuration,
             type = GestureType.ZOOM_FINGER1,
             pathsFlow = _gesturePaths,
             coroutineScope = serviceScope
@@ -367,7 +388,7 @@ class GestureManager(
             gestureId = gestureId2,
             startPosition = Offset(finger2StartX, finger2StartY),
             endPosition = Offset(finger2EndX, finger2EndY),
-            duration = settings.gestureDuration,
+            duration = settings.zoomDuration,
             type = GestureType.ZOOM_FINGER2,
             pathsFlow = _gesturePaths,
             coroutineScope = serviceScope
