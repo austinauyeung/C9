@@ -3,6 +3,7 @@ package com.austinauyeung.nyuma.c9.grid.handler
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
@@ -172,6 +173,9 @@ class GridActionHandler(
                             if (!wasOverlayActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
                                 gestureManager.setGestureReady(true)
+                            } else {
+                                val serviceInstance = OverlayAccessibilityService.getInstance()
+                                serviceInstance?.setHidingCursor(false)
                             }
                         }
                     }

@@ -108,7 +108,7 @@ All gestures are dispatched at the tip of the cursor's current location.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - Enable `C9 > Gesture Visualization` to learn what each gesture is doing.
 - Use `C9 > Auto-Hide Cursor Options` to auto-hide the cursor in select locations. See [Settings](#settings) for more information.
-  - Automatic restoration is cancelled if any cursor is manually reactivated.
+  - Automatic restoration is cancelled if any cursor is manually reactivated. Cursor auto-hide will resume the next time any of the enabled locations is observed.
   - The standard cursor's last position is saved upon restore.
   - `Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
