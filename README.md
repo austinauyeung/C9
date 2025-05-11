@@ -108,7 +108,7 @@ All gestures are dispatched at the tip of the cursor's current location.
 - In the standard cursor mode, both numpad 5 and D-pad center can be used to initiate a long press and drag. It may be easier to use either the numpad or D-pad to initiate the long press and use the other pad to drag.
 - Enable `C9 > Gesture Visualization` to learn what each gesture is doing.
 - Use `C9 > Auto-Hide Cursor Options` to auto-hide the cursor in select locations. See [Settings](#settings) for more information.
-  - Automatic restoration is cancelled if any cursor is manually reactivated.
+  - Automatic restoration is cancelled if any cursor is manually reactivated. Cursor auto-hide will resume the next time any of the enabled locations is observed.
   - The standard cursor's last position is saved upon restore.
   - `Text Fields` looks for both common and specific keyboard package names. [TT9](https://github.com/sspanak/tt9) is compatible. If this setting does not work for your device, please submit an [issue](https://github.com/austinauyeung/C9/issues) with the name of your keyboard.
 - In the standard cursor mode, behavior at the edge of the screen can be set with `C9 > Standard Cursor > Screen Edge Behavior`.
@@ -170,7 +170,8 @@ The following settings and `values` are available.
 | Zoom Options | Zoom Duration | Duration of zoom gestures. |
 | General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
-| Developer Options | Log Screen | Activate the cursor on this screen to generate logs. |
+| Developer Options | Collect Logs | `On`: Saves logs internally.<br />`Off`: No logs are saved, and existing logs are cleared. |
+| | Log Screen | If `Collect Logs` is enabled, the log screen will display the saved logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
 | | Overlapping Gestures | This setting applies only to manual gestures, not those dispatched during a continuous gesture via a held button.<br /><br />`On`: New scrolls and zooms can be immediately dispatched before any prior gesture ends. Currently not recommended for use with Shizuku.<br />`Off`: Scroll and zoom button presses are ignored until any prior gesture ends. |
 | | Improve Non-Shizuku Gestures | This setting does not apply if Shizuku is active, and it is recommended only for Android versions 8-10 if poor gesture performance is observed.<br /><br />`On`: Scrolls and zooms become smoother at the expense of possible stutter.<br/>`Off`: Cursor will use the default gesture dispatch. |
@@ -225,7 +226,7 @@ The following devices have been confirmed by users and is not exhaustive.
 <img src='./docs/gifs/Screen_recording_20250328_195409.gif' width=200>
 </div>
 
-If gestures do not work as expected, logs can be generated to help identify and fix any issues. Navigate to `C9 > Developer Options > Log Screen`, activate the cursor, and perform the gesture(s) in question. Copy the logs and submit a GitHub issue. The example logs below correspond to the screen recording above.
+If gestures do not work as expected, logs can be generated to help identify and fix any issues. Enable `C9 > Developer Options > Collect Logs`, duplicate the issue, and copy the logs in `C9 > Developer Options > Log Screen` and submit a GitHub issue. The example logs below correspond to the screen recording above.
 
 ```
 --- SYSTEM INFORMATION ---

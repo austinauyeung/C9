@@ -8,6 +8,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
+import com.austinauyeung.nyuma.c9.core.logs.LogManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
 import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
@@ -70,6 +71,10 @@ class C9 : Application() {
                     }
                 } else {
                     cleanupShizuku()
+                }
+
+                if (!settings.collectLogs) {
+                    LogManager.clear()
                 }
             }
             .flowOn(Dispatchers.IO)

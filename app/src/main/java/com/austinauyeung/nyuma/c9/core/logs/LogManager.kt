@@ -1,20 +1,21 @@
 package com.austinauyeung.nyuma.c9.core.logs
 
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import com.austinauyeung.nyuma.c9.C9
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.math.max
 
 object LogManager {
-    private const val LOG_MAX_SIZE = 200
-    private val logQueue = ConcurrentLinkedQueue<LogEntry>()
+    private const val LOG_MAX_SIZE = 500
     private val dateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 
-    private val _logFlow = MutableSharedFlow<LogEntry>(extraBufferCapacity = 20)
-    val logFlow: SharedFlow<LogEntry> = _logFlow.asSharedFlow()
+    private val _logs = MutableStateFlow<List<LogEntry>>(emptyList())
+    val logs: StateFlow<List<LogEntry>> = _logs.asStateFlow()
 
     data class LogEntry(
         val timestamp: Long = System.currentTimeMillis(),
@@ -26,20 +27,24 @@ object LogManager {
     }
 
     fun addLog(level: Logger.Level, message: String, tag: String? = null) {
-        val entry = LogEntry(level = level, message = message, tag = tag)
-        logQueue.add(entry)
-        _logFlow.tryEmit(entry)
+        val settings = C9.getInstance().getSettingsFlow().value
 
-        while (logQueue.size > LOG_MAX_SIZE) {
-            logQueue.poll()
+        if (settings.collectLogs) {
+            val entry = LogEntry(level = level, message = message, tag = tag)
+
+            _logs.update { currentLogs ->
+                if (currentLogs.isNotEmpty()) {
+                    currentLogs.drop(max(currentLogs.size - LOG_MAX_SIZE + 1, 0))
+                } else {
+                    currentLogs
+                }
+            }
+
+            _logs.value += entry
         }
     }
 
-    fun getLogs(): List<LogEntry> {
-        return logQueue.toList()
-    }
-
     fun clear() {
-        logQueue.clear()
+        _logs.value = emptyList()
     }
 }

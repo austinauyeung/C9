@@ -4,6 +4,7 @@ import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
@@ -287,6 +288,9 @@ class CursorActionHandler(
                             if (!wasActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
                                 gestureManager.setGestureReady(true)
+                            } else {
+                                val serviceInstance = OverlayAccessibilityService.getInstance()
+                                serviceInstance?.setHidingCursor(false)
                             }
                         }
                     }

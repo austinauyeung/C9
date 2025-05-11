@@ -62,11 +62,16 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private var lastOverlayType: OverlayModeCoordinator.OverlayMode? = null
     private var hidingCursor: Boolean = false
 
+    fun setHidingCursor(hide: Boolean) {
+        hidingCursor = hide
+    }
+
     private val keysPressed: MutableSet<Int> = mutableSetOf()
 
     private var lastKeyboardState = false
     private var lastLauncherState = false
     private var lastLockScreenState = false
+    private var lastStateChanged = false
     private var autoHideJob: Job? = null
     private val imeKeywords = listOf("inputmethod", "ime", "io.github.sspanak.tt9")
     private val launcherPackages: Set<String> by lazy {
@@ -282,8 +287,10 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                     if (settings.hideOnLockScreen) {
                         checkLockScreenVisibility()
                     }
-
-                    onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState, lastKeyboardState)
+                    if (lastStateChanged) {
+                        onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState)
+                    }
+                    lastStateChanged = false
                 }
             }
         }
@@ -294,7 +301,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val isKeyboardVisible = isImeWindowPresent() ||
                     windowHeightMethod.invoke(imm) as Int > 0
             if (isKeyboardVisible != lastKeyboardState) {
+                Logger.d("Keyboard visibility changed, visible: $isKeyboardVisible")
                 lastKeyboardState = isKeyboardVisible
+                lastStateChanged = true
             }
         } catch (e: Exception) {
             Logger.e("Error checking keyboard visibility", e)
@@ -317,7 +326,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         try {
             val isLauncherVisible = isLauncherPresent()
             if (isLauncherVisible != lastLauncherState) {
+                Logger.d("Launcher visibility changed, visible: $isLauncherVisible")
                 lastLauncherState = isLauncherVisible
+                lastStateChanged = true
             }
         } catch (e: Exception) {
             Logger.e("Error checking launcher visibility", e)
@@ -338,18 +349,20 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         try {
             val isLockScreenVisible = keyguardManager.isKeyguardLocked
             if (isLockScreenVisible != lastLockScreenState) {
+                Logger.d("Lock screen visibility changed, visible: $isLockScreenVisible")
                 lastLockScreenState = isLockScreenVisible
+                lastStateChanged = true
             }
         } catch (e: Exception) {
             Logger.e("Error checking launcher visibility", e)
         }
     }
 
-    private fun onAutoHideConditionChanged(visible: Boolean, force: Boolean = false) {
+    private fun onAutoHideConditionChanged(visible: Boolean) {
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
-            if ((visible && !hidingCursor) || force) {
+            if (visible && !hidingCursor) {
                 Logger.d("Auto-hide condition changed: hiding cursor")
                 autoHideCursor()
             } else if (!visible && hidingCursor) {

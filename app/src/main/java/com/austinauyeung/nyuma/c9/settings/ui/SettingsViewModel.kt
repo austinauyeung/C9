@@ -100,6 +100,7 @@ class SettingsViewModel(
                             edgeScrollMultiplier = settings.edgeScrollMultiplier,
                             edgeScrollAccelerationStart = settings.edgeScrollAccelerationStart,
                             edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
+                            collectLogs = settings.collectLogs
                         )
                     }
                 }
@@ -182,6 +183,7 @@ class SettingsViewModel(
             edgeScrollMultiplier = _uiState.value.edgeScrollMultiplier,
             edgeScrollAccelerationStart = _uiState.value.edgeScrollAccelerationStart,
             edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
+            collectLogs = _uiState.value.collectLogs
         )
     }
 
@@ -281,5 +283,6 @@ data class SettingsUiState(
     val edgeScrollDuration: Long = Defaults.Settings.EDGE_SCROLL_DURATION,
     val edgeScrollMultiplier: Float = Defaults.Settings.EDGE_SCROLL_MULTIPLIER,
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
-    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION
+    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
+    val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS
 )
