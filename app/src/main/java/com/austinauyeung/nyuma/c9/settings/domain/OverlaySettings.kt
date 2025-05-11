@@ -61,7 +61,8 @@ data class OverlaySettings(
     val edgeScrollDuration: Long = Defaults.Settings.EDGE_SCROLL_DURATION,
     val edgeScrollMultiplier: Float = Defaults.Settings.EDGE_SCROLL_MULTIPLIER,
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
-    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION
+    val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
+    val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

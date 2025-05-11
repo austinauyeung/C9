@@ -54,10 +54,9 @@ import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepositoryImpl
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogScreen(
-    viewModel: LogViewModel,
     onNavigateBack: () -> Unit,
 ) {
-    val logs by viewModel.logs.collectAsState()
+    val logs by LogManager.logs.collectAsState()
     val listState = rememberLazyListState()
     val context = LocalContext.current
 

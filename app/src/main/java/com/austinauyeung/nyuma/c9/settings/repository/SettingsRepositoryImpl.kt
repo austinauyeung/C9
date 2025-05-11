@@ -75,6 +75,7 @@ class SettingsRepositoryImpl(
         private val EDGE_SCROLL_MULTIPLIER = floatPreferencesKey("edge_scroll_multiplier")
         private val EDGE_SCROLL_ACCELERATION_START = longPreferencesKey("edge_scroll_acceleration_start")
         private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
+        private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -231,7 +232,9 @@ class SettingsRepositoryImpl(
                     edgeScrollAccelerationStart = preferences[EDGE_SCROLL_ACCELERATION_START]
                         ?: OverlaySettings.DEFAULT.edgeScrollAccelerationStart,
                     edgeScrollAccelerationDuration = preferences[EDGE_SCROLL_ACCELERATION_DURATION]
-                        ?: OverlaySettings.DEFAULT.edgeScrollAccelerationDuration
+                        ?: OverlaySettings.DEFAULT.edgeScrollAccelerationDuration,
+                    collectLogs = preferences[COLLECT_LOGS]
+                        ?: OverlaySettings.DEFAULT.collectLogs
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -288,6 +291,7 @@ class SettingsRepositoryImpl(
                 preferences[EDGE_SCROLL_MULTIPLIER] = settings.edgeScrollMultiplier
                 preferences[EDGE_SCROLL_ACCELERATION_START] = settings.edgeScrollAccelerationStart
                 preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
+                preferences[COLLECT_LOGS] = settings.collectLogs
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

@@ -60,6 +60,16 @@ fun DebugOptionsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             PreferenceCategory(title = "Logging") {
+                SwitchPreferenceItem(
+                    title = "Collect Logs",
+                    subtitle = "Logs will be written to the log screen",
+                    checked = uiState.collectLogs,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(collectLogs = v)
+                        }
+                    }
+                )
                 SimplePreferenceItem(
                     title = "Log Screen",
                     subtitle = "View application logs",

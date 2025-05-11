@@ -301,6 +301,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
             val isKeyboardVisible = isImeWindowPresent() ||
                     windowHeightMethod.invoke(imm) as Int > 0
             if (isKeyboardVisible != lastKeyboardState) {
+                Logger.d("Keyboard visibility changed, visible: $isKeyboardVisible")
                 lastKeyboardState = isKeyboardVisible
                 lastStateChanged = true
             }
@@ -325,6 +326,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         try {
             val isLauncherVisible = isLauncherPresent()
             if (isLauncherVisible != lastLauncherState) {
+                Logger.d("Launcher visibility changed, visible: $isLauncherVisible")
                 lastLauncherState = isLauncherVisible
                 lastStateChanged = true
             }
@@ -347,6 +349,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         try {
             val isLockScreenVisible = keyguardManager.isKeyguardLocked
             if (isLockScreenVisible != lastLockScreenState) {
+                Logger.d("Lock screen visibility changed, visible: $isLockScreenVisible")
                 lastLockScreenState = isLockScreenVisible
                 lastStateChanged = true
             }
