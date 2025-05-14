@@ -242,30 +242,22 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         hidingCursor = true
     }
 
-    private fun attemptCursorRestore(): Boolean {
+    private fun attemptCursorRestore() {
         Logger.d("Restoring cursor overlay")
 
-        if (keysPressed.isNotEmpty()) return false
-
-        if (hidingCursor) {
-            when (lastOverlayType) {
-                OverlayModeCoordinator.OverlayMode.GRID -> {
-                    serviceManager.activateGridMode(toggle = false)
-                }
-
-                OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                    serviceManager.activateCursorMode(toggle = false)
-                }
-
-                else -> {}
+        when (lastOverlayType) {
+            OverlayModeCoordinator.OverlayMode.GRID -> {
+                serviceManager.activateGridMode(toggle = false)
             }
-            lastOverlayType = null
-            hidingCursor = false
 
-            return true
+            OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                serviceManager.activateCursorMode(toggle = false)
+            }
+
+            else -> {}
         }
-
-        return false
+        lastOverlayType = null
+        hidingCursor = false
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
