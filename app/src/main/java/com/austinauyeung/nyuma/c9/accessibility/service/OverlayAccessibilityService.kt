@@ -351,6 +351,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     private fun onAutoHideConditionChanged(visible: Boolean) {
+        Logger.d("Evaluating cursor visibility, hidingCursor: $hidingCursor")
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
