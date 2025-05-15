@@ -619,7 +619,7 @@ class CursorActionHandler(
                     allowTap = !updatedState.inScrollMode && updatedState.isHoldActive
                 }
             } else {
-                allowTap = !cursorState.inScrollMode && !cursorState.isHoldActive
+                allowTap = !cursorState.isHoldActive
             }
 
             if (!isLongPressing && allowTap) {
