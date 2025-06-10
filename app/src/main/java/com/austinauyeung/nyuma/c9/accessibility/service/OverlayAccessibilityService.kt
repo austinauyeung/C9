@@ -69,17 +69,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private val keysPressed: MutableSet<Int> = mutableSetOf()
 
     private var lastKeyboardState = false
-    private var lastLauncherState = false
     private var lastLockScreenState = false
     private var lastStateChanged = false
+    private var lastAppState = false
     private var autoHideJob: Job? = null
     private val imeKeywords = listOf("inputmethod", "ime", "io.github.sspanak.tt9")
-    private val launcherPackages: Set<String> by lazy {
-        val intent = Intent(Intent.ACTION_MAIN)
-        intent.addCategory(Intent.CATEGORY_HOME)
-        val resolveInfos = packageManager.queryIntentActivities(intent, 0)
-        resolveInfos.mapNotNull { it.activityInfo?.packageName }.toSet()
-    }
     private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
     private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
     private val windowHeightMethod by lazy { InputMethodManager::class.java.getMethod("getInputMethodWindowVisibleHeight")}
@@ -273,14 +267,14 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                     if (settings.hideOnKeyboardOpen) {
                         checkKeyboardVisibility()
                     }
-                    if (settings.hideOnLauncherOpen) {
-                        checkLauncherVisibility()
-                    }
                     if (settings.hideOnLockScreen) {
                         checkLockScreenVisibility()
                     }
+
+                    checkAppVisibility()
+
                     if (lastStateChanged) {
-                        onAutoHideConditionChanged(lastKeyboardState || lastLauncherState || lastLockScreenState)
+                        onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState)
                     }
                     lastStateChanged = false
                 }
@@ -314,23 +308,26 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         return false
     }
 
-    private fun checkLauncherVisibility() {
+    private fun checkAppVisibility() {
         try {
-            val isLauncherVisible = isLauncherPresent()
-            if (isLauncherVisible != lastLauncherState) {
-                Logger.d("Launcher visibility changed, visible: $isLauncherVisible")
-                lastLauncherState = isLauncherVisible
+            val isAppVisible = shouldAutoHideInCurrentApp()
+            if (isAppVisible != lastAppState) {
+                Logger.d("App visibility changed, visible: $isAppVisible")
+                lastAppState = isAppVisible
                 lastStateChanged = true
             }
         } catch (e: Exception) {
-            Logger.e("Error checking launcher visibility", e)
+            Logger.e("Error checking app visibility", e)
         }
     }
 
-    private fun isLauncherPresent(): Boolean {
+    private fun shouldAutoHideInCurrentApp(): Boolean {
+        val settings = C9.getInstance().getSettingsFlow().value
+        if (settings.autoHideApps.isEmpty()) return false
+
         for (window in windows) {
-            val pkg = window.root?.packageName?.toString() ?: continue
-            if (pkg in launcherPackages) {
+            val pkg = window.root?.packageName?.toString()
+            if (pkg != null && pkg in settings.autoHideApps) {
                 return true
             }
         }
@@ -346,7 +343,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
                 lastStateChanged = true
             }
         } catch (e: Exception) {
-            Logger.e("Error checking launcher visibility", e)
+            Logger.e("Error checking lock screen visibility", e)
         }
     }
 

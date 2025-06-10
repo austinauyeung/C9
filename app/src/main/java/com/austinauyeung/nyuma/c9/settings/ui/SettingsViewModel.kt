@@ -100,7 +100,8 @@ class SettingsViewModel(
                             edgeScrollMultiplier = settings.edgeScrollMultiplier,
                             edgeScrollAccelerationStart = settings.edgeScrollAccelerationStart,
                             edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
-                            collectLogs = settings.collectLogs
+                            collectLogs = settings.collectLogs,
+                            autoHideApps = settings.autoHideApps
                         )
                     }
                 }
@@ -183,7 +184,8 @@ class SettingsViewModel(
             edgeScrollMultiplier = _uiState.value.edgeScrollMultiplier,
             edgeScrollAccelerationStart = _uiState.value.edgeScrollAccelerationStart,
             edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
-            collectLogs = _uiState.value.collectLogs
+            collectLogs = _uiState.value.collectLogs,
+            autoHideApps = _uiState.value.autoHideApps
         )
     }
 
@@ -284,5 +286,6 @@ data class SettingsUiState(
     val edgeScrollMultiplier: Float = Defaults.Settings.EDGE_SCROLL_MULTIPLIER,
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
-    val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS
+    val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
+    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS
 )

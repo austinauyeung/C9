@@ -1,18 +1,16 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.common.ui.C9Theme
 
 /**
- * Auto-hide cursor settings screen.
+ * Auto-hide apps screen.
  */
-class AutoHideSettingsActivity : ComponentActivity() {
+class AutoHideAppsActivity : ComponentActivity() {
     private lateinit var viewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,15 +24,10 @@ class AutoHideSettingsActivity : ComponentActivity() {
 
         setContent {
             C9Theme {
-                AutoHideSettingsScreen(
+                AutoHideAppsScreen(
                     viewModel = viewModel,
                     onNavigateBack = {
                         finish()
-                    },
-                    onNavigateToAutoHideAppsScreen = {
-                        val intent = Intent(this, AutoHideAppsActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
                     }
                 )
             }
