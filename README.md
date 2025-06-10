@@ -152,8 +152,8 @@ The following settings and `values` are available.
 | | Scroll Toggle Icon Alignment | `Top left`: Cursor is aligned to the top-left of the scroll toggle icon.<br />`Center`: Cursor is aligned to the center of the scroll toggle icon. |
 | | Clear Scroll Toggle Icon | This setting is enabled only for the `D-pad` and `Numpad` control schemes and applies to their scroll mode.<br /><br />Deletes the saved file from the application and falls back to the default screen border indicator. |
 | Auto-Hide Cursor Options | Text Fields | `On`: Hide the cursor when a text field opens a keyboard, and restore the cursor when the keyboard closes.<br />`Off`: Never auto-hide the cursor in text fields. |
-| | Launchers | This setting may consider the Settings app on your device to be a launcher.<br /><br />`On`: Hide the cursor when entering a launcher, and restore the cursor when leaving the launcher.<br />`Off`: Never auto-hide the cursor in launchers. |
 | | Lock Screen | This setting applies only when a screen lock has been configured.<br /><br />`On`: Hide the cursor when the device locks, and restore the cursor when the device unlocks.<br />`Off`: Never auto-hide the cursor in the lock screen. |
+| | Select Applications | Allows auto-hide on any application in the app drawer plus the stock launcher. |
 | Common Gesture Options | Gesture Style | `Fixed 1`: Scrolls are controlled and fixed distance. In non-Shizuku scrolling, this may work better on media and in other places.<br />`Fixed 2`: Enforces fixed distance scrolling more strongly than `Fixed 1`. In non-Shizuku scrolling, this may work better in browsers and other places. Not applicable when Shizuku integration is enabled.<br />`Inertia`: Scrolls resemble flicks.<br /> |
 | | Gesture Visualization | `On`: Show visualizations for all gestures.<br />`Off`: Hide all visualizations. |
 | | Gesture Visualization Size | Size of visualization icon. |
@@ -210,15 +210,16 @@ The following devices have been confirmed by users and is not exhaustive.
 | Brand | Models | Notes |
 | --- | --- | --- |
 | ALT | `MIVE Style Folder` `MIVE Style Folder 2` | |
+| CAT | `S22 Flip` | |
 | Doro | `7080` | |
 | Freetel | `Mode 1 Retro II` | | 
 | Kyocera | `Cadence S2720` `Digno Keitai 4 A202KC` `DuraXE Epic E4830` `DuraXV Extreme E4810` `DuraXV Extreme+ E4811` `Gratina KYF42` | |
 | LG | `X100S` | |
-| QIN | `F21 Pro` | |
 | Sharp | `Aquos SH-02L` `Aquos Keitai 3 805SH` | The `Aquos SH-02L` may need Shizuku if running Android 8. | 
 | Sonim | `XP3 Plus XP3900` | The `XP3 Plus XP3900` may need Shizuku if running Android 11. |
 | TCL | `Flip 2` | The `Flip 2` may need Shizuku if running Android 11. |
 | Vortex | `V3` | See [Known Issues](#known-issues). |
+| Xiaomi | `Qin F21 Pro` `Qin F22 Pro` | |
 
 ## Troubleshooting
 ### Generating cursor logs
