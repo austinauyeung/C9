@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.austinauyeung.nyuma.c9">
 
     <uses-permission android:name="rikka.shizuku.permission.API" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <queries>
         <intent>
@@ -77,6 +80,12 @@
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.DebugOptionsActivity" />
+
+        <activity
+            android:name=".settings.ui.AutoHideAppsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.C9"
+            android:parentActivityName=".settings.ui.AutoHideSettingsActivity" />
 
         <activity
             android:name=".shortcuts.GridCursorCreateShortcutActivity"

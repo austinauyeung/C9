@@ -22,7 +22,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun AutoHideSettingsScreen(
     viewModel: SettingsViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToAutoHideAppsScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -59,16 +60,6 @@ fun AutoHideSettingsScreen(
                     },
                 )
                 SwitchPreferenceItem(
-                    title = "Launchers",
-                    subtitle = "Hide on launcher open, restore on launcher close",
-                    checked = uiState.hideOnLauncherOpen,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(hideOnLauncherOpen = v)
-                        }
-                    },
-                )
-                SwitchPreferenceItem(
                     title = "Lock Screen",
                     subtitle = "Hide on device lock, restore on device unlock",
                     checked = uiState.hideOnLockScreen,
@@ -77,6 +68,11 @@ fun AutoHideSettingsScreen(
                             settings.copy(hideOnLockScreen = v)
                         }
                     },
+                )
+                SimplePreferenceItem(
+                    title = "Select Applications",
+                    subtitle = "Auto-hide in specific apps",
+                    onClick = onNavigateToAutoHideAppsScreen
                 )
             }
         }

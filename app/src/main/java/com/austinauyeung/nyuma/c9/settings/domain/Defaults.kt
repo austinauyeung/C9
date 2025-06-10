@@ -59,6 +59,7 @@ object Defaults {
         val SCROLL_TOGGLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         const val USE_ADVANCED_SCROLLING = false
         const val COLLECT_LOGS = false
+        val AUTO_HIDE_APPS = emptySet<String>()
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER
