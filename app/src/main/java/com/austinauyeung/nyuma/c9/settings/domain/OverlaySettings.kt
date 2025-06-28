@@ -63,7 +63,8 @@ data class OverlaySettings(
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
-    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS
+    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
+    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

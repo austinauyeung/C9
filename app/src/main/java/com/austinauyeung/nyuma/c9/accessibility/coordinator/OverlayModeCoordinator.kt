@@ -34,8 +34,7 @@ class OverlayModeCoordinator {
 
     fun deactivate(mode: OverlayMode) {
         if (_activeMode.value == mode) {
-            _activeMode.value =
-                OverlayMode.NONE
+            _activeMode.value = OverlayMode.NONE
             Logger.d("Overlay mode deactivated: $mode")
         }
     }

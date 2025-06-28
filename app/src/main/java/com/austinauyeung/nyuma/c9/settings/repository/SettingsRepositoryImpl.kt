@@ -77,6 +77,7 @@ class SettingsRepositoryImpl(
         private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
         private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
+        private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -243,7 +244,9 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.edgeScrollAccelerationDuration,
                     collectLogs = preferences[COLLECT_LOGS]
                         ?: OverlaySettings.DEFAULT.collectLogs,
-                    autoHideApps = autoHideApps
+                    autoHideApps = autoHideApps,
+                    showNotification = preferences[SHOW_NOTIFICATION]
+                        ?: OverlaySettings.DEFAULT.showNotification
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -302,6 +305,7 @@ class SettingsRepositoryImpl(
                 preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
                 preferences[COLLECT_LOGS] = settings.collectLogs
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
+                preferences[SHOW_NOTIFICATION] = settings.showNotification
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath
