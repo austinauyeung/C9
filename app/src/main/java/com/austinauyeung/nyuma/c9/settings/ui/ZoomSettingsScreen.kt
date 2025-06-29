@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +61,19 @@ fun ZoomSettingsScreen(
                         }
                     },
                     steps = 3,
+                )
+
+                SliderPreferenceItem(
+                    title = "Zoom Distance",
+                    value = uiState.zoomFactor,
+                    valueRange = GestureConstants.MIN_ZOOM_DISTANCE_FACTOR..GestureConstants.MAX_ZOOM_DISTANCE_FACTOR,
+                    valueText = "${round(uiState.zoomFactor * 100 * 2).toInt()}% of axis at most",
+                    onValueChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(zoomFactor = v)
+                        }
+                    },
+                    steps = 9,
                 )
             }
         }

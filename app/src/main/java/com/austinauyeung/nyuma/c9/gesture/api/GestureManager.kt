@@ -198,7 +198,7 @@ class GestureManager(
         try {
             Logger.d("Performing ${if (isZoomIn) "zoom in" else "zoom out"} gesture at ($startX, $startY)")
             val zoomDistance =
-                dimensions.percentOfLargerDimension(GestureConstants.ZOOM_DISTANCE_FACTOR)
+                dimensions.percentOfLargerDimension(settings.zoomFactor)
             val zoomOffset =
                 dimensions.percentOfLargerDimension(GestureConstants.ZOOM_DISTANCE_OFFSET)
 

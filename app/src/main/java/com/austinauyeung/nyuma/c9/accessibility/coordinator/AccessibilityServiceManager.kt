@@ -7,6 +7,7 @@ import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.notification.NotificationManager
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.handler.CursorActionHandler
 import com.austinauyeung.nyuma.c9.cursor.handler.CursorStateManager
@@ -41,6 +42,7 @@ class AccessibilityServiceManager(
     private lateinit var gridStateManager: GridStateManager
     private lateinit var gridActionHandler: GridActionHandler
     private lateinit var modeCoordinator: OverlayModeCoordinator
+    private lateinit var notificationManager: NotificationManager
 
     private val _currentGrid = MutableStateFlow<Grid?>(null)
     val currentGrid: StateFlow<Grid?> = _currentGrid.asStateFlow()
@@ -55,6 +57,7 @@ class AccessibilityServiceManager(
             Logger.i("Initializing AccessibilityServiceManager")
 
             modeCoordinator = OverlayModeCoordinator()
+            notificationManager = NotificationManager(service)
 
             val defaultStrategy = DefaultGestureStrategy(service, settingsFlow)
             val shizukuStrategy = ShizukuGestureStrategy(
@@ -108,6 +111,19 @@ class AccessibilityServiceManager(
             orientationHandler.screenDimensions
                 .onEach { newDimensions ->
                     onScreenDimensionsChanged(newDimensions)
+                }
+                .launchIn(backgroundScope)
+
+            // Listen for mode changes to update notification
+            modeCoordinator.activeMode
+                .onEach { mode ->
+                    updateNotification(mode)
+                }
+                .launchIn(backgroundScope)
+
+            settingsFlow
+                .onEach {
+                    updateNotification(modeCoordinator.activeMode.value)
                 }
                 .launchIn(backgroundScope)
 
@@ -212,6 +228,32 @@ class AccessibilityServiceManager(
 
     private fun onCursorStateChanged(cursorState: CursorState?) {
         _currentCursor.value = cursorState
+    }
+
+    private fun updateNotification(mode: OverlayModeCoordinator.OverlayMode) {
+        val settings = settingsFlow.value
+
+        try {
+            if (settings.showNotification) {
+                when (mode) {
+                    OverlayModeCoordinator.OverlayMode.GRID -> {
+                        notificationManager.showNotification(OverlayModeCoordinator.OverlayMode.GRID)
+                    }
+
+                    OverlayModeCoordinator.OverlayMode.CURSOR -> {
+                        notificationManager.showNotification(OverlayModeCoordinator.OverlayMode.CURSOR)
+                    }
+
+                    OverlayModeCoordinator.OverlayMode.NONE -> {
+                        notificationManager.hideNotification()
+                    }
+                }
+            } else {
+                notificationManager.hideNotification()
+            }
+        } catch (e: Exception) {
+            Logger.e("Error updating notification", e)
+        }
     }
 
     // Invoked when setting activation key

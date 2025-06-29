@@ -170,6 +170,7 @@ The following settings and `values` are available.
 | Zoom Options | Zoom Duration | Duration of zoom gestures. |
 | General | Activation Duration | Duration until cursor (de)activation. Does not apply to third-party button mappers.<br /><br />If set to `0ms`, the buttons used for activation will be completely intercepted by this application, and the following features will be disabled: [`Reset back to main grid`](#instructions) in the grid cursor and [`Toggle Move/Scroll`](#instructions-1) in the standard cursor.
 | | Rotate Buttons With Orientation | `On`: Rotate the D-pad and numpad along with the screen. <br />`Off`: D-pad and numpad behave as though the screen is always in portrait mode. |
+| | Show Notification Icon | `On`: Show a notification icon when any cursor is activated/visible. <br />`Off`: Do not show a notification icon. |
 | Developer Options | Collect Logs | `On`: Saves logs internally.<br />`Off`: No logs are saved, and existing logs are cleared. |
 | | Log Screen | If `Collect Logs` is enabled, the log screen will display the saved logs. |
 | | Enable Shizuku Integration | `On`: Cursor will authorize with Shizuku and, if authorized, dispatch gestures using Shizuku.<br />`Off`: Cursor will use the default gesture dispatch. |
@@ -296,24 +297,6 @@ Shizuku allows applications in general to perform actions that require elevated 
 ### What does it mean for the cursor to intercept button presses?
 The cursors sit between your button presses and the underlying application. If a button is used by the cursor, the cursor will consume it and prevent the underlying application from receiving the button press.
 
-### What does C9 stand for?
-Officially, it stands for "Click on 9 keys" as homage to T9's "Text on 9 keys". 
-
-Unofficially, I think it now encapsulates these 9 goals and themes:
-- Cursor paradigms
-- Cascading grid cursor
-- Continuity with modern applications
-- Context-aware auto-hide
-- Compatibility across Android versions
-- Customization options
-- Compact size
-- Convenience
-- Community
-
-The last one is especially important as this application has become a product of feedback from the dumbphone/flipphone community. Thank you to those who have used C9!
-
-Finally, there's the saying that cats have nine lives. As the [package name](#option-2) would suggest, this application is dedicated to my late cat, [Nyuma](./docs/imgs/IMG_3226.jpg).
-
 ## License
 [Apache License Version 2.0](./LICENSE)
 
@@ -323,3 +306,5 @@ Finally, there's the saying that cats have nine lives. As the [package name](#op
 - `sam-club` for extensive initial testing
 - `Dev-in-the-BM` for initial testing and the Shizuku suggestion
 - `anonymousfliphones` for initial testing
+
+As the [package name](#option-2) would suggest, this application is dedicated to my late cat, [Nyuma](./docs/imgs/IMG_3226.jpg).

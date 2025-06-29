@@ -36,6 +36,7 @@ data class OverlaySettings(
     val scrollDuration: Long = Defaults.Settings.SCROLL_DURATION,
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val zoomDuration: Long = Defaults.Settings.ZOOM_DURATION,
+    val zoomFactor: Float = Defaults.Settings.ZOOM_FACTOR,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
     val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
@@ -63,7 +64,8 @@ data class OverlaySettings(
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
-    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS
+    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
+    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

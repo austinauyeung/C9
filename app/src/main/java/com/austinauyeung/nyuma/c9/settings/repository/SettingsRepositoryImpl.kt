@@ -49,6 +49,7 @@ class SettingsRepositoryImpl(
         private val SCROLL_DURATION = longPreferencesKey("scroll_duration")
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ZOOM_DURATION = longPreferencesKey("zoom_duration")
+        private val ZOOM_FACTOR = floatPreferencesKey("zoom_factor")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
@@ -77,6 +78,7 @@ class SettingsRepositoryImpl(
         private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
         private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
+        private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -191,6 +193,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.scrollMultiplier,
                     zoomDuration = preferences[ZOOM_DURATION]
                         ?: OverlaySettings.DEFAULT.zoomDuration,
+                    zoomFactor = preferences[ZOOM_FACTOR]
+                        ?: OverlaySettings.DEFAULT.zoomFactor,
                     allowPassthrough = preferences[ALLOW_PASSTHROUGH]
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
@@ -243,7 +247,9 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.edgeScrollAccelerationDuration,
                     collectLogs = preferences[COLLECT_LOGS]
                         ?: OverlaySettings.DEFAULT.collectLogs,
-                    autoHideApps = autoHideApps
+                    autoHideApps = autoHideApps,
+                    showNotification = preferences[SHOW_NOTIFICATION]
+                        ?: OverlaySettings.DEFAULT.showNotification
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -276,6 +282,7 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_DURATION] = settings.scrollDuration
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ZOOM_DURATION] = settings.zoomDuration
+                preferences[ZOOM_FACTOR] = settings.zoomFactor
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
@@ -302,6 +309,7 @@ class SettingsRepositoryImpl(
                 preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
                 preferences[COLLECT_LOGS] = settings.collectLogs
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
+                preferences[SHOW_NOTIFICATION] = settings.showNotification
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

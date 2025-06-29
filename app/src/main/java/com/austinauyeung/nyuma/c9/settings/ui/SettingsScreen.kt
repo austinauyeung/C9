@@ -182,6 +182,17 @@ fun SettingsScreen(
                         }
                     },
                 )
+
+                SwitchPreferenceItem(
+                    title = "Show Notification Icon",
+                    subtitle = "Show icon when cursor is activated",
+                    checked = uiState.showNotification,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(showNotification = v)
+                        }
+                    },
+                )
             }
 
             PreferenceCategory(title = "Gestures") {

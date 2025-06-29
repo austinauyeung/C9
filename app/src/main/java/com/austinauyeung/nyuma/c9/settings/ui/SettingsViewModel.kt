@@ -74,6 +74,7 @@ class SettingsViewModel(
                             scrollDuration = settings.scrollDuration,
                             scrollMultiplier = settings.scrollMultiplier,
                             zoomDuration = settings.zoomDuration,
+                            zoomFactor = settings.zoomFactor,
                             allowPassthrough = settings.allowPassthrough,
                             enableShizukuIntegration = settings.enableShizukuIntegration,
                             hideOnKeyboardOpen = settings.hideOnKeyboardOpen,
@@ -101,7 +102,8 @@ class SettingsViewModel(
                             edgeScrollAccelerationStart = settings.edgeScrollAccelerationStart,
                             edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
                             collectLogs = settings.collectLogs,
-                            autoHideApps = settings.autoHideApps
+                            autoHideApps = settings.autoHideApps,
+                            showNotification = settings.showNotification
                         )
                     }
                 }
@@ -158,6 +160,7 @@ class SettingsViewModel(
             scrollDuration = _uiState.value.scrollDuration,
             scrollMultiplier = _uiState.value.scrollMultiplier,
             zoomDuration = _uiState.value.zoomDuration,
+            zoomFactor = _uiState.value.zoomFactor,
             allowPassthrough = _uiState.value.allowPassthrough,
             enableShizukuIntegration = _uiState.value.enableShizukuIntegration,
             hideOnKeyboardOpen = _uiState.value.hideOnKeyboardOpen,
@@ -185,7 +188,8 @@ class SettingsViewModel(
             edgeScrollAccelerationStart = _uiState.value.edgeScrollAccelerationStart,
             edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
             collectLogs = _uiState.value.collectLogs,
-            autoHideApps = _uiState.value.autoHideApps
+            autoHideApps = _uiState.value.autoHideApps,
+            showNotification = _uiState.value.showNotification
         )
     }
 
@@ -260,6 +264,7 @@ data class SettingsUiState(
     val scrollDuration: Long = Defaults.Settings.SCROLL_DURATION,
     val scrollMultiplier: Float = Defaults.Settings.SCROLL_MULTIPLIER,
     val zoomDuration: Long = Defaults.Settings.ZOOM_DURATION,
+    val zoomFactor: Float = Defaults.Settings.ZOOM_FACTOR,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
     val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
@@ -287,5 +292,6 @@ data class SettingsUiState(
     val edgeScrollAccelerationStart: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_START,
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
-    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS
+    val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
+    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION
 )
