@@ -33,8 +33,10 @@ object GestureConstants {
     const val DEFAULT_EDGE_SCROLL_MULTIPLIER = MIN_SCROLL_MULTIPLIER
 
     // Zoom
-    const val ZOOM_DISTANCE_FACTOR = 0.16f
-    const val ZOOM_DISTANCE_OFFSET = ZOOM_DISTANCE_FACTOR / 4
+    const val MIN_ZOOM_DISTANCE_FACTOR = 0.05f
+    const val MAX_ZOOM_DISTANCE_FACTOR = 0.15f
+    const val DEFAULT_ZOOM_DISTANCE_FACTOR = 0.15f
+    const val ZOOM_DISTANCE_OFFSET = 0.02f
     const val MIN_ZOOM_DURATION = 100L
     const val MAX_ZOOM_DURATION = 500L
     const val DEFAULT_ZOOM_DURATION = 300L

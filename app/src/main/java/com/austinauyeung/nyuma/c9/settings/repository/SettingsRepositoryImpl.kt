@@ -49,6 +49,7 @@ class SettingsRepositoryImpl(
         private val SCROLL_DURATION = longPreferencesKey("scroll_duration")
         private val SCROLL_MULTIPLIER = floatPreferencesKey("scroll_multiplier")
         private val ZOOM_DURATION = longPreferencesKey("zoom_duration")
+        private val ZOOM_FACTOR = floatPreferencesKey("zoom_factor")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
@@ -192,6 +193,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.scrollMultiplier,
                     zoomDuration = preferences[ZOOM_DURATION]
                         ?: OverlaySettings.DEFAULT.zoomDuration,
+                    zoomFactor = preferences[ZOOM_FACTOR]
+                        ?: OverlaySettings.DEFAULT.zoomFactor,
                     allowPassthrough = preferences[ALLOW_PASSTHROUGH]
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
@@ -279,6 +282,7 @@ class SettingsRepositoryImpl(
                 preferences[SCROLL_DURATION] = settings.scrollDuration
                 preferences[SCROLL_MULTIPLIER] = settings.scrollMultiplier
                 preferences[ZOOM_DURATION] = settings.zoomDuration
+                preferences[ZOOM_FACTOR] = settings.zoomFactor
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen

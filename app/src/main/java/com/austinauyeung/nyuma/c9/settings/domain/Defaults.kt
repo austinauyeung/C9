@@ -40,6 +40,7 @@ object Defaults {
         const val SCROLL_DURATION = GestureConstants.DEFAULT_SCROLL_DURATION
         const val SCROLL_MULTIPLIER = GestureConstants.DEFAULT_SCROLL_MULTIPLIER
         const val ZOOM_DURATION = GestureConstants.DEFAULT_ZOOM_DURATION
+        const val ZOOM_FACTOR = GestureConstants.DEFAULT_ZOOM_DISTANCE_FACTOR
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
         const val ENABLE_SHIZUKU_INTEGRATION = false
         const val HIDE_ON_KEYBOARD_OPEN = false
