@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.domain
+package com.austinauyeung.nyuma.c9.cursor.domain
 
 /**
  * Represents standard cursor schemes.

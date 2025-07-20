@@ -79,6 +79,7 @@ class SettingsRepositoryImpl(
         private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
         private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
+        private val APPLICATION_LIST_TYPE = stringPreferencesKey("application_list_type")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -155,6 +156,13 @@ class SettingsRepositoryImpl(
                 } else {
                     autoHideAppsString.split(",").toSet()
                 }
+
+                val applicationListType = getEnumPreference(
+                    preferences,
+                    APPLICATION_LIST_TYPE,
+                    OverlaySettings.DEFAULT.applicationListType,
+                    "application list type"
+                )
 
                 val settings = OverlaySettings(
                     activationDuration = preferences[ACTIVATION_DURATION]
@@ -249,7 +257,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.collectLogs,
                     autoHideApps = autoHideApps,
                     showNotification = preferences[SHOW_NOTIFICATION]
-                        ?: OverlaySettings.DEFAULT.showNotification
+                        ?: OverlaySettings.DEFAULT.showNotification,
+                    applicationListType = applicationListType
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -310,6 +319,7 @@ class SettingsRepositoryImpl(
                 preferences[COLLECT_LOGS] = settings.collectLogs
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
                 preferences[SHOW_NOTIFICATION] = settings.showNotification
+                preferences[APPLICATION_LIST_TYPE] = settings.applicationListType.name
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath
