@@ -311,15 +311,15 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun shouldAutoHideInCurrentApp(): Boolean {
         val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.autoHideApps.isEmpty()) return settings.applicationListType == AppListType.DENY_LIST
+        if (settings.autoHideApps.isEmpty()) return settings.applicationListType == AppListType.ALLOW_LIST
 
         for (window in windows) {
             val pkg = window.root?.packageName?.toString()
             if (pkg != null && pkg in settings.autoHideApps) {
-                return settings.applicationListType == AppListType.ALLOW_LIST
+                return settings.applicationListType == AppListType.DENY_LIST
             }
         }
-        return settings.applicationListType == AppListType.DENY_LIST
+        return settings.applicationListType == AppListType.ALLOW_LIST
     }
 
     private fun checkLockScreenVisibility() {

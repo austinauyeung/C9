@@ -76,8 +76,8 @@ fun AutoHideSettingsScreen(
                     title = "Application List Type",
                     subtitle =
                         when (uiState.applicationListType) {
-                            AppListType.ALLOW_LIST -> "Auto-hide for selected apps, auto-show elsewhere"
-                            AppListType.DENY_LIST -> "Auto-show for selected apps, auto-hide elsewhere"
+                            AppListType.ALLOW_LIST -> "Auto-show for selected apps, auto-hide elsewhere"
+                            AppListType.DENY_LIST -> "Auto-hide for selected apps, auto-show elsewhere"
                         },
                     selectedOption = uiState.applicationListType,
                     options =
@@ -94,7 +94,7 @@ fun AutoHideSettingsScreen(
 
                 SimplePreferenceItem(
                     title = "Select Applications",
-                    subtitle = "Auto-${if (uiState.applicationListType == AppListType.ALLOW_LIST) "hide" else "show"} in specific apps",
+                    subtitle = "Auto-${if (uiState.applicationListType == AppListType.ALLOW_LIST) "show" else "hide"} in specific apps",
                     onClick = onNavigateToAutoHideAppsScreen
                 )
             }
