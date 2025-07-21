@@ -64,6 +64,7 @@ object Defaults {
         val AUTO_HIDE_APPS = emptySet<String>()
         const val SHOW_NOTIFICATION = false
         val APPLICATION_LIST_TYPE = AppListType.ALLOW_LIST
+        const val IGNORE_NUMPAD = false
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

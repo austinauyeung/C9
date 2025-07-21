@@ -105,7 +105,8 @@ class SettingsViewModel(
                             collectLogs = settings.collectLogs,
                             autoHideApps = settings.autoHideApps,
                             showNotification = settings.showNotification,
-                            applicationListType = settings.applicationListType
+                            applicationListType = settings.applicationListType,
+                            ignoreNumpad = settings.ignoreNumpad
                         )
                     }
                 }
@@ -192,7 +193,8 @@ class SettingsViewModel(
             collectLogs = _uiState.value.collectLogs,
             autoHideApps = _uiState.value.autoHideApps,
             showNotification = _uiState.value.showNotification,
-            applicationListType = _uiState.value.applicationListType
+            applicationListType = _uiState.value.applicationListType,
+            ignoreNumpad = _uiState.value.ignoreNumpad
         )
     }
 
@@ -297,5 +299,6 @@ data class SettingsUiState(
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
     val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
-    val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE
+    val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
+    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD
 )

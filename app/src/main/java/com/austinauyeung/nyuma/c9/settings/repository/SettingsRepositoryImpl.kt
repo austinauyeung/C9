@@ -80,6 +80,7 @@ class SettingsRepositoryImpl(
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
         private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
         private val APPLICATION_LIST_TYPE = stringPreferencesKey("application_list_type")
+        private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -258,7 +259,9 @@ class SettingsRepositoryImpl(
                     autoHideApps = autoHideApps,
                     showNotification = preferences[SHOW_NOTIFICATION]
                         ?: OverlaySettings.DEFAULT.showNotification,
-                    applicationListType = applicationListType
+                    applicationListType = applicationListType,
+                    ignoreNumpad = preferences[IGNORE_NUMPAD]
+                        ?: OverlaySettings.DEFAULT.ignoreNumpad
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -320,6 +323,7 @@ class SettingsRepositoryImpl(
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
                 preferences[SHOW_NOTIFICATION] = settings.showNotification
                 preferences[APPLICATION_LIST_TYPE] = settings.applicationListType.name
+                preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

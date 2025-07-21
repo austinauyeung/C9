@@ -106,6 +106,25 @@ class CursorActionHandler(
                 return handleActivationKey(event)
             }
 
+            if (settings.ignoreNumpad) {
+                if (event.keyCode in setOf(
+                        KeyEvent.KEYCODE_1,
+                        KeyEvent.KEYCODE_2,
+                        KeyEvent.KEYCODE_3,
+                        KeyEvent.KEYCODE_4,
+                        KeyEvent.KEYCODE_5,
+                        KeyEvent.KEYCODE_6,
+                        KeyEvent.KEYCODE_7,
+                        KeyEvent.KEYCODE_8,
+                        KeyEvent.KEYCODE_9,
+                        KeyEvent.KEYCODE_0,
+                        KeyEvent.KEYCODE_STAR,
+                        KeyEvent.KEYCODE_POUND
+                    )) {
+                    return false
+                }
+            }
+
             if (!cursorStateManager.isCursorVisible()) return false
 
             // Map keys based on control scheme
