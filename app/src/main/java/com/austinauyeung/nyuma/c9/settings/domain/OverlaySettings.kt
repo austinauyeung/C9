@@ -6,6 +6,7 @@ import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
@@ -65,7 +66,9 @@ data class OverlaySettings(
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
-    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION
+    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
+    val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
+    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

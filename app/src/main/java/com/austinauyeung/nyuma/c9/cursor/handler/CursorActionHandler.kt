@@ -4,7 +4,6 @@ import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
 import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
@@ -15,10 +14,10 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
+import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGesture
-import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -105,6 +104,25 @@ class CursorActionHandler(
 
             if (event.keyCode in activateKeys) {
                 return handleActivationKey(event)
+            }
+
+            if (settings.ignoreNumpad) {
+                if (event.keyCode in setOf(
+                        KeyEvent.KEYCODE_1,
+                        KeyEvent.KEYCODE_2,
+                        KeyEvent.KEYCODE_3,
+                        KeyEvent.KEYCODE_4,
+                        KeyEvent.KEYCODE_5,
+                        KeyEvent.KEYCODE_6,
+                        KeyEvent.KEYCODE_7,
+                        KeyEvent.KEYCODE_8,
+                        KeyEvent.KEYCODE_9,
+                        KeyEvent.KEYCODE_0,
+                        KeyEvent.KEYCODE_STAR,
+                        KeyEvent.KEYCODE_POUND
+                    )) {
+                    return false
+                }
             }
 
             if (!cursorStateManager.isCursorVisible()) return false
@@ -288,9 +306,6 @@ class CursorActionHandler(
                             if (!wasActivated) {
                                 modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
                                 gestureManager.setGestureReady(true)
-                            } else {
-                                val serviceInstance = OverlayAccessibilityService.getInstance()
-                                serviceInstance?.setHidingCursor(false)
                             }
                         }
                     }

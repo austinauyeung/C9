@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,9 +70,31 @@ fun AutoHideSettingsScreen(
                         }
                     },
                 )
+            }
+            PreferenceCategory(title = "Applications") {
+                DropdownPreferenceItem(
+                    title = "Application List Type",
+                    subtitle =
+                        when (uiState.applicationListType) {
+                            AppListType.ALLOW_LIST -> "Auto-show for selected apps, auto-hide elsewhere"
+                            AppListType.DENY_LIST -> "Auto-hide for selected apps, auto-show elsewhere"
+                        },
+                    selectedOption = uiState.applicationListType,
+                    options =
+                        listOf(
+                            AppListType.ALLOW_LIST to "Allow",
+                            AppListType.DENY_LIST to "Deny"
+                        ),
+                    onOptionSelected = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(applicationListType = v)
+                        }
+                    },
+                )
+
                 SimplePreferenceItem(
                     title = "Select Applications",
-                    subtitle = "Auto-hide in specific apps",
+                    subtitle = "Auto-${if (uiState.applicationListType == AppListType.ALLOW_LIST) "show" else "hide"} in specific apps",
                     onClick = onNavigateToAutoHideAppsScreen
                 )
             }

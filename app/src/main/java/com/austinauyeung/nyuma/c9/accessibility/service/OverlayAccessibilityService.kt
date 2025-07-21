@@ -10,6 +10,7 @@ import android.os.Build
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityWindowInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.Lifecycle
@@ -24,6 +25,7 @@ import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinat
 import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
 import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,12 +61,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private lateinit var uiManager: OverlayUIManager
     private lateinit var orientationHandler: OrientationHandler
 
-    private var lastOverlayType: OverlayModeCoordinator.OverlayMode? = null
-    private var hidingCursor: Boolean = false
-
-    fun setHidingCursor(hide: Boolean) {
-        hidingCursor = hide
-    }
+    private var lastOverlayType: OverlayModeCoordinator.OverlayMode = OverlayModeCoordinator.OverlayMode.CURSOR
 
     private val keysPressed: MutableSet<Int> = mutableSetOf()
 
@@ -73,7 +70,6 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     private var lastStateChanged = false
     private var lastAppState = false
     private var autoHideJob: Job? = null
-    private val imeKeywords = listOf("inputmethod", "ime", "io.github.sspanak.tt9")
     private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
     private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
     private val windowHeightMethod by lazy { InputMethodManager::class.java.getMethod("getInputMethodWindowVisibleHeight")}
@@ -233,12 +229,10 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
         Logger.d("Hiding cursor overlay")
         forceHideAllOverlays()
-        hidingCursor = true
     }
 
     private fun attemptCursorRestore() {
         Logger.d("Restoring cursor overlay")
-
         when (lastOverlayType) {
             OverlayModeCoordinator.OverlayMode.GRID -> {
                 serviceManager.activateGridMode(toggle = false)
@@ -250,36 +244,33 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             else -> {}
         }
-        lastOverlayType = null
-        hidingCursor = false
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val settings = C9.getInstance().getSettingsFlow().value
+
         event?.let {
             when (event.eventType) {
-                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
-                AccessibilityEvent.TYPE_VIEW_SCROLLED,
-                AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED,
-                AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED -> {}
-
-                else -> {
+                AccessibilityEvent.TYPE_WINDOWS_CHANGED, AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                     if (settings.hideOnKeyboardOpen) {
                         checkKeyboardVisibility()
                     }
+
                     if (settings.hideOnLockScreen) {
                         checkLockScreenVisibility()
                     }
 
                     checkAppVisibility()
-
-                    if (lastStateChanged) {
-                        onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState)
-                    }
-                    lastStateChanged = false
                 }
+
+                else -> {}
             }
         }
+
+        if (lastStateChanged) {
+            onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState)
+        }
+        lastStateChanged = false
     }
 
     private fun checkKeyboardVisibility() {
@@ -298,10 +289,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun isImeWindowPresent(): Boolean {
         for (window in windows) {
-            val pkg = window.root?.packageName?.toString() ?: continue
-            val pkgLower = pkg.lowercase()
-
-            if (imeKeywords.any { it in pkgLower }) {
+            if (window.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
                 return true
             }
         }
@@ -323,15 +311,15 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun shouldAutoHideInCurrentApp(): Boolean {
         val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.autoHideApps.isEmpty()) return false
+        if (settings.autoHideApps.isEmpty()) return settings.applicationListType == AppListType.ALLOW_LIST
 
         for (window in windows) {
             val pkg = window.root?.packageName?.toString()
             if (pkg != null && pkg in settings.autoHideApps) {
-                return true
+                return settings.applicationListType == AppListType.DENY_LIST
             }
         }
-        return false
+        return settings.applicationListType == AppListType.ALLOW_LIST
     }
 
     private fun checkLockScreenVisibility() {
@@ -348,15 +336,12 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     private fun onAutoHideConditionChanged(visible: Boolean) {
-        Logger.d("Evaluating cursor visibility, hidingCursor: $hidingCursor")
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
-            if (visible && !hidingCursor) {
-                Logger.d("Auto-hide condition changed: hiding cursor")
+            if (visible) {
                 autoHideCursor()
-            } else if (!visible && hidingCursor) {
-                Logger.d("Auto-hide condition changed: attempting to restore cursor")
+            } else {
                 attemptCursorRestore()
             }
         }

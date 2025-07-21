@@ -7,6 +7,7 @@ import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 
@@ -62,6 +63,8 @@ object Defaults {
         const val COLLECT_LOGS = false
         val AUTO_HIDE_APPS = emptySet<String>()
         const val SHOW_NOTIFICATION = false
+        val APPLICATION_LIST_TYPE = AppListType.DENY_LIST
+        const val IGNORE_NUMPAD = false
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

@@ -7,9 +7,10 @@ import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityServ
 import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
-import com.austinauyeung.nyuma.c9.settings.domain.ControlScheme
+import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 import com.austinauyeung.nyuma.c9.settings.domain.Defaults
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepository
@@ -103,7 +104,9 @@ class SettingsViewModel(
                             edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
                             collectLogs = settings.collectLogs,
                             autoHideApps = settings.autoHideApps,
-                            showNotification = settings.showNotification
+                            showNotification = settings.showNotification,
+                            applicationListType = settings.applicationListType,
+                            ignoreNumpad = settings.ignoreNumpad
                         )
                     }
                 }
@@ -189,7 +192,9 @@ class SettingsViewModel(
             edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
             collectLogs = _uiState.value.collectLogs,
             autoHideApps = _uiState.value.autoHideApps,
-            showNotification = _uiState.value.showNotification
+            showNotification = _uiState.value.showNotification,
+            applicationListType = _uiState.value.applicationListType,
+            ignoreNumpad = _uiState.value.ignoreNumpad
         )
     }
 
@@ -293,5 +298,7 @@ data class SettingsUiState(
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
-    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION
+    val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
+    val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
+    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD
 )

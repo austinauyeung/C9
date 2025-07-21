@@ -167,6 +167,17 @@ fun DebugOptionsScreen(
 
             PreferenceCategory(title = "Experimental") {
                 SwitchPreferenceItem(
+                    title = "Ignore Numpad",
+                    subtitle = "Bypass all numpad behavior except for activation",
+                    checked = uiState.ignoreNumpad,
+                    onCheckedChange = { value ->
+                        viewModel.updatePreference(value) { settings, v ->
+                            settings.copy(ignoreNumpad = v)
+                        }
+                    },
+                )
+
+                SwitchPreferenceItem(
                     title = "Allow Passthrough",
                     subtitle = "Disable key press interception",
                     checked = uiState.allowPassthrough,
