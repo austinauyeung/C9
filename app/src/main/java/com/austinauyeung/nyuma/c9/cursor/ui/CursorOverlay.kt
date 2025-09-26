@@ -81,7 +81,8 @@ fun CursorOverlay(
                     cursorColor = cursorColor,
                     matchBorder = matchBorder,
                     roundedCorners = settings?.roundedCursorCorners ?: false,
-                    isHoldActive = cursorState.isHoldActive
+                    isHoldActive = cursorState.isHoldActive,
+                    isClickable = cursorState.clickable
                 )
             }
         } else {
@@ -135,6 +136,7 @@ private fun DrawScope.drawDefaultCursor(
     matchBorder: Boolean,
     roundedCorners: Boolean,
     isHoldActive: Boolean,
+    isClickable: Boolean
 ) {
     // Arrowhead shape
     val side1Y = cursorSize * 1.0f

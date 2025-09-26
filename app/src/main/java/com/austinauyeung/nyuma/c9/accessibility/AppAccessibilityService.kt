@@ -6,10 +6,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Rect
 import android.os.Build
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Offset
@@ -154,6 +156,38 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
+    private fun _isNodeClickable(node: AccessibilityNodeInfo?, pos: Offset?): Boolean {
+        if (node == null || pos == null) return false
+
+        val bounds = Rect()
+        node.getBoundsInScreen(bounds)
+        val x = pos.x.toInt()
+        val y = pos.y.toInt()
+
+        if (!bounds.contains(x, y)) {
+            return false
+        }
+
+        val isClickable = node.isClickable ||
+                node.actionList.contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)
+        if (isClickable) {
+            return true
+        }
+
+        for (i in 0 until node.childCount) {
+            val child = node.getChild(i)
+            if (_isNodeClickable(child, pos)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    fun isNodeClickable(pos: Offset?): Boolean {
+        return _isNodeClickable(rootInActiveWindow, pos)
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
@@ -246,10 +280,10 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+    override fun onAccessibilityEvent(event: AccessibilityEvent) {
         val settings = C9.getInstance().getSettingsFlow().value
 
-        event?.let {
+        event.let {
             when (event.eventType) {
                 AccessibilityEvent.TYPE_WINDOWS_CHANGED, AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                     if (settings.hideOnKeyboardOpen) {

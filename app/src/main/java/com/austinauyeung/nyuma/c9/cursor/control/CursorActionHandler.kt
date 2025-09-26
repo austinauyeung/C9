@@ -3,6 +3,7 @@ package com.austinauyeung.nyuma.c9.cursor.control
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
+import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
@@ -93,6 +94,7 @@ class CursorActionHandler(
     }
 
     fun handleKeyEvent(event: KeyEvent?): Boolean {
+        cursorStateManager.updateClickable(false)
         val settings = settingsFlow.value
 
         try {
@@ -478,6 +480,9 @@ class CursorActionHandler(
             cancelSlowScrollJob()
             movementJob = null
         }
+
+        val clickable = AppAccessibilityService.getInstance()?.isNodeClickable(cursorStateManager.cursorState.value?.position)
+        cursorStateManager.updateClickable(clickable!!)
     }
 
     private fun moveCursor(direction: CursorDirection) {

@@ -102,6 +102,12 @@ class CursorStateManager(
         _lastCursorPosition = pos
     }
 
+    fun updateClickable(clickable: Boolean) {
+        _cursorState.update { currentState ->
+            currentState?.copy(clickable = clickable)
+        }
+    }
+
     fun updateHoldState(isHoldActive: Boolean): CursorState? {
         _cursorState.update { currentState ->
             currentState?.copy(
