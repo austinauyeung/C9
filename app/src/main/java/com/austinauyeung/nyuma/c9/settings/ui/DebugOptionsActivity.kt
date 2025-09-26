@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
-import com.austinauyeung.nyuma.c9.core.logs.ui.LogActivity
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
+import com.austinauyeung.nyuma.c9.core.logs.LogActivity
 
 class DebugOptionsActivity : ComponentActivity() {
     private lateinit var viewModel: SettingsViewModel
@@ -20,7 +20,7 @@ class DebugOptionsActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         setContent {
-            C9Theme {
+            AppTheme {
                 DebugOptionsScreen(
                     viewModel = viewModel,
                     onNavigateBack = {

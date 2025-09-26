@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
-import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
-import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuStatus
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 
 /**
@@ -100,13 +100,13 @@ fun SettingsScreen(
             )
 
             if (uiState.enableShizukuIntegration) {
-                val shizukuStatus = ShizukuServiceConnection.statusFlow.collectAsState().value
+                val shizukuStatus = ShizukuConnection.statusFlow.collectAsState().value
                 PermissionStatusBanner(
                     title = "Shizuku Service",
                     status = shizukuStatus == ShizukuStatus.READY,
                     onClickAction = {
                         when (shizukuStatus) {
-                            ShizukuStatus.PERMISSION_REQUIRED -> ShizukuServiceConnection.requestPermission()
+                            ShizukuStatus.PERMISSION_REQUIRED -> ShizukuConnection.requestPermission()
                             else -> {}
                         }
                     }

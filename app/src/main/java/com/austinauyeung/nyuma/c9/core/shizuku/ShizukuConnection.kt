@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.core.service
+package com.austinauyeung.nyuma.c9.core.shizuku
 
 import android.content.pm.PackageManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Manages connection to the Shizuku service for privileged operations.
  */
-object ShizukuServiceConnection {
+object ShizukuConnection {
     private val initialized = AtomicBoolean(false)
 
     private val _statusFlow = MutableStateFlow(ShizukuStatus.UNKNOWN)

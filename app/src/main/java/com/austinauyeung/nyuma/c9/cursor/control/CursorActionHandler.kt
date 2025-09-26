@@ -1,13 +1,13 @@
-package com.austinauyeung.nyuma.c9.cursor.handler
+package com.austinauyeung.nyuma.c9.cursor.control
 
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdge
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
-import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
+import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger

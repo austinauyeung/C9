@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.common.domain
+package com.austinauyeung.nyuma.c9.core.domain
 
 import android.content.Context
 import android.graphics.Rect

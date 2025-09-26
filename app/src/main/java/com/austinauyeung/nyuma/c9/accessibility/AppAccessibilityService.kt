@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.accessibility.service
+package com.austinauyeung.nyuma.c9.accessibility
 
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager
@@ -20,10 +20,10 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.accessibility.ui.OverlayUIManager
-import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
+import com.austinauyeung.nyuma.c9.core.control.AccessibilityServiceManager
+import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.OverlayUIManager
+import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 /**
  * Receives key events, displays overlays, and performs gestures.
  */
-class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
+class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     SavedStateRegistryOwner {
     private var windowManager: WindowManager? = null
 
@@ -54,7 +54,7 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
-            Logger.e("Coroutine error in service", exception)
+            Logger.e("Coroutine error in shizuku", exception)
         }
 
     private lateinit var serviceManager: AccessibilityServiceManager
@@ -102,9 +102,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     companion object {
-        private var instance: OverlayAccessibilityService? = null
+        private var instance: AppAccessibilityService? = null
 
-        fun getInstance(): OverlayAccessibilityService? {
+        fun getInstance(): AppAccessibilityService? {
             return instance
         }
 
@@ -208,9 +208,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
-            Logger.i("Overlay accessibility service connected")
+            Logger.i("Overlay accessibility shizuku connected")
         } catch (e: Exception) {
-            Logger.e("Error initializing service", e)
+            Logger.e("Error initializing shizuku", e)
             if (!::serviceJob.isInitialized) {
                 serviceJob = SupervisorJob()
             }
@@ -375,11 +375,11 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
         instance = null
         try {
             if (::backgroundScope.isInitialized) {
-                backgroundScope.cancel("Service destroyed")
+                backgroundScope.cancel("AppAccessibilityService destroyed")
             }
 
             if (::mainScope.isInitialized) {
-                mainScope.cancel("Service destroyed")
+                mainScope.cancel("AppAccessibilityService destroyed")
             }
 
             if (::serviceManager.isInitialized) {
@@ -402,9 +402,9 @@ class OverlayAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
-            Logger.i("Overlay accessibility service destroyed")
+            Logger.i("Overlay accessibility shizuku destroyed")
         } catch (e: Exception) {
-            Logger.e("Error during service cleanup", e)
+            Logger.e("Error during shizuku cleanup", e)
         } finally {
             super.onDestroy()
         }

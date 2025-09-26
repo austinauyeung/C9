@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import kotlin.math.max
 import kotlin.math.round

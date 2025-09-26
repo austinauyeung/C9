@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.accessibility.coordinator
+package com.austinauyeung.nyuma.c9.core.control
 
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import kotlinx.coroutines.flow.MutableStateFlow

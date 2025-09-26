@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.common.ui
+package com.austinauyeung.nyuma.c9.core.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

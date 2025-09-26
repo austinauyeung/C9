@@ -1,8 +1,8 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
 import android.view.KeyEvent
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants

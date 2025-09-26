@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 /**
  * Common gesture settings screen.
@@ -23,7 +23,7 @@ class CommonGestureSettingsActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         setContent {
-            C9Theme {
+            AppTheme {
                 CommonGestureSettingsScreen(
                     viewModel = viewModel,
                     onNavigateBack = {

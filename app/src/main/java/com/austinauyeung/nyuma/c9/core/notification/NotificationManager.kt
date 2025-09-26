@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.austinauyeung.nyuma.c9.R
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.ui.SettingsActivity
 

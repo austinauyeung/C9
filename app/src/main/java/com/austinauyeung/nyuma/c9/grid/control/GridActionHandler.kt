@@ -1,9 +1,9 @@
-package com.austinauyeung.nyuma.c9.grid.handler
+package com.austinauyeung.nyuma.c9.grid.control
 
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
+import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue

@@ -1,23 +1,23 @@
-package com.austinauyeung.nyuma.c9.accessibility.coordinator
+package com.austinauyeung.nyuma.c9.core.control
 
 import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.notification.NotificationManager
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
-import com.austinauyeung.nyuma.c9.cursor.handler.CursorActionHandler
-import com.austinauyeung.nyuma.c9.cursor.handler.CursorStateManager
+import com.austinauyeung.nyuma.c9.cursor.control.CursorActionHandler
+import com.austinauyeung.nyuma.c9.cursor.control.CursorStateManager
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.standard.DefaultGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
-import com.austinauyeung.nyuma.c9.grid.handler.GridActionHandler
-import com.austinauyeung.nyuma.c9.grid.handler.GridStateManager
+import com.austinauyeung.nyuma.c9.grid.control.GridActionHandler
+import com.austinauyeung.nyuma.c9.grid.control.GridStateManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -151,7 +151,9 @@ class AccessibilityServiceManager(
 
     fun activateGridMode(toggle: Boolean = true): Boolean {
         try {
-            if ((!gridStateManager.isGridVisible() || toggle) && modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
+            if ((!gridStateManager.isGridVisible() || toggle) && modeCoordinator.requestActivation(
+                    OverlayModeCoordinator.OverlayMode.GRID
+                )) {
                 gridStateManager.toggleGridVisibility()
                 return gridStateManager.isGridVisible()
             }
@@ -177,7 +179,9 @@ class AccessibilityServiceManager(
 
     fun activateCursorMode(toggle: Boolean = true): Boolean {
         try {
-            if ((!cursorStateManager.isCursorVisible() || toggle) && modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
+            if ((!cursorStateManager.isCursorVisible() || toggle) && modeCoordinator.requestActivation(
+                    OverlayModeCoordinator.OverlayMode.CURSOR
+                )) {
                 cursorStateManager.toggleCursorVisibility()
                 return cursorStateManager.isCursorVisible()
             }

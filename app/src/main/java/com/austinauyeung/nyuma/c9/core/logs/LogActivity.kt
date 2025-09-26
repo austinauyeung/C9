@@ -1,9 +1,9 @@
-package com.austinauyeung.nyuma.c9.core.logs.ui
+package com.austinauyeung.nyuma.c9.core.logs
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 /**
  * Basic console for real-time logs.
@@ -13,7 +13,7 @@ class LogActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            C9Theme {
+            AppTheme {
                 LogScreen(
                     onNavigateBack = {
                         finish()

@@ -13,7 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 /**
  * Main settings screen.
@@ -44,7 +44,7 @@ class SettingsActivity : ComponentActivity() {
         checkAccessibilityServiceStatus()
 
         setContent {
-            C9Theme {
+            AppTheme {
                 SettingsScreen(
                     viewModel = viewModel,
                     onNavigateToGridSettings = { startCustomActivity(this, GridSettingsActivity::class.java) },

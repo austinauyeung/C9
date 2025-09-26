@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 /**
  * Grid cursor settings screen.
@@ -27,7 +27,7 @@ class GridSettingsActivity : ComponentActivity() {
         }
 
         setContent {
-            C9Theme {
+            AppTheme {
                 GridSettingsScreen(
                     viewModel = viewModel,
                     onNavigateBack = {

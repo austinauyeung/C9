@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.core.service
+package com.austinauyeung.nyuma.c9.core.shizuku
 
 enum class ShizukuStatus {
     UNKNOWN,                // Initial state

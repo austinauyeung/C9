@@ -77,7 +77,7 @@
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".core.logs.ui.LogActivity"
+            android:name=".core.logs.LogActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.DebugOptionsActivity" />
@@ -175,7 +175,7 @@
         <!--        </activity>-->
 
         <service
-            android:name=".accessibility.service.OverlayAccessibilityService"
+            android:name=".accessibility.AppAccessibilityService"
             android:exported="false"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

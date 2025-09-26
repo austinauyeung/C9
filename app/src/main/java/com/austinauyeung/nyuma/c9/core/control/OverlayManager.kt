@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.accessibility.ui
+package com.austinauyeung.nyuma.c9.core.control
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -20,9 +20,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.AccessibilityServiceManager
-import com.austinauyeung.nyuma.c9.common.domain.OrientationHandler
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.ui.CursorOverlay
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
@@ -146,7 +145,7 @@ class OverlayUIManager(
                 val currentOrientation by orientationHandler.currentOrientation.collectAsState()
                 val dimensions by orientationHandler.screenDimensions.collectAsState()
 
-                C9Theme {
+                AppTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent,

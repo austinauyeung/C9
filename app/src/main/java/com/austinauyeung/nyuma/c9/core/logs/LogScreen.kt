@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.core.logs.ui
+package com.austinauyeung.nyuma.c9.core.logs
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -43,8 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.core.logs.LogManager
-import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.SystemInfoUtil
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepositoryImpl
 

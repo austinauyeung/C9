@@ -3,9 +3,9 @@ package com.austinauyeung.nyuma.c9.settings.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
@@ -215,7 +215,7 @@ class SettingsViewModel(
     }
 
     fun requestHideAllOverlays() {
-        val serviceInstance = OverlayAccessibilityService.getInstance()
+        val serviceInstance = AppAccessibilityService.getInstance()
         serviceInstance?.forceHideAllOverlays()
     }
 

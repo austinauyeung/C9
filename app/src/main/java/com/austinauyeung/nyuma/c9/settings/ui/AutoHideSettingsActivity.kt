@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 /**
  * Auto-hide cursor settings screen.
@@ -25,7 +25,7 @@ class AutoHideSettingsActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         setContent {
-            C9Theme {
+            AppTheme {
                 AutoHideSettingsScreen(
                     viewModel = viewModel,
                     onNavigateBack = {
