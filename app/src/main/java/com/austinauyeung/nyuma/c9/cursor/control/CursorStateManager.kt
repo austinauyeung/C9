@@ -28,20 +28,11 @@ import kotlinx.coroutines.flow.update
  */
 class CursorStateManager(
     private val settingsFlow: StateFlow<OverlaySettings>,
-    private val dimensionsFlow: StateFlow<ScreenDimensions>,
-    private val onCursorStateChanged: (CursorState?) -> Unit
+    private val dimensionsFlow: StateFlow<ScreenDimensions>
 ) {
     private val _cursorState = MutableStateFlow<CursorState?>(null)
     val cursorState: StateFlow<CursorState?> = _cursorState.asStateFlow()
     private var _lastCursorPosition: Offset? = null
-
-    init {
-        _cursorState
-            .onEach { newCursorState ->
-                onCursorStateChanged(newCursorState)
-            }
-            .launchIn(CoroutineScope(Dispatchers.Main + SupervisorJob()))
-    }
 
     fun isCursorVisible(): Boolean = _cursorState.value != null
 

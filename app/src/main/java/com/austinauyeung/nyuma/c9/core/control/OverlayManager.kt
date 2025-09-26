@@ -36,14 +36,14 @@ import kotlinx.coroutines.launch
 /**
  * Creates and updates the overlay according to observed state changes.
  */
-class OverlayUIManager(
+class OverlayManager(
     private val context: Context,
     private val backgroundScope: CoroutineScope,
     private val mainScope: CoroutineScope,
     private val windowManager: WindowManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val orientationHandler: OrientationHandler,
-    private val accessibilityManager: AccessibilityServiceManager,
+    private val coreManager: CoreManager,
     private val lifecycleOwner: LifecycleOwner,
     private val savedStateRegistryOwner: SavedStateRegistryOwner
 ) {
@@ -53,15 +53,15 @@ class OverlayUIManager(
 
     fun initialize() {
         try {
-            Logger.i("Initializing OverlayUIManager")
+            Logger.i("Initializing OverlayManager")
             observeStateChanges()
         } catch (e: Exception) {
-            Logger.e("Error initializing OverlayUIManager", e)
+            Logger.e("Error initializing OverlayManager", e)
         }
     }
 
     private fun observeStateChanges() {
-        accessibilityManager.currentGrid
+        coreManager.gridStateManager.gridState
             .onEach { grid ->
                 Logger.d("Grid state changed: ${grid != null}")
                 mainScope.launch {
@@ -70,7 +70,7 @@ class OverlayUIManager(
             }
             .launchIn(backgroundScope)
 
-        accessibilityManager.currentCursor
+        coreManager.cursorStateManager.cursorState
             .onEach { cursor ->
                 Logger.d("Cursor state changed: ${cursor != null}")
                 mainScope.launch {
@@ -79,7 +79,7 @@ class OverlayUIManager(
             }
             .launchIn(backgroundScope)
 
-        accessibilityManager.getGesturePaths()
+        coreManager.getGesturePaths()
             .onEach { paths ->
                 if (currentPaths != paths.size) {
                     Logger.d("Gesture paths changed: ${paths.size} paths")
@@ -94,7 +94,7 @@ class OverlayUIManager(
         settingsFlow
             .onEach { settings ->
                 Logger.d("Settings changed")
-                accessibilityManager.updateGestureVisualization(settings.showGestureVisualization)
+                coreManager.updateGestureVisualization(settings.showGestureVisualization)
                 mainScope.launch {
                     updateOverlayUI()
                 }
@@ -115,9 +115,9 @@ class OverlayUIManager(
 //                return
 //            }
 
-            val grid = accessibilityManager.currentGrid.value
-            val cursor = accessibilityManager.currentCursor.value
-            val gesturePaths = accessibilityManager.getGesturePaths().value
+            val grid = coreManager.gridStateManager.gridState.value
+            val cursor = coreManager.cursorStateManager.cursorState.value
+            val gesturePaths = coreManager.getGesturePaths().value
             val settings = settingsFlow.value
 
             val shouldShowOverlay = grid != null ||
@@ -141,7 +141,7 @@ class OverlayUIManager(
 
             overlayView?.setContent {
                 val currentSettings by settingsFlow.collectAsState()
-                val currentGesturePaths by accessibilityManager.getGesturePaths().collectAsState()
+                val currentGesturePaths by coreManager.getGesturePaths().collectAsState()
                 val currentOrientation by orientationHandler.currentOrientation.collectAsState()
                 val dimensions by orientationHandler.screenDimensions.collectAsState()
 
@@ -150,7 +150,7 @@ class OverlayUIManager(
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent,
                     ) {
-                        val currentGrid by accessibilityManager.currentGrid.collectAsState()
+                        val currentGrid by coreManager.gridStateManager.gridState.collectAsState()
                         currentGrid?.let { activeGrid ->
                             GridOverlay(
                                 grid = activeGrid,
@@ -162,7 +162,7 @@ class OverlayUIManager(
                             )
                         }
 
-                        val currentCursor by accessibilityManager.currentCursor.collectAsState()
+                        val currentCursor by coreManager.cursorStateManager.cursorState.collectAsState()
                         currentCursor?.let { activeCursor ->
                             CursorOverlay(
                                 cursorState = activeCursor,
@@ -186,8 +186,8 @@ class OverlayUIManager(
             try {
                 mainScope.launch {
                     removeOverlayView()
-                    if (accessibilityManager.currentGrid.value != null ||
-                        accessibilityManager.currentCursor.value != null
+                    if (coreManager.gridStateManager.gridState.value != null ||
+                        coreManager.cursorStateManager.cursorState.value != null
                     ) {
                         createOverlayView()
                     }
@@ -307,6 +307,6 @@ class OverlayUIManager(
         mainScope.launch {
             removeOverlayView()
         }
-        Logger.d("OverlayUIManager cleanup completed")
+        Logger.d("OverlayManager cleanup completed")
     }
 }

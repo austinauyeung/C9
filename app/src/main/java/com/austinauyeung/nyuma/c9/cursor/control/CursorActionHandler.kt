@@ -3,7 +3,7 @@ package com.austinauyeung.nyuma.c9.cursor.control
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
-import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
@@ -34,7 +34,7 @@ class CursorActionHandler(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val backgroundScope: CoroutineScope,
-    private val modeCoordinator: OverlayModeCoordinator,
+    private val modeCoordinator: ModeCoordinator,
     private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT },
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
 ) {
@@ -299,12 +299,12 @@ class CursorActionHandler(
                 activationJob = backgroundScope.launch {
                     delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
-                        if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.CURSOR)) {
+                        if (modeCoordinator.requestActivation(ModeCoordinator.OverlayMode.CURSOR)) {
                             cursorStateManager.toggleCursorVisibility()
                             wasActivated = cursorStateManager.isCursorVisible()
 
                             if (!wasActivated) {
-                                modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
+                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR)
                                 gestureManager.setGestureReady(true)
                             }
                         }

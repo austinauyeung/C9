@@ -24,20 +24,11 @@ class GridStateManager(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
-    private val backgroundScope: CoroutineScope,
-    private val onGridStateChanged: (Grid?) -> Unit
+    private val backgroundScope: CoroutineScope
 ) {
     private val _gridState = MutableStateFlow<Grid?>(null)
     val gridState: StateFlow<Grid?> = _gridState.asStateFlow()
     private val keySequence = mutableListOf<Int>()
-
-    init {
-        _gridState
-            .onEach { grid ->
-                onGridStateChanged(grid)
-            }
-            .launchIn(CoroutineScope(Dispatchers.Main + SupervisorJob()))
-    }
 
     fun isGridVisible(): Boolean = _gridState.value != null
 

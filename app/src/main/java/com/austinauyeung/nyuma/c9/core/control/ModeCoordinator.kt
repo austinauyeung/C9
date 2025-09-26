@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Ensures only one overlay is active at a time.
  */
-class OverlayModeCoordinator {
+class ModeCoordinator {
     enum class OverlayMode {
         NONE,
         GRID,

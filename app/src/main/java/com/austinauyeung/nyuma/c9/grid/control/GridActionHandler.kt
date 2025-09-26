@@ -2,7 +2,7 @@ package com.austinauyeung.nyuma.c9.grid.control
 
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
-import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
@@ -25,7 +25,7 @@ class GridActionHandler(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val backgroundScope: CoroutineScope,
-    private val modeCoordinator: OverlayModeCoordinator,
+    private val modeCoordinator: ModeCoordinator,
     private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT }
 ) {
     private var activationKeyPressStartTime: Long = -1
@@ -184,12 +184,12 @@ class GridActionHandler(
                 activationJob = backgroundScope.launch {
                     delay(settings.activationDuration)
                     if (isActivationKeyPressed) {
-                        if (modeCoordinator.requestActivation(OverlayModeCoordinator.OverlayMode.GRID)) {
+                        if (modeCoordinator.requestActivation(ModeCoordinator.OverlayMode.GRID)) {
                             gridStateManager.toggleGridVisibility()
                             wasOverlayActivated = gridStateManager.isGridVisible()
 
                             if (!wasOverlayActivated) {
-                                modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
+                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID)
                                 gestureManager.setGestureReady(true)
                             }
                         }

@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.onEach
 /**
  * Manages grid cursor and standard cursor modes.
  */
-class AccessibilityServiceManager(
+class CoreManager(
     private val service: AccessibilityService,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val orientationHandler: OrientationHandler,
@@ -39,24 +39,18 @@ class AccessibilityServiceManager(
     private lateinit var gestureManager: GestureManager
     lateinit var cursorStateManager: CursorStateManager
     private lateinit var cursorActionHandler: CursorActionHandler
-    private lateinit var gridStateManager: GridStateManager
+    lateinit var gridStateManager: GridStateManager
     private lateinit var gridActionHandler: GridActionHandler
-    private lateinit var modeCoordinator: OverlayModeCoordinator
+    private lateinit var modeCoordinator: ModeCoordinator
     private lateinit var notificationManager: NotificationManager
-
-    private val _currentGrid = MutableStateFlow<Grid?>(null)
-    val currentGrid: StateFlow<Grid?> = _currentGrid.asStateFlow()
-
-    private val _currentCursor = MutableStateFlow<CursorState?>(null)
-    val currentCursor: StateFlow<CursorState?> = _currentCursor.asStateFlow()
 
     private val screenDimensionsFlow = orientationHandler.screenDimensions
 
     fun initialize() {
         try {
-            Logger.i("Initializing AccessibilityServiceManager")
+            Logger.i("Initializing CoreManager")
 
-            modeCoordinator = OverlayModeCoordinator()
+            modeCoordinator = ModeCoordinator()
             notificationManager = NotificationManager(service)
 
             val defaultStrategy = DefaultGestureStrategy(service, settingsFlow)
@@ -79,8 +73,7 @@ class AccessibilityServiceManager(
                 gestureManager,
                 settingsFlow,
                 screenDimensionsFlow,
-                backgroundScope,
-                { grid -> onGridStateChanged(grid) }
+                backgroundScope
             )
             gridActionHandler = GridActionHandler(
                 gridStateManager,
@@ -94,8 +87,7 @@ class AccessibilityServiceManager(
             // Cursor components
             cursorStateManager = CursorStateManager(
                 settingsFlow,
-                screenDimensionsFlow,
-                { cursorState -> onCursorStateChanged(cursorState) }
+                screenDimensionsFlow
             )
             cursorActionHandler = CursorActionHandler(
                 cursorStateManager,
@@ -127,9 +119,9 @@ class AccessibilityServiceManager(
                 }
                 .launchIn(backgroundScope)
 
-            Logger.i("AccessibilityServiceManager initialization complete")
+            Logger.i("CoreManager initialization complete")
         } catch (e: Exception) {
-            Logger.e("Error initializing AccessibilityServiceManager", e)
+            Logger.e("Error initializing CoreManager", e)
             throw e
         }
     }
@@ -152,7 +144,7 @@ class AccessibilityServiceManager(
     fun activateGridMode(toggle: Boolean = true): Boolean {
         try {
             if ((!gridStateManager.isGridVisible() || toggle) && modeCoordinator.requestActivation(
-                    OverlayModeCoordinator.OverlayMode.GRID
+                    ModeCoordinator.OverlayMode.GRID
                 )) {
                 gridStateManager.toggleGridVisibility()
                 return gridStateManager.isGridVisible()
@@ -166,7 +158,7 @@ class AccessibilityServiceManager(
 
     fun resetGrid(): Boolean {
         try {
-            if (modeCoordinator.activeMode.value == OverlayModeCoordinator.OverlayMode.GRID) {
+            if (modeCoordinator.activeMode.value == ModeCoordinator.OverlayMode.GRID) {
                 gridStateManager.resetToMainGrid()
                 return true
             }
@@ -180,7 +172,7 @@ class AccessibilityServiceManager(
     fun activateCursorMode(toggle: Boolean = true): Boolean {
         try {
             if ((!cursorStateManager.isCursorVisible() || toggle) && modeCoordinator.requestActivation(
-                    OverlayModeCoordinator.OverlayMode.CURSOR
+                    ModeCoordinator.OverlayMode.CURSOR
                 )) {
                 cursorStateManager.toggleCursorVisibility()
                 return cursorStateManager.isCursorVisible()
@@ -194,7 +186,7 @@ class AccessibilityServiceManager(
 
     fun toggleCursorScroll(): Boolean {
         try {
-            if (modeCoordinator.activeMode.value == OverlayModeCoordinator.OverlayMode.CURSOR) {
+            if (modeCoordinator.activeMode.value == ModeCoordinator.OverlayMode.CURSOR) {
                 cursorStateManager.toggleScrollMode()
                 return true
             }
@@ -226,29 +218,21 @@ class AccessibilityServiceManager(
         }
     }
 
-    private fun onGridStateChanged(grid: Grid?) {
-        _currentGrid.value = grid
-    }
-
-    private fun onCursorStateChanged(cursorState: CursorState?) {
-        _currentCursor.value = cursorState
-    }
-
-    private fun updateNotification(mode: OverlayModeCoordinator.OverlayMode) {
+    private fun updateNotification(mode: ModeCoordinator.OverlayMode) {
         val settings = settingsFlow.value
 
         try {
             if (settings.showNotification) {
                 when (mode) {
-                    OverlayModeCoordinator.OverlayMode.GRID -> {
-                        notificationManager.showNotification(OverlayModeCoordinator.OverlayMode.GRID)
+                    ModeCoordinator.OverlayMode.GRID -> {
+                        notificationManager.showNotification(ModeCoordinator.OverlayMode.GRID)
                     }
 
-                    OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                        notificationManager.showNotification(OverlayModeCoordinator.OverlayMode.CURSOR)
+                    ModeCoordinator.OverlayMode.CURSOR -> {
+                        notificationManager.showNotification(ModeCoordinator.OverlayMode.CURSOR)
                     }
 
-                    OverlayModeCoordinator.OverlayMode.NONE -> {
+                    ModeCoordinator.OverlayMode.NONE -> {
                         notificationManager.hideNotification()
                     }
                 }
@@ -273,8 +257,8 @@ class AccessibilityServiceManager(
                 cursorStateManager.hideCursor()
             }
 
-            modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.GRID)
-            modeCoordinator.deactivate(OverlayModeCoordinator.OverlayMode.CURSOR)
+            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID)
+            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR)
 
             gridActionHandler.cleanup()
             cursorActionHandler.cleanup()

@@ -20,9 +20,9 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.core.control.AccessibilityServiceManager
-import com.austinauyeung.nyuma.c9.core.control.OverlayModeCoordinator
-import com.austinauyeung.nyuma.c9.core.control.OverlayUIManager
+import com.austinauyeung.nyuma.c9.core.control.CoreManager
+import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.OverlayManager
 import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.domain.AppListType
@@ -57,11 +57,11 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             Logger.e("Coroutine error in shizuku", exception)
         }
 
-    private lateinit var serviceManager: AccessibilityServiceManager
-    private lateinit var uiManager: OverlayUIManager
+    private lateinit var coreManager: CoreManager
+    private lateinit var overlayManager: OverlayManager
     private lateinit var orientationHandler: OrientationHandler
 
-    private var lastOverlayType: OverlayModeCoordinator.OverlayMode = OverlayModeCoordinator.OverlayMode.CURSOR
+    private var lastOverlayType: ModeCoordinator.OverlayMode = ModeCoordinator.OverlayMode.CURSOR
 
     private val keysPressed: MutableSet<Int> = mutableSetOf()
 
@@ -79,22 +79,22 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             when (intent.action) {
                 ACTION_ACTIVATE_GRID -> {
                     backgroundScope.launch {
-                        serviceManager.activateGridMode()
+                        coreManager.activateGridMode()
                     }
                 }
                 ACTION_RESET_GRID -> {
                     backgroundScope.launch {
-                        serviceManager.resetGrid()
+                        coreManager.resetGrid()
                     }
                 }
                 ACTION_ACTIVATE_CURSOR -> {
                     backgroundScope.launch {
-                        serviceManager.activateCursorMode()
+                        coreManager.activateCursorMode()
                     }
                 }
                 ACTION_TOGGLE_CURSOR -> {
                     backgroundScope.launch {
-                        serviceManager.toggleCursorScroll()
+                        coreManager.toggleCursorScroll()
                     }
                 }
             }
@@ -171,27 +171,27 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
             orientationHandler = OrientationHandler(context = this, settingsFlow = settingsFlow)
 
-            serviceManager = AccessibilityServiceManager(
+            coreManager = CoreManager(
                 service = this,
                 settingsFlow = settingsFlow,
                 orientationHandler = orientationHandler,
                 backgroundScope = backgroundScope,
                 mainScope = mainScope,
             )
-            serviceManager.initialize()
+            coreManager.initialize()
 
-            uiManager = OverlayUIManager(
+            overlayManager = OverlayManager(
                 context = this,
                 backgroundScope = backgroundScope,
                 mainScope = mainScope,
                 windowManager = windowManager!!,
                 settingsFlow = settingsFlow,
                 orientationHandler = orientationHandler,
-                accessibilityManager = serviceManager,
+                coreManager = coreManager,
                 lifecycleOwner = this,
                 savedStateRegistryOwner = this
             )
-            uiManager.initialize()
+            overlayManager.initialize()
 
             val filter = IntentFilter().apply {
                 addAction(ACTION_ACTIVATE_GRID)
@@ -218,12 +218,12 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     private fun autoHideCursor() {
-        if (serviceManager.currentGrid.value != null) {
-            lastOverlayType = OverlayModeCoordinator.OverlayMode.GRID
-        } else if (serviceManager.currentCursor.value != null) {
-            lastOverlayType = OverlayModeCoordinator.OverlayMode.CURSOR
-            serviceManager.currentCursor.value?.let { cursor ->
-                serviceManager.cursorStateManager.setLastCursorPosition(Offset(cursor.position.x, cursor.position.y))
+        if (coreManager.gridStateManager.gridState.value != null) {
+            lastOverlayType = ModeCoordinator.OverlayMode.GRID
+        } else if (coreManager.cursorStateManager.cursorState.value != null) {
+            lastOverlayType = ModeCoordinator.OverlayMode.CURSOR
+            coreManager.cursorStateManager.cursorState.value?.let { cursor ->
+                coreManager.cursorStateManager.setLastCursorPosition(Offset(cursor.position.x, cursor.position.y))
             }
         }
 
@@ -234,12 +234,12 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     private fun attemptCursorRestore() {
         Logger.d("Restoring cursor overlay")
         when (lastOverlayType) {
-            OverlayModeCoordinator.OverlayMode.GRID -> {
-                serviceManager.activateGridMode(toggle = false)
+            ModeCoordinator.OverlayMode.GRID -> {
+                coreManager.activateGridMode(toggle = false)
             }
 
-            OverlayModeCoordinator.OverlayMode.CURSOR -> {
-                serviceManager.activateCursorMode(toggle = false)
+            ModeCoordinator.OverlayMode.CURSOR -> {
+                coreManager.activateCursorMode(toggle = false)
             }
 
             else -> {}
@@ -359,7 +359,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         Logger.d("Current key presses: $keysPressed")
 
         return try {
-            serviceManager.handleKeyEvent(event)
+            coreManager.handleKeyEvent(event)
         } catch (e: Exception) {
             Logger.e("Error processing key event", e)
             false
@@ -367,8 +367,8 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     fun forceHideAllOverlays() {
-        serviceManager.forceHideAllOverlays()
-        uiManager.updateOverlayUI()
+        coreManager.forceHideAllOverlays()
+        overlayManager.updateOverlayUI()
     }
 
     override fun onDestroy() {
@@ -382,12 +382,12 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 mainScope.cancel("AppAccessibilityService destroyed")
             }
 
-            if (::serviceManager.isInitialized) {
-                serviceManager.cleanup()
+            if (::coreManager.isInitialized) {
+                coreManager.cleanup()
             }
 
-            if (::uiManager.isInitialized) {
-                uiManager.cleanup()
+            if (::overlayManager.isInitialized) {
+                overlayManager.cleanup()
             }
 
             if (::orientationHandler.isInitialized) {
