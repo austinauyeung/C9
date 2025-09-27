@@ -1,11 +1,11 @@
 package com.austinauyeung.nyuma.c9.cursor.control
 
 import androidx.compose.ui.geometry.Offset
+import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
-import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue
@@ -13,14 +13,9 @@ import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorDirection
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 /**

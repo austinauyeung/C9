@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 import com.austinauyeung.nyuma.c9.core.logs.LogActivity
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 class DebugOptionsActivity : ComponentActivity() {
     private lateinit var viewModel: SettingsViewModel

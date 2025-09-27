@@ -21,8 +21,8 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
-import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 import com.austinauyeung.nyuma.c9.core.logs.Logger
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 import com.austinauyeung.nyuma.c9.cursor.ui.CursorOverlay
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
 import com.austinauyeung.nyuma.c9.grid.ui.GridOverlay

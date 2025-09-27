@@ -4,13 +4,13 @@ import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
+import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
-import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.cubicBezier
 import com.austinauyeung.nyuma.c9.core.util.AccelerationUtil.normalizeValue

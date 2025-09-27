@@ -1,11 +1,11 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
-import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility

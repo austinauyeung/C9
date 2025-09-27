@@ -1,20 +1,16 @@
 package com.austinauyeung.nyuma.c9.grid.control
 
-import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**

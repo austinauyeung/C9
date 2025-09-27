@@ -5,8 +5,8 @@ import android.os.SystemClock
 import android.view.InputDevice
 import android.view.InputEvent
 import android.view.MotionEvent
-import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureCompletionListener

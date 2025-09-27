@@ -8,21 +8,17 @@ import com.austinauyeung.nyuma.c9.core.domain.OrientationHandler
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.notification.NotificationManager
-import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.control.CursorActionHandler
 import com.austinauyeung.nyuma.c9.cursor.control.CursorStateManager
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.standard.DefaultGestureStrategy
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
-import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.control.GridActionHandler
 import com.austinauyeung.nyuma.c9.grid.control.GridStateManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

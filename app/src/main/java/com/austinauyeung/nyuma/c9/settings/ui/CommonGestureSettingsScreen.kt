@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -2,9 +2,9 @@ package com.austinauyeung.nyuma.c9.gesture.api
 
 import android.os.Build
 import androidx.compose.ui.geometry.Offset
+import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
-import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
