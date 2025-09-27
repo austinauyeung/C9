@@ -56,6 +56,7 @@ import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
+import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
@@ -86,6 +87,7 @@ fun CursorSettingsScreen(
     onNavigateToCursorIcon: () -> Unit,
     onNavigateToLocationClickableIcon: () -> Unit,
     onNavigateToScrollToggleIcon: () -> Unit,
+    onNavigateToClickableAppsScreen: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val uiState by settingsState.uiState.collectAsState()
@@ -369,6 +371,47 @@ fun CursorSettingsScreen(
 //                )
             }
 
+            PreferenceCategory(title = "Adaptive") {
+                SwitchPreferenceItem(
+                    title = "Show Location Clickable",
+                    subtitle = "Attempt to indicate if current cursor location is clickable",
+                    checked = uiState.checkClickable,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(checkClickable = v)
+                        }
+                    },
+                )
+
+                DropdownPreferenceItem(
+                    title = "Application List Type",
+                    subtitle =
+                        when (uiState.clickableListType) {
+                            AppListType.ALLOW_LIST -> "Show clickable locations only for selected apps"
+                            AppListType.DENY_LIST -> "Do not show clickable locations for selected apps"
+                        },
+                    selectedOption = uiState.clickableListType,
+                    options =
+                        listOf(
+                            AppListType.ALLOW_LIST to "Allow",
+                            AppListType.DENY_LIST to "Deny"
+                        ),
+                    onOptionSelected = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(clickableListType = v)
+                        }
+                    },
+                    enabled = uiState.checkClickable
+                )
+
+                SimplePreferenceItem(
+                    title = "Select Applications",
+                    subtitle = "${if (uiState.clickableListType == AppListType.ALLOW_LIST) "Show" else "Ignore"} in specific apps",
+                    onClick = onNavigateToClickableAppsScreen,
+                    enabled = uiState.checkClickable
+                )
+            }
+
             PreferenceCategory(title = "Appearance") {
                 SliderPreferenceItem(
                     title = "Cursor Size",
@@ -422,17 +465,6 @@ fun CursorSettingsScreen(
                         onDismiss = { showColorPickerDialog = false }
                     )
                 }
-
-                SwitchPreferenceItem(
-                    title = "Show Location Clickable",
-                    subtitle = "Attempt to indicate if current cursor location is clickable",
-                    checked = uiState.checkClickable,
-                    onCheckedChange = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(checkClickable = v)
-                        }
-                    },
-                )
             }
 
             PreferenceCategory(title = "Custom Icon") {
@@ -458,7 +490,7 @@ fun CursorSettingsScreen(
                     title = "Location Clickable Icon",
                     subtitle = if (!uiState.checkClickable) "Only applicable if \"Show Location Clickable\" is enabled " else "Configure location clickable icon",
                     onClick = onNavigateToLocationClickableIcon,
-                    enabled = uiState.checkClickable,
+                    enabled = uiState.useCustomCursorIcon && uiState.checkClickable,
                 )
 
                 SimplePreferenceItem(

@@ -481,8 +481,9 @@ class CursorActionHandler(
             movementJob = null
         }
 
-        val clickable = AppAccessibilityService.getInstance()?.isNodeClickable(cursorStateManager.cursorState.value?.position)
-        cursorStateManager.updateClickable(clickable!!)
+        val service = AppAccessibilityService.getInstance()
+        val clickable = service?.isNodeClickable(cursorStateManager.cursorState.value?.position) == true && service.showClickableInCurrentApp()
+        cursorStateManager.updateClickable(clickable)
     }
 
     private fun moveCursor(direction: CursorDirection) {

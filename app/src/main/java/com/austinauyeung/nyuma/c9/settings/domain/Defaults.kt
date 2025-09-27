@@ -64,8 +64,10 @@ object Defaults {
         const val USE_ADVANCED_SCROLLING = false
         const val COLLECT_LOGS = false
         val AUTO_HIDE_APPS = emptySet<String>()
+        val CLICKABLE_APPS = emptySet<String>()
         const val SHOW_NOTIFICATION = false
         val APPLICATION_LIST_TYPE = AppListType.DENY_LIST
+        val CLICKABLE_LIST_TYPE = AppListType.DENY_LIST
         const val IGNORE_NUMPAD = false
         const val CHECK_CLICKABLE = false
 

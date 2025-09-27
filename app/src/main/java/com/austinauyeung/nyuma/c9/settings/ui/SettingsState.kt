@@ -106,8 +106,10 @@ class SettingsState(
                             edgeScrollAccelerationDuration = settings.edgeScrollAccelerationDuration,
                             collectLogs = settings.collectLogs,
                             autoHideApps = settings.autoHideApps,
+                            clickableApps = settings.clickableApps,
                             showNotification = settings.showNotification,
                             applicationListType = settings.applicationListType,
+                            clickableListType = settings.clickableListType,
                             ignoreNumpad = settings.ignoreNumpad,
                             checkClickable = settings.checkClickable
                         )
@@ -197,8 +199,10 @@ class SettingsState(
             edgeScrollAccelerationDuration = _uiState.value.edgeScrollAccelerationDuration,
             collectLogs = _uiState.value.collectLogs,
             autoHideApps = _uiState.value.autoHideApps,
+            clickableApps = _uiState.value.clickableApps,
             showNotification = _uiState.value.showNotification,
             applicationListType = _uiState.value.applicationListType,
+            clickableListType = _uiState.value.clickableListType,
             ignoreNumpad = _uiState.value.ignoreNumpad,
             checkClickable = _uiState.value.checkClickable
         )
@@ -306,8 +310,10 @@ data class SettingsUiState(
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
+    val clickableApps: Set<String> = Defaults.Settings.CLICKABLE_APPS,
     val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
+    val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
     val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
     val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
 )

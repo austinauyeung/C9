@@ -356,6 +356,21 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         return settings.applicationListType == AppListType.ALLOW_LIST
     }
 
+    fun showClickableInCurrentApp(): Boolean {
+        val settings = C9.getInstance().getSettingsFlow().value
+        val showByDefault = settings.clickableListType == AppListType.DENY_LIST
+
+        if (settings.clickableApps.isEmpty()) return showByDefault
+
+        for (window in windows) {
+            val pkg = window.root?.packageName?.toString()
+            if (pkg != null && pkg in settings.clickableApps) {
+                return !showByDefault
+            }
+        }
+        return showByDefault
+    }
+
     private fun checkLockScreenVisibility() {
         try {
             val isLockScreenVisible = keyguardManager.isKeyguardLocked

@@ -80,8 +80,10 @@ class SettingsRepositoryImpl(
         private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
         private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
+        private val CLICKABLE_APPS = stringPreferencesKey("clickable_apps")
         private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
         private val APPLICATION_LIST_TYPE = stringPreferencesKey("application_list_type")
+        private val CLICKABLE_LIST_TYPE = stringPreferencesKey("clickable_list_type")
         private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
         private val CHECK_CLICKABLE = booleanPreferencesKey("check_clickable")
     }
@@ -173,6 +175,20 @@ class SettingsRepositoryImpl(
                     APPLICATION_LIST_TYPE,
                     OverlaySettings.DEFAULT.applicationListType,
                     "application list type"
+                )
+
+                val clickableAppsString = preferences[CLICKABLE_APPS] ?: ""
+                val clickableApps = if (clickableAppsString.isBlank()) {
+                    emptySet()
+                } else {
+                    clickableAppsString.split(",").toSet()
+                }
+
+                val clickableListType = getEnumPreference(
+                    preferences,
+                    CLICKABLE_LIST_TYPE,
+                    OverlaySettings.DEFAULT.clickableListType,
+                    "clickable list type"
                 )
 
                 val settings = OverlaySettings(
@@ -270,9 +286,11 @@ class SettingsRepositoryImpl(
                     collectLogs = preferences[COLLECT_LOGS]
                         ?: OverlaySettings.DEFAULT.collectLogs,
                     autoHideApps = autoHideApps,
+                    clickableApps = clickableApps,
                     showNotification = preferences[SHOW_NOTIFICATION]
                         ?: OverlaySettings.DEFAULT.showNotification,
                     applicationListType = applicationListType,
+                    clickableListType = clickableListType,
                     ignoreNumpad = preferences[IGNORE_NUMPAD]
                         ?: OverlaySettings.DEFAULT.ignoreNumpad,
                     checkClickable = preferences[CHECK_CLICKABLE]
@@ -337,8 +355,10 @@ class SettingsRepositoryImpl(
                 preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
                 preferences[COLLECT_LOGS] = settings.collectLogs
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
+                preferences[CLICKABLE_APPS] = settings.clickableApps.joinToString(",")
                 preferences[SHOW_NOTIFICATION] = settings.showNotification
                 preferences[APPLICATION_LIST_TYPE] = settings.applicationListType.name
+                preferences[CLICKABLE_LIST_TYPE] = settings.clickableListType.name
                 preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
                 preferences[CHECK_CLICKABLE] = settings.checkClickable
 

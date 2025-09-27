@@ -28,7 +28,7 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CursorClickableIconScreen(
+fun LocationClickableIconScreen(
     settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
