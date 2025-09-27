@@ -43,11 +43,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -58,7 +56,6 @@ import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
-import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
@@ -86,47 +83,15 @@ import kotlin.math.round
 @Composable
 fun CursorSettingsScreen(
     settingsState: SettingsState,
-    onNavigateBack: () -> Unit,
+    onNavigateToCursorIcon: () -> Unit,
+    onNavigateToScrollToggleIcon: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val uiState by settingsState.uiState.collectAsState()
     var showCursorKeyCaptureOverlay by remember { mutableStateOf(false) }
     var reservedKeys by remember { mutableStateOf(emptyMap<Int, String>()) }
     var showColorPickerDialog by remember { mutableStateOf(false) }
     val inToggleControlScheme = (uiState.controlScheme == ControlScheme.DPAD_TOGGLE || uiState.controlScheme == ControlScheme.NUMPAD_TOGGLE)
-
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    val clearIcon = {
-        settingsState.updatePreference(null) { settings, v ->
-            settings.copy(cursorImagePath = v)
-        }
-    }
-    val clearScrollToggleIcon = {
-        settingsState.updatePreference(null) { settings, v ->
-            settings.copy(scrollToggleImagePath = v)
-        }
-    }
-
-    val cursorImagePicker = rememberUnifiedImagePickerLauncher(
-        coroutineScope = coroutineScope,
-        context = context,
-        oldPath = uiState.cursorImagePath,
-        onCleared = clearIcon,
-        updatePreference = { path ->
-            settingsState.updatePreference(path) { settings, v -> settings.copy(cursorImagePath = v) }
-        }
-    )
-
-    val scrollToggleImagePicker = rememberUnifiedImagePickerLauncher(
-        coroutineScope = coroutineScope,
-        context = context,
-        oldPath = uiState.scrollToggleImagePath,
-        onCleared = clearScrollToggleIcon,
-        updatePreference = { path ->
-            settingsState.updatePreference(path) { settings, v -> settings.copy(scrollToggleImagePath = v) }
-        }
-    )
 
     when (uiState.controlScheme) {
         ControlScheme.STANDARD -> {
@@ -471,110 +436,19 @@ fun CursorSettingsScreen(
                 )
 
                 SimplePreferenceItem(
-                    title = if (!uiState.cursorImagePath.isNullOrEmpty() && File(uiState.cursorImagePath!!).exists() ) "Change Cursor Icon" else "Set Cursor Icon",
-                    subtitle = "Supported formats: png, gif, jpg, bmp, webp",
-                    onClick = { cursorImagePicker.launch(context) },
-                    enabled = uiState.useCustomCursorIcon
-                )
-                DropdownPreferenceItem(
-                    title = "Cursor Icon Alignment",
-                    subtitle =
-                    when (uiState.cursorImageAlignment) {
-                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
-                        IconAlignment.CENTER -> "Align to center of icon"
-                    },
-                    selectedOption = uiState.cursorImageAlignment,
-                    options =
-                    listOf(
-                        IconAlignment.TOP_LEFT to "Top left",
-                        IconAlignment.CENTER to "Center"
-                    ),
-                    onOptionSelected = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(cursorImageAlignment = v)
-                        }
-                    },
-                    enabled = uiState.useCustomCursorIcon
-                )
-                DropdownPreferenceItem(
-                    title = "Cursor Icon Alignment",
-                    subtitle =
-                    when (uiState.cursorImageAlignment) {
-                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
-                        IconAlignment.CENTER -> "Align to center of icon"
-                    },
-                    selectedOption = uiState.cursorImageAlignment,
-                    options =
-                    listOf(
-                        IconAlignment.TOP_LEFT to "Top left",
-                        IconAlignment.CENTER to "Center"
-                    ),
-                    onOptionSelected = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(cursorImageAlignment = v)
-                        }
-                    },
-                    enabled = uiState.useCustomCursorIcon
-                )
-                SimplePreferenceItem(
-                    title = "Clear Cursor Icon",
-                    subtitle = "Fallback to default icon",
-                    onClick = { clearImage(uiState.cursorImagePath, clearIcon) },
+                    title = "Cursor Icon",
+                    subtitle = "Configure cursor icon",
+                    onClick = onNavigateToCursorIcon,
                     enabled = uiState.useCustomCursorIcon
                 )
 
                 SimplePreferenceItem(
-                    title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Scroll Toggle Icon" else "Set Scroll Toggle Icon",
-                    subtitle = if (!inToggleControlScheme) "Applies only in D-pad and numpad control schemes" else "Supported formats: png, gif, jpg, bmp, webp",
-                    onClick = { scrollToggleImagePicker.launch(context) },
+                    title = "Scroll Toggle Icon",
+                    subtitle = if (!inToggleControlScheme) "Control scheme must be D-pad or numpad" else "Configure scroll toggle icon",
+                    onClick = onNavigateToScrollToggleIcon,
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
-                DropdownPreferenceItem(
-                    title = "Scroll Toggle Icon Alignment",
-                    subtitle =
-                    when (uiState.scrollToggleImageAlignment) {
-                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
-                        IconAlignment.CENTER -> "Align to center of icon"
-                    },
-                    selectedOption = uiState.scrollToggleImageAlignment,
-                    options =
-                    listOf(
-                        IconAlignment.TOP_LEFT to "Top left",
-                        IconAlignment.CENTER to "Center"
-                    ),
-                    onOptionSelected = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(scrollToggleImageAlignment = v)
-                        }
-                    },
-                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
-                )
-                DropdownPreferenceItem(
-                    title = "Scroll Toggle Icon Alignment",
-                    subtitle =
-                    when (uiState.scrollToggleImageAlignment) {
-                        IconAlignment.TOP_LEFT -> "Align to top-left of icon"
-                        IconAlignment.CENTER -> "Align to center of icon"
-                    },
-                    selectedOption = uiState.scrollToggleImageAlignment,
-                    options =
-                    listOf(
-                        IconAlignment.TOP_LEFT to "Top left",
-                        IconAlignment.CENTER to "Center"
-                    ),
-                    onOptionSelected = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(scrollToggleImageAlignment = v)
-                        }
-                    },
-                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
-                )
-                SimplePreferenceItem(
-                    title = "Clear Scroll Toggle Icon",
-                    subtitle = "Fallback to default screen border indicator",
-                    onClick = { clearImage(uiState.scrollToggleImagePath, clearScrollToggleIcon) },
-                    enabled = uiState.useCustomCursorIcon && inToggleControlScheme
-                )
+
             }
         }
     }

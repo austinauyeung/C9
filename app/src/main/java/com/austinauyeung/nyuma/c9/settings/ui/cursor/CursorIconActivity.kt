@@ -1,28 +1,19 @@
 package com.austinauyeung.nyuma.c9.settings.ui.cursor
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
 
 /**
- * Standard cursor settings screen.
+ * Cursor icon settings.
  */
-class CursorSettingsActivity : ComponentActivity() {
+class CursorIconActivity : ComponentActivity() {
     private lateinit var settingsState: SettingsState
-
-    private fun startCustomActivity(context: Context, activityClass: Class<*>) {
-        val intent = Intent(context, activityClass)
-        val options = ActivityOptionsCompat.makeBasic()
-        context.startActivity(intent, options.toBundle())
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,10 +29,8 @@ class CursorSettingsActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                CursorSettingsScreen(
+                CursorIconScreen(
                     settingsState = settingsState,
-                    onNavigateToCursorIcon = { startCustomActivity(this, CursorIconActivity::class.java) },
-                    onNavigateToScrollToggleIcon = { startCustomActivity(this, ScrollToggleIconActivity::class.java) },
                     onNavigateBack = {
                         finish()
                     },
