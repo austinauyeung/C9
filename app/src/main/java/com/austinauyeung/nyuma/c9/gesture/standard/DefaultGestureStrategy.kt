@@ -94,11 +94,11 @@ class DefaultGestureStrategy(
             override fun onCompleted(gestureDescription: GestureDescription?) {
                 if (willContinue) {
                     val finger1PausePath = Path().apply {
-                        moveTo(endX1 / 2, endY1 / 2)
+                        moveTo(endX1, endY1)
                     }
 
                     val finger2PausePath = Path().apply {
-                        moveTo(endX2 / 2, endY2 / 2)
+                        moveTo(endX2, endY2)
                     }
 
                     val stroke1Pause = stroke1.continueStroke(
