@@ -30,11 +30,10 @@ import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebugOptionsScreen(
-    viewModel: SettingsViewModel,
-    onNavigateBack: () -> Unit,
-    onNavigateToLogScreen: () -> Unit
+    settingsState: SettingsState,
+    onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
     var showShizukuDialog by remember { mutableStateOf(false) }
     var showExperimentalDialog by remember { mutableStateOf(false) }
 
@@ -59,23 +58,23 @@ fun DebugOptionsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            PreferenceCategory(title = "Logging") {
-                SwitchPreferenceItem(
-                    title = "Collect Logs",
-                    subtitle = "Logs will be written to the log screen",
-                    checked = uiState.collectLogs,
-                    onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
-                            settings.copy(collectLogs = v)
-                        }
-                    }
-                )
-                SimplePreferenceItem(
-                    title = "Log Screen",
-                    subtitle = "View application logs",
-                    onClick = onNavigateToLogScreen,
-                )
-            }
+//            PreferenceCategory(title = "Logging") {
+//                SwitchPreferenceItem(
+//                    title = "Collect Logs",
+//                    subtitle = "Logs will be written to the log screen",
+//                    checked = uiState.collectLogs,
+//                    onCheckedChange = { value ->
+//                        settingsState.updatePreference(value) { settings, v ->
+//                            settings.copy(collectLogs = v)
+//                        }
+//                    }
+//                )
+//                SimplePreferenceItem(
+//                    title = "Log Screen",
+//                    subtitle = "View application logs",
+//                    onClick = onNavigateToLogScreen,
+//                )
+//            }
 
             PreferenceCategory(title = "Shizuku") {
                 SwitchPreferenceItem(
@@ -86,10 +85,22 @@ fun DebugOptionsScreen(
                         if (newValue && !uiState.enableShizukuIntegration) {
                             showShizukuDialog = true
                         } else {
-                            viewModel.updateEnableShizukuIntegration(newValue)
+                            settingsState.updateEnableShizukuIntegration(newValue)
                         }
                     },
                     enabled = !VersionUtil.belowVersion(Build.VERSION_CODES.O)
+                )
+
+                SwitchPreferenceItem(
+                    title = "Android 7 Override",
+                    subtitle = "Removes Shizuku requirement but restricts gestures to clicks only",
+                    checked = uiState.overrideAndroid7,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(overrideAndroid7 = v, enableShizukuIntegration = !v)
+                        }
+                    },
+                    enabled = VersionUtil.belowVersion(Build.VERSION_CODES.O)
                 )
             }
 
@@ -103,7 +114,7 @@ fun DebugOptionsScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.updateEnableShizukuIntegration(true)
+                                settingsState.updateEnableShizukuIntegration(true)
                                 showShizukuDialog = false
                             }
                         ) {
@@ -126,7 +137,7 @@ fun DebugOptionsScreen(
                     subtitle = "Allow manual scrolls and zooms to overlap",
                     checked = uiState.allowOverlappingGestures,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(allowOverlappingGestures = v)
                         }
                     },
@@ -136,7 +147,7 @@ fun DebugOptionsScreen(
                     subtitle = "Currently recommended only for Android versions 8-10 as needed",
                     checked = uiState.forceSmootherGestures,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(forceSmootherGestures = v)
                         }
                     },
@@ -158,7 +169,7 @@ fun DebugOptionsScreen(
                     subtitle = "Overlay cursor over the entire screen, including any navigation bars",
                     checked = uiState.usePhysicalSize,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(usePhysicalSize = v)
                         }
                     },
@@ -171,7 +182,7 @@ fun DebugOptionsScreen(
                     subtitle = "Bypass all numpad behavior except for activation",
                     checked = uiState.ignoreNumpad,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(ignoreNumpad = v)
                         }
                     },
@@ -185,7 +196,7 @@ fun DebugOptionsScreen(
                         if (newValue && !uiState.allowPassthrough) {
                             showExperimentalDialog = true
                         } else {
-                            viewModel.updateAllowPassthrough(newValue)
+                            settingsState.updateAllowPassthrough(newValue)
                         }
                     },
                 )
@@ -201,7 +212,7 @@ fun DebugOptionsScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.updateAllowPassthrough(true)
+                                settingsState.updateAllowPassthrough(true)
                                 showExperimentalDialog = false
                             }
                         ) {

@@ -1,11 +1,11 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -40,6 +40,7 @@ data class OverlaySettings(
     val zoomFactor: Float = Defaults.Settings.ZOOM_FACTOR,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
+    val overrideAndroid7: Boolean = Defaults.Settings.OVERRIDE_ANDROID_7,
     val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
     val hideOnLauncherOpen: Boolean = Defaults.Settings.HIDE_ON_LAUNCHER_OPEN,
     val hideOnLockScreen: Boolean = Defaults.Settings.HIDE_ON_LOCK_SCREEN,
@@ -51,9 +52,11 @@ data class OverlaySettings(
     val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
     val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES,
     val cursorImagePath: String? = Defaults.Settings.CURSOR_IMAGE_PATH,
+    val clickableImagePath: String? = Defaults.Settings.CLICKABLE_IMAGE_PATH,
     val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
     val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON,
     val cursorImageAlignment: IconAlignment = Defaults.Settings.CURSOR_IMAGE_ALIGNMENT,
+    val clickableImageAlignment: IconAlignment = Defaults.Settings.CLICKABLE_IMAGE_ALIGNMENT,
     val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT,
     val useAdvancedScrolling: Boolean = Defaults.Settings.USE_ADVANCED_SCROLLING,
     val continuousScrollDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_DURATION,
@@ -66,9 +69,12 @@ data class OverlaySettings(
     val edgeScrollAccelerationDuration: Long = Defaults.Settings.EDGE_SCROLL_ACCELERATION_DURATION,
     val collectLogs: Boolean = Defaults.Settings.COLLECT_LOGS,
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
+    val clickableApps: Set<String> = Defaults.Settings.CLICKABLE_APPS,
     val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
-    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD
+    val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
+    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
+    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

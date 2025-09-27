@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.austinauyeung.nyuma.c9.R
-import com.austinauyeung.nyuma.c9.accessibility.coordinator.OverlayModeCoordinator
+import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.settings.ui.SettingsActivity
 
@@ -45,20 +45,20 @@ class NotificationManager(private val context: Context) {
         }
     }
 
-    fun showNotification(mode: OverlayModeCoordinator.OverlayMode) {
+    fun showNotification(mode: ModeCoordinator.OverlayMode) {
         try {
             val (title, text, icon) = when (mode) {
-                OverlayModeCoordinator.OverlayMode.GRID -> Triple(
+                ModeCoordinator.OverlayMode.GRID -> Triple(
                     "Grid Cursor Active",
                     "Tap to open settings",
                     R.drawable.ic_stat_name
                 )
-                OverlayModeCoordinator.OverlayMode.CURSOR -> Triple(
+                ModeCoordinator.OverlayMode.CURSOR -> Triple(
                     "Standard Cursor Active",
                     "Tap to open settings",
                     R.drawable.ic_stat_name
                 )
-                OverlayModeCoordinator.OverlayMode.NONE -> {
+                ModeCoordinator.OverlayMode.NONE -> {
                     hideNotification()
                     return
                 }

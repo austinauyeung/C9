@@ -5,10 +5,10 @@ import android.os.SystemClock
 import android.view.InputDevice
 import android.view.InputEvent
 import android.view.MotionEvent
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureCompletionListener
 import com.austinauyeung.nyuma.c9.gesture.api.GestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
@@ -66,7 +66,7 @@ class ShizukuGestureStrategy(
     private var _currentGestureY = 0f
 
     private fun isAvailable(): Boolean {
-        return ShizukuServiceConnection.isReady()
+        return ShizukuConnection.isReady()
     }
 
     @SuppressLint("PrivateApi")
@@ -76,7 +76,7 @@ class ShizukuGestureStrategy(
         try {
             val inputBinder = SystemServiceHelper.getSystemService("input")
             if (inputBinder == null) {
-                Logger.e("Failed to get input service via ShizukuServiceConnection")
+                Logger.e("Failed to get input shizuku via ShizukuConnection")
                 return null
             }
 

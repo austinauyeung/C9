@@ -1,6 +1,5 @@
 package com.austinauyeung.nyuma.c9.settings.repository
 
-import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -11,7 +10,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -52,6 +50,7 @@ class SettingsRepositoryImpl(
         private val ZOOM_FACTOR = floatPreferencesKey("zoom_factor")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
+        private val OVERRIDE_ANDROID_7 = booleanPreferencesKey("override_android_7")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
         private val HIDE_ON_LAUNCHER_OPEN = booleanPreferencesKey("hide_on_launcher_open")
         private val HIDE_ON_LOCK_SCREEN = booleanPreferencesKey("hide_on_lock_screen")
@@ -63,9 +62,11 @@ class SettingsRepositoryImpl(
         private val ALLOW_OVERLAPPING_GESTURES = booleanPreferencesKey("allow_overlapping_gestures")
         private val FORCE_SMOOTHER_GESTURES = booleanPreferencesKey("force_smoother_gestures")
         private val CURSOR_IMAGE_PATH = stringPreferencesKey("cursor_image_path")
+        private val CLICKABLE_IMAGE_PATH = stringPreferencesKey("clickable_image_path")
         private val SCROLL_TOGGLE_IMAGE_PATH = stringPreferencesKey("scroll_toggle_image_path")
         private val USE_CUSTOM_CURSOR_ICON = booleanPreferencesKey("use_custom_cursor_icon")
         private val CURSOR_IMAGE_ALIGNMENT = stringPreferencesKey("cursor_image_alignment")
+        private val CLICKABLE_IMAGE_ALIGNMENT = stringPreferencesKey("clickable_image_alignment")
         private val SCROLL_TOGGLE_IMAGE_ALIGNMENT = stringPreferencesKey("scroll_toggle_image_alignment")
         private val USE_ADVANCED_SCROLLING = booleanPreferencesKey("use_advanced_scrolling")
         private val CONTINUOUS_SCROLL_DURATION = longPreferencesKey("continuous_scroll_duration")
@@ -78,9 +79,12 @@ class SettingsRepositoryImpl(
         private val EDGE_SCROLL_ACCELERATION_DURATION = longPreferencesKey("edge_scroll_acceleration_duration")
         private val COLLECT_LOGS = booleanPreferencesKey("collect_logs")
         private val AUTO_HIDE_APPS = stringPreferencesKey("auto_hide_apps")
+        private val CLICKABLE_APPS = stringPreferencesKey("clickable_apps")
         private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
         private val APPLICATION_LIST_TYPE = stringPreferencesKey("application_list_type")
+        private val CLICKABLE_LIST_TYPE = stringPreferencesKey("clickable_list_type")
         private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
+        private val CHECK_CLICKABLE = booleanPreferencesKey("check_clickable")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -144,6 +148,13 @@ class SettingsRepositoryImpl(
                     "cursor image alignment"
                 )
 
+                val clickableImageAlignment = getEnumPreference(
+                    preferences,
+                    CLICKABLE_IMAGE_ALIGNMENT,
+                    OverlaySettings.DEFAULT.clickableImageAlignment,
+                    "clickable image alignment"
+                )
+
                 val scrollToggleImageAlignment = getEnumPreference(
                     preferences,
                     SCROLL_TOGGLE_IMAGE_ALIGNMENT,
@@ -163,6 +174,20 @@ class SettingsRepositoryImpl(
                     APPLICATION_LIST_TYPE,
                     OverlaySettings.DEFAULT.applicationListType,
                     "application list type"
+                )
+
+                val clickableAppsString = preferences[CLICKABLE_APPS] ?: ""
+                val clickableApps = if (clickableAppsString.isBlank()) {
+                    emptySet()
+                } else {
+                    clickableAppsString.split(",").toSet()
+                }
+
+                val clickableListType = getEnumPreference(
+                    preferences,
+                    CLICKABLE_LIST_TYPE,
+                    OverlaySettings.DEFAULT.clickableListType,
+                    "clickable list type"
                 )
 
                 val settings = OverlaySettings(
@@ -208,6 +233,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
+                    overrideAndroid7 = preferences[OVERRIDE_ANDROID_7]
+                        ?: OverlaySettings.DEFAULT.overrideAndroid7,
                     hideOnKeyboardOpen = preferences[HIDE_ON_KEYBOARD_OPEN]
                         ?: OverlaySettings.DEFAULT.hideOnKeyboardOpen,
                     hideOnLauncherOpen = preferences[HIDE_ON_LAUNCHER_OPEN]
@@ -230,11 +257,14 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.forceSmootherGestures,
                     cursorImagePath = preferences[CURSOR_IMAGE_PATH]
                         ?: OverlaySettings.DEFAULT.cursorImagePath,
+                    clickableImagePath = preferences[CLICKABLE_IMAGE_PATH]
+                        ?: OverlaySettings.DEFAULT.clickableImagePath,
                     scrollToggleImagePath = preferences[SCROLL_TOGGLE_IMAGE_PATH]
                         ?: OverlaySettings.DEFAULT.scrollToggleImagePath,
                     useCustomCursorIcon = preferences[USE_CUSTOM_CURSOR_ICON]
                         ?: OverlaySettings.DEFAULT.useCustomCursorIcon,
                     cursorImageAlignment = cursorImageAlignment,
+                    clickableImageAlignment = clickableImageAlignment,
                     scrollToggleImageAlignment = scrollToggleImageAlignment,
                     useAdvancedScrolling = preferences[USE_ADVANCED_SCROLLING]
                         ?: OverlaySettings.DEFAULT.useAdvancedScrolling,
@@ -257,14 +287,18 @@ class SettingsRepositoryImpl(
                     collectLogs = preferences[COLLECT_LOGS]
                         ?: OverlaySettings.DEFAULT.collectLogs,
                     autoHideApps = autoHideApps,
+                    clickableApps = clickableApps,
                     showNotification = preferences[SHOW_NOTIFICATION]
                         ?: OverlaySettings.DEFAULT.showNotification,
                     applicationListType = applicationListType,
+                    clickableListType = clickableListType,
                     ignoreNumpad = preferences[IGNORE_NUMPAD]
-                        ?: OverlaySettings.DEFAULT.ignoreNumpad
+                        ?: OverlaySettings.DEFAULT.ignoreNumpad,
+                    checkClickable = preferences[CHECK_CLICKABLE]
+                        ?: OverlaySettings.DEFAULT.checkClickable
                 )
 
-                if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
+                settings
             }
     }
 
@@ -297,6 +331,7 @@ class SettingsRepositoryImpl(
                 preferences[ZOOM_FACTOR] = settings.zoomFactor
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
+                preferences[OVERRIDE_ANDROID_7] = settings.overrideAndroid7
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
                 preferences[HIDE_ON_LAUNCHER_OPEN] = settings.hideOnLauncherOpen
                 preferences[HIDE_ON_LOCK_SCREEN] = settings.hideOnLockScreen
@@ -309,6 +344,7 @@ class SettingsRepositoryImpl(
                 preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
                 preferences[USE_CUSTOM_CURSOR_ICON] = settings.useCustomCursorIcon
                 preferences[CURSOR_IMAGE_ALIGNMENT] = settings.cursorImageAlignment.name
+                preferences[CLICKABLE_IMAGE_ALIGNMENT] = settings.clickableImageAlignment.name
                 preferences[SCROLL_TOGGLE_IMAGE_ALIGNMENT] = settings.scrollToggleImageAlignment.name
                 preferences[USE_ADVANCED_SCROLLING] = settings.useAdvancedScrolling
                 preferences[CONTINUOUS_SCROLL_DURATION] = settings.continuousScrollDuration
@@ -321,14 +357,23 @@ class SettingsRepositoryImpl(
                 preferences[EDGE_SCROLL_ACCELERATION_DURATION] = settings.edgeScrollAccelerationDuration
                 preferences[COLLECT_LOGS] = settings.collectLogs
                 preferences[AUTO_HIDE_APPS] = settings.autoHideApps.joinToString(",")
+                preferences[CLICKABLE_APPS] = settings.clickableApps.joinToString(",")
                 preferences[SHOW_NOTIFICATION] = settings.showNotification
                 preferences[APPLICATION_LIST_TYPE] = settings.applicationListType.name
+                preferences[CLICKABLE_LIST_TYPE] = settings.clickableListType.name
                 preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
+                preferences[CHECK_CLICKABLE] = settings.checkClickable
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath
                 } else {
                     preferences.remove(CURSOR_IMAGE_PATH)
+                }
+
+                if (settings.clickableImagePath != null) {
+                    preferences[CLICKABLE_IMAGE_PATH] = settings.clickableImagePath
+                } else {
+                    preferences.remove(CLICKABLE_IMAGE_PATH)
                 }
 
                 if (settings.scrollToggleImagePath != null) {

@@ -1,12 +1,14 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
+import android.os.Build
 import android.view.KeyEvent
-import com.austinauyeung.nyuma.c9.common.domain.GestureStyle
-import com.austinauyeung.nyuma.c9.common.domain.ScreenEdgeBehavior
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
+import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -43,7 +45,8 @@ object Defaults {
         const val ZOOM_DURATION = GestureConstants.DEFAULT_ZOOM_DURATION
         const val ZOOM_FACTOR = GestureConstants.DEFAULT_ZOOM_DISTANCE_FACTOR
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
-        const val ENABLE_SHIZUKU_INTEGRATION = false
+        val ENABLE_SHIZUKU_INTEGRATION = VersionUtil.belowVersion(Build.VERSION_CODES.O)
+        const val OVERRIDE_ANDROID_7 = false
         const val HIDE_ON_KEYBOARD_OPEN = false
         const val HIDE_ON_LAUNCHER_OPEN = false
         const val HIDE_ON_LOCK_SCREEN = false
@@ -55,16 +58,21 @@ object Defaults {
         const val ALLOW_OVERLAPPING_GESTURES = false
         const val FORCE_SMOOTHER_GESTURES = false
         val CURSOR_IMAGE_PATH = null
+        val CLICKABLE_IMAGE_PATH = null
         val SCROLL_TOGGLE_IMAGE_PATH = null
         const val USE_CUSTOM_CURSOR_ICON = false
         val CURSOR_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
+        val CLICKABLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         val SCROLL_TOGGLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         const val USE_ADVANCED_SCROLLING = false
         const val COLLECT_LOGS = false
         val AUTO_HIDE_APPS = emptySet<String>()
+        val CLICKABLE_APPS = emptySet<String>()
         const val SHOW_NOTIFICATION = false
         val APPLICATION_LIST_TYPE = AppListType.DENY_LIST
+        val CLICKABLE_LIST_TYPE = AppListType.DENY_LIST
         const val IGNORE_NUMPAD = false
+        const val CHECK_CLICKABLE = false
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

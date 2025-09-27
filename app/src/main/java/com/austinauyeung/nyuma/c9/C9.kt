@@ -7,11 +7,11 @@ import android.view.accessibility.AccessibilityManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.austinauyeung.nyuma.c9.accessibility.service.OverlayAccessibilityService
+import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
 import com.austinauyeung.nyuma.c9.core.logs.LogManager
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
-import com.austinauyeung.nyuma.c9.core.service.ShizukuStatus
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuStatus
 import com.austinauyeung.nyuma.c9.gesture.shizuku.ShizukuGestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.repository.SettingsRepository
@@ -85,19 +85,19 @@ class C9 : Application() {
 
     private fun initializeShizuku() {
         Logger.i("Initializing Shizuku on Android 11")
-        ShizukuServiceConnection.initialize()
+        ShizukuConnection.initialize()
         shizukuObserverJob =
-            ShizukuServiceConnection.observeStatus { status ->
+            ShizukuConnection.observeStatus { status ->
                 Logger.d("Shizuku status changed: $status")
 
                 when (status) {
                     ShizukuStatus.PERMISSION_REQUIRED -> {
                         Logger.d("Auto-requesting Shizuku permission")
-                        ShizukuServiceConnection.requestPermission()
+                        ShizukuConnection.requestPermission()
                     }
 
                     ShizukuStatus.NOT_AVAILABLE -> {
-                        ShizukuServiceConnection.resetPermissionRetryCount()
+                        ShizukuConnection.resetPermissionRetryCount()
                         _shizukuGestureStrategy?.reset()
                     }
 
@@ -106,7 +106,7 @@ class C9 : Application() {
                     }
 
                     ShizukuStatus.READY -> {
-                        ShizukuServiceConnection.resetPermissionRetryCount()
+                        ShizukuConnection.resetPermissionRetryCount()
                         Logger.i("Shizuku ready")
                     }
 
@@ -118,7 +118,7 @@ class C9 : Application() {
     private fun cleanupShizuku() {
         shizukuObserverJob?.cancel()
         _shizukuGestureStrategy?.shutdown()
-        ShizukuServiceConnection.cleanup()
+        ShizukuConnection.cleanup()
         shizukuObserverJob?.cancel()
     }
 
@@ -149,7 +149,7 @@ class C9 : Application() {
                     )
                 return enabledServices.any {
                     it.id.contains(context.packageName) &&
-                            it.id.contains(OverlayAccessibilityService::class.java.simpleName)
+                            it.id.contains(AppAccessibilityService::class.java.simpleName)
                 }
             } catch (e: Exception) {
                 Logger.e("Error checking accessibility service status", e)

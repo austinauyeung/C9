@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -17,14 +18,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -46,7 +50,7 @@ fun CursorOverlay(
     val opacity = CursorConstants.OPACITY
     val cursorColor = settings?.standardCursorHex?.let {
         try {
-            Color(android.graphics.Color.parseColor("#$it"))
+            Color("#$it".toColorInt())
         } catch (e: Exception) {
             Color.White
         }
@@ -56,6 +60,9 @@ fun CursorOverlay(
     val iconImageUri = settings?.cursorImagePath?.takeIf {
         it.isNotEmpty() && File(it).exists()
     }
+    val clickableImageUri = settings?.clickableImagePath?.takeIf {
+        it.isNotEmpty() && File(it).exists()
+    }
     val scrollToggleIconImageUri = settings?.scrollToggleImagePath?.takeIf {
         it.isNotEmpty() && File(it).exists()
     }
@@ -63,8 +70,10 @@ fun CursorOverlay(
 //    var customImageLoaded by remember { mutableStateOf(false) }
     val position = cursorState.position
     val density = LocalDensity.current
-
     val context = LocalContext.current
+
+    val isClickable = cursorState.clickable && settings?.checkClickable == true
+
     Box(modifier = modifier
         .fillMaxSize()
         .border(
@@ -72,20 +81,42 @@ fun CursorOverlay(
             color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (settings?.useCustomCursorIcon != true || scrollToggleIconImageUri == null)) 1f else 0f),
         )
     ) {
-        if (settings?.useCustomCursorIcon != true || iconImageUri == null) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawDefaultCursor(
-                    position = position,
-                    cursorSize = cursorSize,
-                    opacity = opacity,
-                    cursorColor = cursorColor,
-                    matchBorder = matchBorder,
-                    roundedCorners = settings?.roundedCursorCorners ?: false,
-                    isHoldActive = cursorState.isHoldActive
+        val showScrollToggleIcon = (settings?.useCustomCursorIcon == true) && (cursorState.inScrollMode) && (scrollToggleIconImageUri != null)
+        val showClickableIcon = !showScrollToggleIcon && (settings?.useCustomCursorIcon == true) && (isClickable) && (clickableImageUri != null)
+        val showBaseCustomIcon = !showScrollToggleIcon && !showClickableIcon && (settings?.useCustomCursorIcon == true) && (iconImageUri != null)
+
+        when {
+            showScrollToggleIcon -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(scrollToggleIconImageUri)
+                        .build(),
+                    contentDescription = "Custom Scroll Toggle Cursor Icon",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(cursorSize.dp)
+                        .offset(
+                            x = with(density) { position.x.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
+                        )
                 )
             }
-        } else {
-            if (!cursorState.inScrollMode || scrollToggleIconImageUri == null) {
+            showClickableIcon -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(clickableImageUri)
+                        .build(),
+                    contentDescription = "Custom Clickable Cursor Icon",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(cursorSize.dp)
+                        .offset(
+                            x = with(density) { position.x.toDp() } - if (settings?.clickableImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.clickableImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
+                        )
+                )
+            }
+            showBaseCustomIcon -> {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(iconImageUri)
@@ -108,20 +139,20 @@ fun CursorOverlay(
 //                    customImageLoaded = false
 //                }
                 )
-            } else {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(scrollToggleIconImageUri)
-                        .build(),
-                    contentDescription = "Custom Scroll Toggle Cursor Icon",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(cursorSize.dp)
-                        .offset(
-                            x = with(density) { position.x.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
-                            y = with(density) { position.y.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
-                        )
-                )
+            }
+            else -> {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawDefaultCursor(
+                        position = position,
+                        cursorSize = cursorSize,
+                        opacity = opacity,
+                        cursorColor = cursorColor,
+                        matchBorder = matchBorder,
+                        roundedCorners = settings?.roundedCursorCorners ?: false,
+                        isHoldActive = cursorState.isHoldActive,
+                        isClickable = isClickable
+                    )
+                }
             }
         }
     }
@@ -135,6 +166,7 @@ private fun DrawScope.drawDefaultCursor(
     matchBorder: Boolean,
     roundedCorners: Boolean,
     isHoldActive: Boolean,
+    isClickable: Boolean
 ) {
     // Arrowhead shape
     val side1Y = cursorSize * 1.0f
@@ -172,6 +204,28 @@ private fun DrawScope.drawDefaultCursor(
         color = if (matchBorder) cursorColor else Color.Black,
         style = Stroke(width = cursorSize * 0.1f),
     )
+
+    if (isClickable) {
+        val radius = cursorSize * 0.25f
+        val center = Offset(position.x, position.y)
+        val rect = Rect(
+            left = center.x - radius,
+            top = center.y - radius,
+            right = center.x + radius,
+            bottom = center.y + radius
+        )
+        val padding = 1
+        val angle = theta * 180 / PI
+        val path = Path().apply {
+            arcTo(
+                rect = rect,
+                startAngleDegrees = ((1 - padding) * angle).toFloat(),
+                sweepAngleDegrees = -(360 - (90 - angle) - 2 * padding * angle).toFloat(),
+                forceMoveTo = false
+            )
+        }
+        drawPath(path, if (matchBorder) cursorColor else Color.Black, style = Stroke(width = cursorSize * 0.1f))
+    }
 
     // Trace bottom of cursor
     if (isHoldActive) {

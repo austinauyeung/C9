@@ -2,11 +2,11 @@ package com.austinauyeung.nyuma.c9.gesture.api
 
 import android.os.Build
 import androidx.compose.ui.geometry.Offset
-import com.austinauyeung.nyuma.c9.common.domain.ScreenDimensions
-import com.austinauyeung.nyuma.c9.common.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
+import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.core.service.ShizukuServiceConnection
+import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
@@ -58,7 +58,7 @@ class GestureManager(
     init {
         evaluateStrategy()
 
-        shizukuObserverJob = ShizukuServiceConnection.observeStatus { status ->
+        shizukuObserverJob = ShizukuConnection.observeStatus { status ->
             Logger.d("Shizuku status changed to: $status, re-evaluating gesture strategy")
             serviceScope.launch {
                 delay(1000)
@@ -87,14 +87,12 @@ class GestureManager(
     private var shouldShowGestures = false
 
     private fun shouldUseShizuku(): Boolean {
-        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) return true
-
         val settings = settingsFlow.value
         if (!settings.enableShizukuIntegration) {
             return false
         }
 
-        val isShizukuReady = ShizukuServiceConnection.isReady(forceRefresh = true)
+        val isShizukuReady = ShizukuConnection.isReady(forceRefresh = true)
         Logger.d("Shizuku ready status: $isShizukuReady")
         return isShizukuReady
     }
@@ -266,14 +264,18 @@ class GestureManager(
     }
 
     suspend fun startTap(x: Float, y: Float): Boolean {
-        if (!getGestureReady()) return false
-        setGestureReady(false)
-
         try {
             Logger.d("Starting tap gesture at ($x, $y)")
             if (shouldShowGestures) {
                 visualizeTap(x, y)
             }
+
+            if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+                return defaultStrategy.immediateTap(x, y)
+            }
+
+            if (!getGestureReady()) return false
+            setGestureReady(false)
 
             return currentStrategy.startTap(x, y, completionListener)
         } catch (e: Exception) {
@@ -289,6 +291,10 @@ class GestureManager(
     }
 
     suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         if (!getGestureReady()) return false
         if (fromX.equalToDecimalPlaces(toX, 4) && fromY.equalToDecimalPlaces(toY, 4)) {
             setGestureReady(true)
@@ -308,6 +314,10 @@ class GestureManager(
     }
 
     suspend fun endTap(x: Float, y: Float): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         if (!getGestureReady()) return false
         setGestureReady(false)
 
@@ -322,6 +332,10 @@ class GestureManager(
     }
 
     private fun cancelTap(): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         try {
             Logger.d("Cancelling tap gesture")
             return currentStrategy.cancelTap(completionListener)

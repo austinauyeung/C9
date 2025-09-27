@@ -9,5 +9,6 @@ data class CursorState(
     val position: Offset,
     val isVisible: Boolean = true,
     val inScrollMode: Boolean = false,
-    val isHoldActive: Boolean = false
+    val isHoldActive: Boolean = false,
+    val clickable: Boolean = false
 )

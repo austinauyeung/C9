@@ -7,29 +7,24 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.common.ui.C9Theme
-import com.austinauyeung.nyuma.c9.core.logs.ui.LogActivity
+import com.austinauyeung.nyuma.c9.core.logs.LogActivity
+import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 class DebugOptionsActivity : ComponentActivity() {
-    private lateinit var viewModel: SettingsViewModel
+    private lateinit var settingsState: SettingsState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val factory = SettingsViewModel.Factory(C9.getInstance().settingsRepository)
-        viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+        val factory = SettingsState.Factory(C9.getInstance().settingsRepository)
+        settingsState = ViewModelProvider(this, factory)[SettingsState::class.java]
 
         setContent {
-            C9Theme {
+            AppTheme {
                 DebugOptionsScreen(
-                    viewModel = viewModel,
+                    settingsState = settingsState,
                     onNavigateBack = {
                         finish()
-                    },
-                    onNavigateToLogScreen = {
-                        val intent = Intent(this, LogActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
                     }
                 )
             }
