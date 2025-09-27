@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.gesture
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,16 +19,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 import kotlin.math.max
 import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScrollSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -57,7 +61,7 @@ fun ScrollSettingsScreen(
                     subtitle = "Use content-based scrolling instead of standard scrolling",
                     checked = uiState.useNaturalScrolling,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(useNaturalScrolling = v)
                         }
                     }
@@ -69,7 +73,7 @@ fun ScrollSettingsScreen(
                     valueRange = GestureConstants.MIN_SCROLL_DURATION.toFloat()..GestureConstants.MAX_SCROLL_DURATION.toFloat(),
                     valueText = "${uiState.scrollDuration} ms",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(scrollDuration = v.toLong())
                         }
                     },
@@ -82,7 +86,7 @@ fun ScrollSettingsScreen(
                     valueRange = GestureConstants.MIN_SCROLL_MULTIPLIER..GestureConstants.MAX_SCROLL_MULTIPLIER,
                     valueText = "${round(uiState.scrollMultiplier * 100).toInt()}% of axis at most",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(scrollMultiplier = v)
                         }
                     },
@@ -94,7 +98,7 @@ fun ScrollSettingsScreen(
                     subtitle = "Enable advanced scrolling settings",
                     checked = uiState.useAdvancedScrolling,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(useAdvancedScrolling = v)
                         }
                     }
@@ -109,7 +113,7 @@ fun ScrollSettingsScreen(
                         valueRange = GestureConstants.MIN_SCROLL_DURATION.toFloat()..uiState.scrollDuration.toFloat(),
                         valueText = "${uiState.continuousScrollDuration} ms",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(continuousScrollDuration = v.toLong())
                             }
                         },
@@ -125,7 +129,7 @@ fun ScrollSettingsScreen(
                         valueRange = uiState.scrollMultiplier..GestureConstants.MAX_SCROLL_MULTIPLIER,
                         valueText = "${round(uiState.continuousScrollMultiplier * 100).toInt()}% of axis at most",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(continuousScrollMultiplier = v)
                             }
                         },
@@ -141,7 +145,7 @@ fun ScrollSettingsScreen(
                         valueRange = GestureConstants.MIN_ACCELERATION_START.toFloat()..GestureConstants.MAX_MAX_ACCELERATION_START.toFloat(),
                         valueText = "${round(uiState.continuousScrollAccelerationStart / 100.0).toInt() * 100} ms",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(continuousScrollAccelerationStart = v.toLong())
                             }
                         },
@@ -154,7 +158,7 @@ fun ScrollSettingsScreen(
                         valueRange = GestureConstants.MIN_ACCELERATION_DURATION.toFloat()..GestureConstants.MAX_MAX_ACCELERATION_DURATION.toFloat(),
                         valueText = "${round(uiState.continuousScrollAccelerationDuration / 100.0).toInt() * 100} ms",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(continuousScrollAccelerationDuration = v.toLong())
                             }
                         },
@@ -169,7 +173,7 @@ fun ScrollSettingsScreen(
                         valueRange = uiState.scrollDuration.toFloat()..GestureConstants.MAX_SCROLL_DURATION.toFloat(),
                         valueText = "${uiState.edgeScrollDuration} ms",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(edgeScrollDuration = v.toLong())
                             }
                         },
@@ -186,7 +190,7 @@ fun ScrollSettingsScreen(
                         valueRange = GestureConstants.MIN_SCROLL_MULTIPLIER..uiState.scrollMultiplier,
                         valueText = "${round(uiState.edgeScrollMultiplier * 100).toInt()}% of axis at most",
                         onValueChange = { value ->
-                            viewModel.updatePreference(value) { settings, v ->
+                            settingsState.updatePreference(value) { settings, v ->
                                 settings.copy(edgeScrollMultiplier = v)
                             }
                         },

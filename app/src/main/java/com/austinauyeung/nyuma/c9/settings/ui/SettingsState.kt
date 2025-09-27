@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 /**
  * Bridges settings with UI.
  */
-class SettingsViewModel(
+class SettingsState(
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -232,8 +232,8 @@ class SettingsViewModel(
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-                return SettingsViewModel(settingsRepository) as T
+            if (modelClass.isAssignableFrom(SettingsState::class.java)) {
+                return SettingsState(settingsRepository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

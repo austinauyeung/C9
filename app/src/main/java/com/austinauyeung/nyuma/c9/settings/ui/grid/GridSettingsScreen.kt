@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.grid
 
 import KeyCaptureOverlay
 import android.view.KeyEvent
@@ -29,6 +29,14 @@ import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.NoteItem
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SetKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 
 /**
  * Grid cursor settings screen.
@@ -36,10 +44,10 @@ import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GridSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
     var showGridKeyCaptureOverlay by remember { mutableStateOf(false) }
     val reservedKeys =
         mapOf(
@@ -108,7 +116,7 @@ fun GridSettingsScreen(
                     title = "Set Activation Key",
                     currentKeyCode = uiState.gridActivationKey,
                     onCaptureKey = {
-                        viewModel.requestHideAllOverlays()
+                        settingsState.requestHideAllOverlays()
                         showGridKeyCaptureOverlay = true
                     },
                 )
@@ -116,8 +124,8 @@ fun GridSettingsScreen(
                 ClearKeyPreferenceItem(
                     mode = "grid cursor",
                     onClearKey = {
-                        viewModel.requestHideAllOverlays()
-                        viewModel.updateGridActivationKey(OverlaySettings.KEY_NONE)
+                        settingsState.requestHideAllOverlays()
+                        settingsState.updateGridActivationKey(OverlaySettings.KEY_NONE)
                     },
                 )
 
@@ -125,9 +133,9 @@ fun GridSettingsScreen(
                     KeyCaptureOverlay(
                         restrictedKeys = setOf(uiState.cursorActivationKey),
                         reservedKeys = reservedKeys,
-                        onKeySelected = { viewModel.updateGridActivationKey(it) },
+                        onKeySelected = { settingsState.updateGridActivationKey(it) },
                         onDismiss = { showGridKeyCaptureOverlay = false },
-                        showToast = { message -> viewModel.showToast(message) },
+                        showToast = { message -> settingsState.showToast(message) },
                     )
                 }
             }
@@ -145,7 +153,7 @@ fun GridSettingsScreen(
                         else -> stringResource(R.string.settings_grid_levels_4)
                     },
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(gridLevels = v.toInt())
                         }
                     },
@@ -155,7 +163,7 @@ fun GridSettingsScreen(
                     subtitle = "Keep overlay visible after final selection",
                     checked = uiState.persistOverlay,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(persistOverlay = v)
                         }
                     },
@@ -169,7 +177,7 @@ fun GridSettingsScreen(
                     valueRange = GridConstants.MIN_OPACITY.toFloat()..GridConstants.MAX_OPACITY.toFloat(),
                     valueText = "${uiState.overlayOpacity}%",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(overlayOpacity = v.toInt())
                         }
                     },
@@ -181,7 +189,7 @@ fun GridSettingsScreen(
                     subtitle = "Hide cell numbers in the grid",
                     checked = uiState.hideNumbers,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(hideNumbers = v)
                         }
                     },
@@ -201,7 +209,7 @@ fun GridSettingsScreen(
                         GridLineVisibility.HIDE_ALL to "Hide"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(gridLineVisibility = v)
                         }
                     },

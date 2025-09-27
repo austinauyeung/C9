@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.cursor
 
 import KeyCaptureOverlay
 import android.app.Activity
@@ -60,6 +60,15 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
+import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.NoteItem
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SetKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SimplePreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,10 +85,10 @@ import kotlin.math.round
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CursorSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
     var showCursorKeyCaptureOverlay by remember { mutableStateOf(false) }
     var reservedKeys by remember { mutableStateOf(emptyMap<Int, String>()) }
     var showColorPickerDialog by remember { mutableStateOf(false) }
@@ -89,12 +98,12 @@ fun CursorSettingsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val clearIcon = {
-        viewModel.updatePreference(null) { settings, v ->
+        settingsState.updatePreference(null) { settings, v ->
             settings.copy(cursorImagePath = v)
         }
     }
     val clearScrollToggleIcon = {
-        viewModel.updatePreference(null) { settings, v ->
+        settingsState.updatePreference(null) { settings, v ->
             settings.copy(scrollToggleImagePath = v)
         }
     }
@@ -105,7 +114,7 @@ fun CursorSettingsScreen(
         oldPath = uiState.cursorImagePath,
         onCleared = clearIcon,
         updatePreference = { path ->
-            viewModel.updatePreference(path) { settings, v -> settings.copy(cursorImagePath = v) }
+            settingsState.updatePreference(path) { settings, v -> settings.copy(cursorImagePath = v) }
         }
     )
 
@@ -115,7 +124,7 @@ fun CursorSettingsScreen(
         oldPath = uiState.scrollToggleImagePath,
         onCleared = clearScrollToggleIcon,
         updatePreference = { path ->
-            viewModel.updatePreference(path) { settings, v -> settings.copy(scrollToggleImagePath = v) }
+            settingsState.updatePreference(path) { settings, v -> settings.copy(scrollToggleImagePath = v) }
         }
     )
 
@@ -259,7 +268,7 @@ fun CursorSettingsScreen(
                     title = "Set Activation Key",
                     currentKeyCode = uiState.cursorActivationKey,
                     onCaptureKey = {
-                        viewModel.requestHideAllOverlays()
+                        settingsState.requestHideAllOverlays()
                         showCursorKeyCaptureOverlay = true
                     },
                 )
@@ -267,8 +276,8 @@ fun CursorSettingsScreen(
                 ClearKeyPreferenceItem(
                     mode = "standard cursor",
                     onClearKey = {
-                        viewModel.requestHideAllOverlays()
-                        viewModel.updateCursorActivationKey(OverlaySettings.KEY_NONE)
+                        settingsState.requestHideAllOverlays()
+                        settingsState.updateCursorActivationKey(OverlaySettings.KEY_NONE)
                     },
                 )
 
@@ -276,9 +285,9 @@ fun CursorSettingsScreen(
                     KeyCaptureOverlay(
                         restrictedKeys = setOf(uiState.gridActivationKey),
                         reservedKeys = reservedKeys,
-                        onKeySelected = { viewModel.updateCursorActivationKey(it) },
+                        onKeySelected = { settingsState.updateCursorActivationKey(it) },
                         onDismiss = { showCursorKeyCaptureOverlay = false },
-                        showToast = { message -> viewModel.showToast(message) },
+                        showToast = { message -> settingsState.showToast(message) },
                     )
                 }
             }
@@ -302,7 +311,7 @@ fun CursorSettingsScreen(
                         ControlScheme.NUMPAD_TOGGLE to "Numpad"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(controlScheme = v)
                         }
                     },
@@ -324,7 +333,7 @@ fun CursorSettingsScreen(
                         ScreenEdgeBehavior.AUTO_SCROLL to "Scroll"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorEdgeBehavior = v)
                         }
                     },
@@ -336,7 +345,7 @@ fun CursorSettingsScreen(
                     valueRange = CursorConstants.MIN_SPEED.toFloat()..CursorConstants.MAX_SPEED.toFloat(),
                     valueText = uiState.cursorSpeed.toString(),
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorSpeed = v.toInt())
                         }
                     },
@@ -349,7 +358,7 @@ fun CursorSettingsScreen(
                     valueRange = CursorConstants.MIN_ACCELERATION.toFloat()..CursorConstants.MAX_ACCELERATION.toFloat(),
                     valueText = "${uiState.cursorAcceleration}${if (uiState.cursorAcceleration == 0) " (no acceleration)" else ""}",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorAcceleration = v.toInt())
                         }
                     },
@@ -362,7 +371,7 @@ fun CursorSettingsScreen(
                     valueRange = GestureConstants.MIN_ACCELERATION_START.toFloat()..GestureConstants.MAX_ACCELERATION_START.toFloat(),
                     valueText = "${round(uiState.cursorAccelerationStart / 100.0).toInt() * 100} ms",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorAccelerationStart = v.toLong())
                         }
                     },
@@ -375,7 +384,7 @@ fun CursorSettingsScreen(
                     valueRange = GestureConstants.MIN_ACCELERATION_DURATION.toFloat()..GestureConstants.MAX_ACCELERATION_DURATION.toFloat(),
                     valueText = "${round(uiState.cursorAccelerationDuration / 100.0).toInt() * 100} ms",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorAccelerationDuration = v.toLong())
                         }
                     },
@@ -387,7 +396,7 @@ fun CursorSettingsScreen(
 //                    subtitle = "Press both action keys to toggle hold",
 //                    checked = uiState.toggleHold,
 //                    onCheckedChange = { value ->
-//                        viewModel.updatePreference(value) { settings, v ->
+//                        settingsState.updatePreference(value) { settings, v ->
 //                            settings.copy(toggleHold = v)
 //                        }
 //                    },
@@ -401,7 +410,7 @@ fun CursorSettingsScreen(
                     valueRange = CursorConstants.MIN_SIZE.toFloat()..CursorConstants.MAX_SIZE.toFloat(),
                     valueText = uiState.cursorSize.toString(),
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorSize = v.toInt())
                         }
                     },
@@ -413,7 +422,7 @@ fun CursorSettingsScreen(
                     subtitle = "Round out the corners of the cursor",
                     checked = uiState.roundedCursorCorners,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(roundedCursorCorners = v)
                         }
                     },
@@ -430,7 +439,7 @@ fun CursorSettingsScreen(
                     subtitle = "Replace black border and match cursor body color",
                     checked = uiState.standardCursorMatchBorder,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(standardCursorMatchBorder = v)
                         }
                     },
@@ -440,7 +449,7 @@ fun CursorSettingsScreen(
                     ColorPickerDialog(
                         initialColorHex = uiState.standardCursorHex,
                         onColorSelected = { newColorHex ->
-                            viewModel.updatePreference(newColorHex) { settings, v ->
+                            settingsState.updatePreference(newColorHex) { settings, v ->
                                 settings.copy(standardCursorHex = v)
                             }
                         },
@@ -455,7 +464,7 @@ fun CursorSettingsScreen(
                     subtitle = "Replace the default cursor icon with an image or gif",
                     checked = uiState.useCustomCursorIcon,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(useCustomCursorIcon = v)
                         }
                     },
@@ -481,7 +490,7 @@ fun CursorSettingsScreen(
                         IconAlignment.CENTER to "Center"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorImageAlignment = v)
                         }
                     },
@@ -501,7 +510,7 @@ fun CursorSettingsScreen(
                         IconAlignment.CENTER to "Center"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(cursorImageAlignment = v)
                         }
                     },
@@ -534,7 +543,7 @@ fun CursorSettingsScreen(
                         IconAlignment.CENTER to "Center"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(scrollToggleImageAlignment = v)
                         }
                     },
@@ -554,7 +563,7 @@ fun CursorSettingsScreen(
                         IconAlignment.CENTER to "Center"
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(scrollToggleImageAlignment = v)
                         }
                     },

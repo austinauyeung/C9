@@ -14,12 +14,18 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.core.ui.AppTheme
+import com.austinauyeung.nyuma.c9.settings.ui.autohide.AutoHideSettingsActivity
+import com.austinauyeung.nyuma.c9.settings.ui.cursor.CursorSettingsActivity
+import com.austinauyeung.nyuma.c9.settings.ui.gesture.CommonGestureSettingsActivity
+import com.austinauyeung.nyuma.c9.settings.ui.gesture.ScrollSettingsActivity
+import com.austinauyeung.nyuma.c9.settings.ui.gesture.ZoomSettingsActivity
+import com.austinauyeung.nyuma.c9.settings.ui.grid.GridSettingsActivity
 
 /**
  * Main settings screen.
  */
 class SettingsActivity : ComponentActivity() {
-    private lateinit var viewModel: SettingsViewModel
+    private lateinit var settingsState: SettingsState
     private lateinit var accessibilitySettingsObserver: ContentObserver
 
     private fun startCustomActivity(context: Context, activityClass: Class<*>) {
@@ -32,11 +38,11 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val factory =
-            SettingsViewModel.Factory(
+            SettingsState.Factory(
                 C9.getInstance().settingsRepository,
             )
-        viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
-        viewModel.setToastFunction { message ->
+        settingsState = ViewModelProvider(this, factory)[SettingsState::class.java]
+        settingsState.setToastFunction { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
 
@@ -46,7 +52,7 @@ class SettingsActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 SettingsScreen(
-                    viewModel = viewModel,
+                    settingsState = settingsState,
                     onNavigateToGridSettings = { startCustomActivity(this, GridSettingsActivity::class.java) },
                     onNavigateToCursorSettings = { startCustomActivity(this, CursorSettingsActivity::class.java) },
                     onNavigateToDebugOptions = { startCustomActivity(this, DebugOptionsActivity::class.java) },
@@ -78,7 +84,7 @@ class SettingsActivity : ComponentActivity() {
 
     private fun checkAccessibilityServiceStatus() {
         val isServiceEnabled = C9.isAccessibilityServiceEnabled(this)
-        viewModel.updateAccessibilityServiceStatus(isServiceEnabled)
+        settingsState.updateAccessibilityServiceStatus(isServiceEnabled)
     }
 
     override fun onDestroy() {

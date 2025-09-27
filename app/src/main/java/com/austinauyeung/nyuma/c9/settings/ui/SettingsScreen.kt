@@ -61,7 +61,7 @@ import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateToGridSettings: () -> Unit,
     onNavigateToCursorSettings: () -> Unit,
     onNavigateToDebugOptions: () -> Unit,
@@ -70,7 +70,7 @@ fun SettingsScreen(
     onNavigateToScrollSettings: () -> Unit,
     onNavigateToZoomSettings: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
     val context = LocalContext.current
 
     Scaffold(
@@ -150,7 +150,7 @@ fun SettingsScreen(
                     valueRange = ApplicationConstants.MIN_ACTIVATION_HOLD_DURATION.toFloat()..ApplicationConstants.MAX_ACTIVATION_HOLD_DURATION.toFloat(),
                     valueText = "${uiState.activationDuration} ms",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(activationDuration = v.toLong())
                         }
                     },
@@ -177,7 +177,7 @@ fun SettingsScreen(
                     subtitle = "Rotate certain D-pad and numpad buttons with the screen",
                     checked = uiState.rotateButtonsWithOrientation,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(rotateButtonsWithOrientation = v)
                         }
                     },
@@ -188,7 +188,7 @@ fun SettingsScreen(
                     subtitle = "Show icon when cursor is activated",
                     checked = uiState.showNotification,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(showNotification = v)
                         }
                     },

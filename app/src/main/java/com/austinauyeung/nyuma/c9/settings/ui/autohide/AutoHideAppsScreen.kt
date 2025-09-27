@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.autohide
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -55,10 +56,10 @@ data class AppInfo(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AutoHideAppsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
     val context = LocalContext.current
     var installedApps by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -144,7 +145,7 @@ fun AutoHideAppsScreen(
                                 } else {
                                     uiState.autoHideApps - app.packageName
                                 }
-                                viewModel.updatePreference(newSet) { settings, v ->
+                                settingsState.updatePreference(newSet) { settings, v ->
                                     settings.copy(autoHideApps = v)
                                 }
                             }

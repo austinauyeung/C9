@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.gesture
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +18,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
 import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZoomSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -56,7 +59,7 @@ fun ZoomSettingsScreen(
                     valueRange = GestureConstants.MIN_ZOOM_DURATION.toFloat()..GestureConstants.MAX_ZOOM_DURATION.toFloat(),
                     valueText = "${uiState.zoomDuration} ms",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(zoomDuration = v.toLong())
                         }
                     },
@@ -69,7 +72,7 @@ fun ZoomSettingsScreen(
                     valueRange = GestureConstants.MIN_ZOOM_DISTANCE_FACTOR..GestureConstants.MAX_ZOOM_DISTANCE_FACTOR,
                     valueText = "${round(uiState.zoomFactor * 100 * 2).toInt()}% of axis at most",
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(zoomFactor = v)
                         }
                     },

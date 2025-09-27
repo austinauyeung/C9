@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.gesture
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,14 +19,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
+import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonGestureSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -68,7 +73,7 @@ fun CommonGestureSettingsScreen(
                         GestureStyle.INERTIA to "Inertia",
                     ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(gestureStyle = v)
                         }
                     },
@@ -81,7 +86,7 @@ fun CommonGestureSettingsScreen(
                     subtitle = "Show gestures on screen",
                     checked = uiState.showGestureVisualization,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(showGestureVisualization = v)
                         }
                     },
@@ -93,7 +98,7 @@ fun CommonGestureSettingsScreen(
                     valueRange = GestureConstants.MIN_SIZE.toFloat()..GestureConstants.MAX_SIZE.toFloat(),
                     valueText = uiState.visualSize.toString(),
                     onValueChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(visualSize = v.toInt())
                         }
                     },

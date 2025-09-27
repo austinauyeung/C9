@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.gesture
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,26 +6,27 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
 import com.austinauyeung.nyuma.c9.core.ui.AppTheme
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
 
 /**
- * Scroll settings screen.
+ * Common gesture settings screen.
  */
-class ScrollSettingsActivity : ComponentActivity() {
-    private lateinit var viewModel: SettingsViewModel
+class CommonGestureSettingsActivity : ComponentActivity() {
+    private lateinit var settingsState: SettingsState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val factory =
-            SettingsViewModel.Factory(
+            SettingsState.Factory(
                 C9.getInstance().settingsRepository,
             )
-        viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
+        settingsState = ViewModelProvider(this, factory)[SettingsState::class.java]
 
         setContent {
             AppTheme {
-                ScrollSettingsScreen(
-                    viewModel = viewModel,
+                CommonGestureSettingsScreen(
+                    settingsState = settingsState,
                     onNavigateBack = {
                         finish()
                     },

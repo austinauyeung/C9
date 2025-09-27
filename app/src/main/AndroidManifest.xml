@@ -35,37 +35,37 @@
         </activity>
 
         <activity
-            android:name=".settings.ui.GridSettingsActivity"
+            android:name=".settings.ui.grid.GridSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".settings.ui.CursorSettingsActivity"
+            android:name=".settings.ui.cursor.CursorSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".settings.ui.AutoHideSettingsActivity"
+            android:name=".settings.ui.autohide.AutoHideSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".settings.ui.CommonGestureSettingsActivity"
+            android:name=".settings.ui.gesture.CommonGestureSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".settings.ui.ScrollSettingsActivity"
+            android:name=".settings.ui.gesture.ScrollSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
         <activity
-            android:name=".settings.ui.ZoomSettingsActivity"
+            android:name=".settings.ui.gesture.ZoomSettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
@@ -83,10 +83,10 @@
             android:parentActivityName=".settings.ui.DebugOptionsActivity" />
 
         <activity
-            android:name=".settings.ui.AutoHideAppsActivity"
+            android:name=".settings.ui.autohide.AutoHideAppsActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"
-            android:parentActivityName=".settings.ui.AutoHideSettingsActivity" />
+            android:parentActivityName=".settings.ui.autohide.AutoHideSettingsActivity" />
 
         <activity
             android:name=".shortcuts.GridCursorCreateShortcutActivity"

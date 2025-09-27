@@ -1,4 +1,4 @@
-package com.austinauyeung.nyuma.c9.settings.ui
+package com.austinauyeung.nyuma.c9.settings.ui.autohide
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +18,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.austinauyeung.nyuma.c9.settings.domain.AppListType
+import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
+import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SimplePreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AutoHideSettingsScreen(
-    viewModel: SettingsViewModel,
+    settingsState: SettingsState,
     onNavigateBack: () -> Unit,
     onNavigateToAutoHideAppsScreen: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by settingsState.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -55,7 +60,7 @@ fun AutoHideSettingsScreen(
                     subtitle = "Hide on keyboard open, restore on keyboard close",
                     checked = uiState.hideOnKeyboardOpen,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(hideOnKeyboardOpen = v)
                         }
                     },
@@ -65,7 +70,7 @@ fun AutoHideSettingsScreen(
                     subtitle = "Hide on device lock, restore on device unlock",
                     checked = uiState.hideOnLockScreen,
                     onCheckedChange = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(hideOnLockScreen = v)
                         }
                     },
@@ -86,7 +91,7 @@ fun AutoHideSettingsScreen(
                             AppListType.DENY_LIST to "Deny"
                         ),
                     onOptionSelected = { value ->
-                        viewModel.updatePreference(value) { settings, v ->
+                        settingsState.updatePreference(value) { settings, v ->
                             settings.copy(applicationListType = v)
                         }
                     },
