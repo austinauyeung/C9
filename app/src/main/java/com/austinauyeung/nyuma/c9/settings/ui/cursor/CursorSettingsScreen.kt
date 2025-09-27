@@ -358,7 +358,7 @@ fun CursorSettingsScreen(
                     },
                     steps = 9,
                 )
-                
+
 //                SwitchPreferenceItem(
 //                    title = "Long Press Hold",
 //                    subtitle = "Press both action keys to toggle hold",
@@ -481,21 +481,32 @@ fun CursorSettingsScreen(
 
                 SimplePreferenceItem(
                     title = "Cursor Icon",
-                    subtitle = "Configure cursor icon",
+                    subtitle = when {
+                        uiState.cursorImagePath == null -> "No icon set, falling back to default icon"
+                        else -> "Update icon"
+                    },
                     onClick = onNavigateToCursorIcon,
                     enabled = uiState.useCustomCursorIcon
                 )
 
                 SimplePreferenceItem(
                     title = "Location Clickable Icon",
-                    subtitle = if (!uiState.checkClickable) "Only applicable if \"Show Location Clickable\" is enabled " else "Configure location clickable icon",
+                    subtitle = when {
+                        !uiState.checkClickable -> "Only applicable if \"Show Location Clickable\" is enabled"
+                        uiState.clickableImagePath == null -> "Select icon, otherwise falling back to base custom icon"
+                        else -> "Update icon"
+                    },
                     onClick = onNavigateToLocationClickableIcon,
                     enabled = uiState.useCustomCursorIcon && uiState.checkClickable,
                 )
 
                 SimplePreferenceItem(
                     title = "Scroll Toggle Icon",
-                    subtitle = if (!inToggleControlScheme) "Only applicable to the D-pad or numpad control schemes" else "Configure scroll toggle icon",
+                    subtitle = when {
+                        !inToggleControlScheme -> "Only applicable to the D-pad or numpad control schemes"
+                        uiState.clickableImagePath == null -> "Select icon, otherwise falling back to base custom icon"
+                        else -> "Update icon"
+                    },
                     onClick = onNavigateToScrollToggleIcon,
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
