@@ -87,8 +87,6 @@ class GestureManager(
     private var shouldShowGestures = false
 
     private fun shouldUseShizuku(): Boolean {
-        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) return true
-
         val settings = settingsFlow.value
         if (!settings.enableShizukuIntegration) {
             return false
@@ -266,14 +264,18 @@ class GestureManager(
     }
 
     suspend fun startTap(x: Float, y: Float): Boolean {
-        if (!getGestureReady()) return false
-        setGestureReady(false)
-
         try {
             Logger.d("Starting tap gesture at ($x, $y)")
             if (shouldShowGestures) {
                 visualizeTap(x, y)
             }
+
+            if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+                return defaultStrategy.immediateTap(x, y)
+            }
+
+            if (!getGestureReady()) return false
+            setGestureReady(false)
 
             return currentStrategy.startTap(x, y, completionListener)
         } catch (e: Exception) {
@@ -289,6 +291,10 @@ class GestureManager(
     }
 
     suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         if (!getGestureReady()) return false
         if (fromX.equalToDecimalPlaces(toX, 4) && fromY.equalToDecimalPlaces(toY, 4)) {
             setGestureReady(true)
@@ -308,6 +314,10 @@ class GestureManager(
     }
 
     suspend fun endTap(x: Float, y: Float): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         if (!getGestureReady()) return false
         setGestureReady(false)
 
@@ -322,6 +332,10 @@ class GestureManager(
     }
 
     private fun cancelTap(): Boolean {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            return true
+        }
+
         try {
             Logger.d("Cancelling tap gesture")
             return currentStrategy.cancelTap(completionListener)

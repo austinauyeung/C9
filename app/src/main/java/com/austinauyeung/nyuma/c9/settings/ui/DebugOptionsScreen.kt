@@ -91,6 +91,18 @@ fun DebugOptionsScreen(
                     },
                     enabled = !VersionUtil.belowVersion(Build.VERSION_CODES.O)
                 )
+
+                SwitchPreferenceItem(
+                    title = "Android 7 Override",
+                    subtitle = "Removes Shizuku requirement but restricts gestures to clicks only",
+                    checked = uiState.overrideAndroid7,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(overrideAndroid7 = v, enableShizukuIntegration = !v)
+                        }
+                    },
+                    enabled = VersionUtil.belowVersion(Build.VERSION_CODES.O)
+                )
             }
 
             if (showShizukuDialog) {

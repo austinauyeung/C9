@@ -1,6 +1,5 @@
 package com.austinauyeung.nyuma.c9.settings.repository
 
-import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -11,7 +10,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.austinauyeung.nyuma.c9.core.logs.Logger
-import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -52,6 +50,7 @@ class SettingsRepositoryImpl(
         private val ZOOM_FACTOR = floatPreferencesKey("zoom_factor")
         private val ALLOW_PASSTHROUGH = booleanPreferencesKey("allow_passthrough")
         private val ENABLE_SHIZUKU_INTEGRATION = booleanPreferencesKey("enable_shizuku_integration")
+        private val OVERRIDE_ANDROID_7 = booleanPreferencesKey("override_android_7")
         private val HIDE_ON_KEYBOARD_OPEN = booleanPreferencesKey("hide_on_keyboard_open")
         private val HIDE_ON_LAUNCHER_OPEN = booleanPreferencesKey("hide_on_launcher_open")
         private val HIDE_ON_LOCK_SCREEN = booleanPreferencesKey("hide_on_lock_screen")
@@ -234,6 +233,8 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.allowPassthrough,
                     enableShizukuIntegration = preferences[ENABLE_SHIZUKU_INTEGRATION]
                         ?: OverlaySettings.DEFAULT.enableShizukuIntegration,
+                    overrideAndroid7 = preferences[OVERRIDE_ANDROID_7]
+                        ?: OverlaySettings.DEFAULT.overrideAndroid7,
                     hideOnKeyboardOpen = preferences[HIDE_ON_KEYBOARD_OPEN]
                         ?: OverlaySettings.DEFAULT.hideOnKeyboardOpen,
                     hideOnLauncherOpen = preferences[HIDE_ON_LAUNCHER_OPEN]
@@ -297,7 +298,7 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.checkClickable
                 )
 
-                if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
+                settings
             }
     }
 
@@ -330,6 +331,7 @@ class SettingsRepositoryImpl(
                 preferences[ZOOM_FACTOR] = settings.zoomFactor
                 preferences[ALLOW_PASSTHROUGH] = settings.allowPassthrough
                 preferences[ENABLE_SHIZUKU_INTEGRATION] = settings.enableShizukuIntegration
+                preferences[OVERRIDE_ANDROID_7] = settings.overrideAndroid7
                 preferences[HIDE_ON_KEYBOARD_OPEN] = settings.hideOnKeyboardOpen
                 preferences[HIDE_ON_LAUNCHER_OPEN] = settings.hideOnLauncherOpen
                 preferences[HIDE_ON_LOCK_SCREEN] = settings.hideOnLockScreen

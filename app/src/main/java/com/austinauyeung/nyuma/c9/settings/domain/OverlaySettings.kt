@@ -40,6 +40,7 @@ data class OverlaySettings(
     val zoomFactor: Float = Defaults.Settings.ZOOM_FACTOR,
     val allowPassthrough: Boolean = Defaults.Settings.ALLOW_PASSTHROUGH,
     val enableShizukuIntegration: Boolean = Defaults.Settings.ENABLE_SHIZUKU_INTEGRATION,
+    val overrideAndroid7: Boolean = Defaults.Settings.OVERRIDE_ANDROID_7,
     val hideOnKeyboardOpen: Boolean = Defaults.Settings.HIDE_ON_KEYBOARD_OPEN,
     val hideOnLauncherOpen: Boolean = Defaults.Settings.HIDE_ON_LAUNCHER_OPEN,
     val hideOnLockScreen: Boolean = Defaults.Settings.HIDE_ON_LOCK_SCREEN,

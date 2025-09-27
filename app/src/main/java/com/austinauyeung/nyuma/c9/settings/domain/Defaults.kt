@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.domain
 
+import android.os.Build
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
@@ -7,6 +8,7 @@ import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdgeBehavior
+import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
@@ -43,7 +45,8 @@ object Defaults {
         const val ZOOM_DURATION = GestureConstants.DEFAULT_ZOOM_DURATION
         const val ZOOM_FACTOR = GestureConstants.DEFAULT_ZOOM_DISTANCE_FACTOR
         const val ALLOW_PASSTHROUGH = GestureConstants.ALLOW_PASSTHROUGH
-        const val ENABLE_SHIZUKU_INTEGRATION = false
+        val ENABLE_SHIZUKU_INTEGRATION = VersionUtil.belowVersion(Build.VERSION_CODES.O)
+        const val OVERRIDE_ANDROID_7 = false
         const val HIDE_ON_KEYBOARD_OPEN = false
         const val HIDE_ON_LAUNCHER_OPEN = false
         const val HIDE_ON_LOCK_SCREEN = false

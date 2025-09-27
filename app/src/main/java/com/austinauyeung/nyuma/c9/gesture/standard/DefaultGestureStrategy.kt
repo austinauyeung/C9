@@ -3,6 +3,8 @@ package com.austinauyeung.nyuma.c9.gesture.standard
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -44,6 +46,7 @@ class DefaultGestureStrategy(
         completionListener: GestureCompletionListener?
     ): AccessibilityService.GestureResultCallback {
         return object : AccessibilityService.GestureResultCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onCompleted(gestureDescription: GestureDescription?) {
                 val settings = settingsFlow.value
                 if (willContinue) {
@@ -87,6 +90,7 @@ class DefaultGestureStrategy(
         completionListener: GestureCompletionListener?
     ): AccessibilityService.GestureResultCallback {
         return object : AccessibilityService.GestureResultCallback() {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onCompleted(gestureDescription: GestureDescription?) {
                 if (willContinue) {
                     val finger1PausePath = Path().apply {
@@ -128,6 +132,7 @@ class DefaultGestureStrategy(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun performScroll(
         startX: Float,
         startY: Float,
@@ -248,6 +253,7 @@ class DefaultGestureStrategy(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun performZoom(
         isZoomIn: Boolean,
         startX1: Float, startY1: Float,
@@ -314,6 +320,7 @@ class DefaultGestureStrategy(
                 val dx2 = (endX2 - startX2) / steps
                 val dy2 = (endY2 - startY2) / steps
 
+                @RequiresApi(Build.VERSION_CODES.O)
                 fun dispatchStep(i: Int, prevStroke1: GestureDescription.StrokeDescription? = null, prevStroke2: GestureDescription.StrokeDescription? = null) {
                     if (i >= steps) return
 
@@ -407,6 +414,34 @@ class DefaultGestureStrategy(
         }
     }
 
+    override suspend fun immediateTap(x: Float, y: Float): Boolean {
+        try {
+            Logger.d("DefaultGestureStrategy: performing immediate tap at ($x, $y)")
+
+            tapPath.reset()
+            tapPath.moveTo(x, y)
+
+            activeStroke = GestureDescription.StrokeDescription(
+                tapPath,
+                0,
+                1,
+            )
+
+            val gesture = GestureDescription.Builder()
+                .addStroke(activeStroke!!)
+                .build()
+
+            service.dispatchGesture(gesture, null, null)
+
+            return true
+
+        } catch (e: Exception) {
+            Logger.e("Error performing tap", e)
+            return false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun startTap(x: Float, y: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: starting tap at ($x, $y)")
@@ -450,6 +485,7 @@ class DefaultGestureStrategy(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: dragging from ($fromX, $fromY) to ($toX, $toY)")
@@ -502,6 +538,7 @@ class DefaultGestureStrategy(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun endTap(finalX: Float, finalY: Float, completionListener: GestureCompletionListener?): Boolean {
         try {
             Logger.d("DefaultGestureStrategy: ending tap at ($finalX, $finalY)")
