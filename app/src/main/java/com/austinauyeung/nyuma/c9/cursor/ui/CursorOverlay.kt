@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -19,12 +20,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
+import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -174,6 +176,28 @@ private fun DrawScope.drawDefaultCursor(
         color = if (matchBorder) cursorColor else Color.Black,
         style = Stroke(width = cursorSize * 0.1f),
     )
+
+    if (isClickable) {
+        val radius = cursorSize * 0.25f
+        val center = Offset(position.x, position.y)
+        val rect = Rect(
+            left = center.x - radius,
+            top = center.y - radius,
+            right = center.x + radius,
+            bottom = center.y + radius
+        )
+        val padding = 1
+        val angle = theta * 180 / PI
+        val path = Path().apply {
+            arcTo(
+                rect = rect,
+                startAngleDegrees = ((1 - padding) * angle).toFloat(),
+                sweepAngleDegrees = -(360 - (90 - angle) - 2 * padding * angle).toFloat(),
+                forceMoveTo = false
+            )
+        }
+        drawPath(path, if (matchBorder) cursorColor else Color.Black, style = Stroke(width = cursorSize * 0.1f))
+    }
 
     // Trace bottom of cursor
     if (isHoldActive) {
