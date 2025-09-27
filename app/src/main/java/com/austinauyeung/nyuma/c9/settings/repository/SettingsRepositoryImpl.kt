@@ -63,9 +63,11 @@ class SettingsRepositoryImpl(
         private val ALLOW_OVERLAPPING_GESTURES = booleanPreferencesKey("allow_overlapping_gestures")
         private val FORCE_SMOOTHER_GESTURES = booleanPreferencesKey("force_smoother_gestures")
         private val CURSOR_IMAGE_PATH = stringPreferencesKey("cursor_image_path")
+        private val CLICKABLE_IMAGE_PATH = stringPreferencesKey("clickable_image_path")
         private val SCROLL_TOGGLE_IMAGE_PATH = stringPreferencesKey("scroll_toggle_image_path")
         private val USE_CUSTOM_CURSOR_ICON = booleanPreferencesKey("use_custom_cursor_icon")
         private val CURSOR_IMAGE_ALIGNMENT = stringPreferencesKey("cursor_image_alignment")
+        private val CLICKABLE_IMAGE_ALIGNMENT = stringPreferencesKey("clickable_image_alignment")
         private val SCROLL_TOGGLE_IMAGE_ALIGNMENT = stringPreferencesKey("scroll_toggle_image_alignment")
         private val USE_ADVANCED_SCROLLING = booleanPreferencesKey("use_advanced_scrolling")
         private val CONTINUOUS_SCROLL_DURATION = longPreferencesKey("continuous_scroll_duration")
@@ -81,6 +83,7 @@ class SettingsRepositoryImpl(
         private val SHOW_NOTIFICATION = booleanPreferencesKey("show_notification")
         private val APPLICATION_LIST_TYPE = stringPreferencesKey("application_list_type")
         private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
+        private val CHECK_CLICKABLE = booleanPreferencesKey("check_clickable")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -142,6 +145,13 @@ class SettingsRepositoryImpl(
                     CURSOR_IMAGE_ALIGNMENT,
                     OverlaySettings.DEFAULT.cursorImageAlignment,
                     "cursor image alignment"
+                )
+
+                val clickableImageAlignment = getEnumPreference(
+                    preferences,
+                    CLICKABLE_IMAGE_ALIGNMENT,
+                    OverlaySettings.DEFAULT.clickableImageAlignment,
+                    "clickable image alignment"
                 )
 
                 val scrollToggleImageAlignment = getEnumPreference(
@@ -230,11 +240,14 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.forceSmootherGestures,
                     cursorImagePath = preferences[CURSOR_IMAGE_PATH]
                         ?: OverlaySettings.DEFAULT.cursorImagePath,
+                    clickableImagePath = preferences[CLICKABLE_IMAGE_PATH]
+                        ?: OverlaySettings.DEFAULT.clickableImagePath,
                     scrollToggleImagePath = preferences[SCROLL_TOGGLE_IMAGE_PATH]
                         ?: OverlaySettings.DEFAULT.scrollToggleImagePath,
                     useCustomCursorIcon = preferences[USE_CUSTOM_CURSOR_ICON]
                         ?: OverlaySettings.DEFAULT.useCustomCursorIcon,
                     cursorImageAlignment = cursorImageAlignment,
+                    clickableImageAlignment = clickableImageAlignment,
                     scrollToggleImageAlignment = scrollToggleImageAlignment,
                     useAdvancedScrolling = preferences[USE_ADVANCED_SCROLLING]
                         ?: OverlaySettings.DEFAULT.useAdvancedScrolling,
@@ -261,7 +274,9 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.showNotification,
                     applicationListType = applicationListType,
                     ignoreNumpad = preferences[IGNORE_NUMPAD]
-                        ?: OverlaySettings.DEFAULT.ignoreNumpad
+                        ?: OverlaySettings.DEFAULT.ignoreNumpad,
+                    checkClickable = preferences[CHECK_CLICKABLE]
+                        ?: OverlaySettings.DEFAULT.checkClickable
                 )
 
                 if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) settings.copy(enableShizukuIntegration = true) else settings
@@ -309,6 +324,7 @@ class SettingsRepositoryImpl(
                 preferences[FORCE_SMOOTHER_GESTURES] = settings.forceSmootherGestures
                 preferences[USE_CUSTOM_CURSOR_ICON] = settings.useCustomCursorIcon
                 preferences[CURSOR_IMAGE_ALIGNMENT] = settings.cursorImageAlignment.name
+                preferences[CLICKABLE_IMAGE_ALIGNMENT] = settings.clickableImageAlignment.name
                 preferences[SCROLL_TOGGLE_IMAGE_ALIGNMENT] = settings.scrollToggleImageAlignment.name
                 preferences[USE_ADVANCED_SCROLLING] = settings.useAdvancedScrolling
                 preferences[CONTINUOUS_SCROLL_DURATION] = settings.continuousScrollDuration
@@ -324,11 +340,18 @@ class SettingsRepositoryImpl(
                 preferences[SHOW_NOTIFICATION] = settings.showNotification
                 preferences[APPLICATION_LIST_TYPE] = settings.applicationListType.name
                 preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
+                preferences[CHECK_CLICKABLE] = settings.checkClickable
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath
                 } else {
                     preferences.remove(CURSOR_IMAGE_PATH)
+                }
+
+                if (settings.clickableImagePath != null) {
+                    preferences[CLICKABLE_IMAGE_PATH] = settings.clickableImagePath
+                } else {
+                    preferences.remove(CLICKABLE_IMAGE_PATH)
                 }
 
                 if (settings.scrollToggleImagePath != null) {

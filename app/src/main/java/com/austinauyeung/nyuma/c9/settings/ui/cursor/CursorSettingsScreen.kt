@@ -84,6 +84,7 @@ import kotlin.math.round
 fun CursorSettingsScreen(
     settingsState: SettingsState,
     onNavigateToCursorIcon: () -> Unit,
+    onNavigateToLocationClickableIcon: () -> Unit,
     onNavigateToScrollToggleIcon: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -355,7 +356,7 @@ fun CursorSettingsScreen(
                     },
                     steps = 9,
                 )
-
+                
 //                SwitchPreferenceItem(
 //                    title = "Long Press Hold",
 //                    subtitle = "Press both action keys to toggle hold",
@@ -421,6 +422,17 @@ fun CursorSettingsScreen(
                         onDismiss = { showColorPickerDialog = false }
                     )
                 }
+
+                SwitchPreferenceItem(
+                    title = "Show Location Clickable",
+                    subtitle = "Attempt to indicate if current cursor location is clickable",
+                    checked = uiState.checkClickable,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(checkClickable = v)
+                        }
+                    },
+                )
             }
 
             PreferenceCategory(title = "Custom Icon") {
@@ -443,8 +455,15 @@ fun CursorSettingsScreen(
                 )
 
                 SimplePreferenceItem(
+                    title = "Location Clickable Icon",
+                    subtitle = if (!uiState.checkClickable) "Only applicable if \"Show Location Clickable\" is enabled " else "Configure location clickable icon",
+                    onClick = onNavigateToLocationClickableIcon,
+                    enabled = uiState.checkClickable,
+                )
+
+                SimplePreferenceItem(
                     title = "Scroll Toggle Icon",
-                    subtitle = if (!inToggleControlScheme) "Control scheme must be D-pad or numpad" else "Configure scroll toggle icon",
+                    subtitle = if (!inToggleControlScheme) "Only applicable to the D-pad or numpad control schemes" else "Configure scroll toggle icon",
                     onClick = onNavigateToScrollToggleIcon,
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )

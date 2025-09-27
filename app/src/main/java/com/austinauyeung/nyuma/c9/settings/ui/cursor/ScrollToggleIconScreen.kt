@@ -75,13 +75,13 @@ fun ScrollToggleIconScreen(
         ) {
             PreferenceCategory(title = "Configure") {
                 SimplePreferenceItem(
-                    title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Scroll Toggle Icon" else "Set Scroll Toggle Icon",
+                    title = if (!uiState.scrollToggleImagePath.isNullOrEmpty() && File(uiState.scrollToggleImagePath!!).exists() ) "Change Icon" else "Set Icon",
                     subtitle = "Supported formats: png, gif, jpg, bmp, webp",
                     onClick = { scrollToggleImagePicker.launch(context) },
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
                 DropdownPreferenceItem(
-                    title = "Scroll Toggle Icon Alignment",
+                    title = "Icon Alignment",
                     subtitle =
                         when (uiState.scrollToggleImageAlignment) {
                             IconAlignment.TOP_LEFT -> "Align to top-left of icon"
@@ -101,7 +101,7 @@ fun ScrollToggleIconScreen(
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme
                 )
                 SimplePreferenceItem(
-                    title = "Clear Scroll Toggle Icon",
+                    title = "Clear Icon",
                     subtitle = "Fallback to default screen border indicator",
                     onClick = { clearImage(uiState.scrollToggleImagePath, clearScrollToggleIcon) },
                     enabled = uiState.useCustomCursorIcon && inToggleControlScheme

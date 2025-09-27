@@ -28,7 +28,7 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CursorIconScreen(
+fun CursorClickableIconScreen(
     settingsState: SettingsState,
     onNavigateBack: () -> Unit
 ) {
@@ -37,23 +37,23 @@ fun CursorIconScreen(
     val coroutineScope = rememberCoroutineScope()
     val clearIcon = {
         settingsState.updatePreference(null) { settings, v ->
-            settings.copy(cursorImagePath = v)
+            settings.copy(clickableImagePath = v)
         }
     }
     val cursorImagePicker = rememberUnifiedImagePickerLauncher(
         coroutineScope = coroutineScope,
         context = context,
-        oldPath = uiState.cursorImagePath,
+        oldPath = uiState.clickableImagePath,
         onCleared = clearIcon,
         updatePreference = { path ->
-            settingsState.updatePreference(path) { settings, v -> settings.copy(cursorImagePath = v) }
+            settingsState.updatePreference(path) { settings, v -> settings.copy(clickableImagePath = v) }
         }
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cursor Icon") },
+                title = { Text("Location Clickable Icon") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -73,7 +73,7 @@ fun CursorIconScreen(
         ) {
             PreferenceCategory(title = "Configure") {
                 SimplePreferenceItem(
-                    title = if (!uiState.cursorImagePath.isNullOrEmpty() && File(uiState.cursorImagePath!!).exists() ) "Change Icon" else "Set Icon",
+                    title = if (!uiState.clickableImagePath.isNullOrEmpty() && File(uiState.clickableImagePath!!).exists() ) "Change Icon" else "Set Icon",
                     subtitle = "Supported formats: png, gif, jpg, bmp, webp",
                     onClick = { cursorImagePicker.launch(context) },
                     enabled = uiState.useCustomCursorIcon
@@ -100,8 +100,8 @@ fun CursorIconScreen(
                 )
                 SimplePreferenceItem(
                     title = "Clear Icon",
-                    subtitle = "Fallback to default icon",
-                    onClick = { clearImage(uiState.cursorImagePath, clearIcon) },
+                    subtitle = "Fallback to base icon",
+                    onClick = { clearImage(uiState.clickableImagePath, clearIcon) },
                     enabled = uiState.useCustomCursorIcon
                 )
             }

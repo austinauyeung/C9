@@ -89,9 +89,11 @@ class SettingsState(
                             allowOverlappingGestures = settings.allowOverlappingGestures,
                             forceSmootherGestures = settings.forceSmootherGestures,
                             cursorImagePath = settings.cursorImagePath,
+                            clickableImagePath = settings.clickableImagePath,
                             scrollToggleImagePath = settings.scrollToggleImagePath,
                             useCustomCursorIcon = settings.useCustomCursorIcon,
                             cursorImageAlignment = settings.cursorImageAlignment,
+                            clickableImageAlignment = settings.clickableImageAlignment,
                             scrollToggleImageAlignment = settings.scrollToggleImageAlignment,
                             useAdvancedScrolling = settings.useAdvancedScrolling,
                             continuousScrollDuration = settings.continuousScrollDuration,
@@ -106,7 +108,8 @@ class SettingsState(
                             autoHideApps = settings.autoHideApps,
                             showNotification = settings.showNotification,
                             applicationListType = settings.applicationListType,
-                            ignoreNumpad = settings.ignoreNumpad
+                            ignoreNumpad = settings.ignoreNumpad,
+                            checkClickable = settings.checkClickable
                         )
                     }
                 }
@@ -177,9 +180,11 @@ class SettingsState(
             allowOverlappingGestures = _uiState.value.allowOverlappingGestures,
             forceSmootherGestures = _uiState.value.forceSmootherGestures,
             cursorImagePath = _uiState.value.cursorImagePath,
+            clickableImagePath = _uiState.value.clickableImagePath,
             scrollToggleImagePath = _uiState.value.scrollToggleImagePath,
             useCustomCursorIcon = _uiState.value.useCustomCursorIcon,
             cursorImageAlignment = _uiState.value.cursorImageAlignment,
+            clickableImageAlignment = _uiState.value.clickableImageAlignment,
             scrollToggleImageAlignment = _uiState.value.scrollToggleImageAlignment,
             useAdvancedScrolling = _uiState.value.useAdvancedScrolling,
             continuousScrollDuration = _uiState.value.continuousScrollDuration,
@@ -194,7 +199,8 @@ class SettingsState(
             autoHideApps = _uiState.value.autoHideApps,
             showNotification = _uiState.value.showNotification,
             applicationListType = _uiState.value.applicationListType,
-            ignoreNumpad = _uiState.value.ignoreNumpad
+            ignoreNumpad = _uiState.value.ignoreNumpad,
+            checkClickable = _uiState.value.checkClickable
         )
     }
 
@@ -283,9 +289,11 @@ data class SettingsUiState(
     val allowOverlappingGestures: Boolean = Defaults.Settings.ALLOW_OVERLAPPING_GESTURES,
     val forceSmootherGestures: Boolean = Defaults.Settings.FORCE_SMOOTHER_GESTURES,
     val cursorImagePath: String? = Defaults.Settings.CURSOR_IMAGE_PATH,
+    val clickableImagePath: String? = Defaults.Settings.CLICKABLE_IMAGE_PATH,
     val scrollToggleImagePath: String? = Defaults.Settings.SCROLL_TOGGLE_IMAGE_PATH,
     val useCustomCursorIcon: Boolean = Defaults.Settings.USE_CUSTOM_CURSOR_ICON,
     val cursorImageAlignment: IconAlignment = Defaults.Settings.CURSOR_IMAGE_ALIGNMENT,
+    val clickableImageAlignment: IconAlignment = Defaults.Settings.CLICKABLE_IMAGE_ALIGNMENT,
     val scrollToggleImageAlignment: IconAlignment = Defaults.Settings.SCROLL_TOGGLE_IMAGE_ALIGNMENT,
     val useAdvancedScrolling: Boolean = Defaults.Settings.USE_ADVANCED_SCROLLING,
     val continuousScrollDuration: Long = Defaults.Settings.CONTINUOUS_SCROLL_DURATION,
@@ -300,5 +308,6 @@ data class SettingsUiState(
     val autoHideApps: Set<String> = Defaults.Settings.AUTO_HIDE_APPS,
     val showNotification: Boolean = Defaults.Settings.SHOW_NOTIFICATION,
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
-    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD
+    val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
+    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
 )

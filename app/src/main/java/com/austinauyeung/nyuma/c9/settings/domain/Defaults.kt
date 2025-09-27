@@ -55,9 +55,11 @@ object Defaults {
         const val ALLOW_OVERLAPPING_GESTURES = false
         const val FORCE_SMOOTHER_GESTURES = false
         val CURSOR_IMAGE_PATH = null
+        val CLICKABLE_IMAGE_PATH = null
         val SCROLL_TOGGLE_IMAGE_PATH = null
         const val USE_CUSTOM_CURSOR_ICON = false
         val CURSOR_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
+        val CLICKABLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         val SCROLL_TOGGLE_IMAGE_ALIGNMENT = IconAlignment.TOP_LEFT
         const val USE_ADVANCED_SCROLLING = false
         const val COLLECT_LOGS = false
@@ -65,6 +67,7 @@ object Defaults {
         const val SHOW_NOTIFICATION = false
         val APPLICATION_LIST_TYPE = AppListType.DENY_LIST
         const val IGNORE_NUMPAD = false
+        const val CHECK_CLICKABLE = false
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

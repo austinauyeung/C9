@@ -32,6 +32,7 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import androidx.core.graphics.toColorInt
 
 /**
  * Renders the standard cursor overlay.
@@ -48,7 +49,7 @@ fun CursorOverlay(
     val opacity = CursorConstants.OPACITY
     val cursorColor = settings?.standardCursorHex?.let {
         try {
-            Color(android.graphics.Color.parseColor("#$it"))
+            Color("#$it".toColorInt())
         } catch (e: Exception) {
             Color.White
         }
@@ -58,6 +59,9 @@ fun CursorOverlay(
     val iconImageUri = settings?.cursorImagePath?.takeIf {
         it.isNotEmpty() && File(it).exists()
     }
+    val clickableImageUri = settings?.clickableImagePath?.takeIf {
+        it.isNotEmpty() && File(it).exists()
+    }
     val scrollToggleIconImageUri = settings?.scrollToggleImagePath?.takeIf {
         it.isNotEmpty() && File(it).exists()
     }
@@ -65,8 +69,10 @@ fun CursorOverlay(
 //    var customImageLoaded by remember { mutableStateOf(false) }
     val position = cursorState.position
     val density = LocalDensity.current
-
     val context = LocalContext.current
+
+    val isClickable = cursorState.clickable && settings?.checkClickable == true
+
     Box(modifier = modifier
         .fillMaxSize()
         .border(
@@ -74,21 +80,42 @@ fun CursorOverlay(
             color = cursorColor.copy(alpha = if (cursorState.inScrollMode && (settings?.useCustomCursorIcon != true || scrollToggleIconImageUri == null)) 1f else 0f),
         )
     ) {
-        if (settings?.useCustomCursorIcon != true || iconImageUri == null) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawDefaultCursor(
-                    position = position,
-                    cursorSize = cursorSize,
-                    opacity = opacity,
-                    cursorColor = cursorColor,
-                    matchBorder = matchBorder,
-                    roundedCorners = settings?.roundedCursorCorners ?: false,
-                    isHoldActive = cursorState.isHoldActive,
-                    isClickable = cursorState.clickable
+        val showScrollToggleIcon = (settings?.useCustomCursorIcon == true) && (cursorState.inScrollMode) && (scrollToggleIconImageUri != null)
+        val showClickableIcon = !showScrollToggleIcon && (settings?.useCustomCursorIcon == true) && (isClickable) && (clickableImageUri != null)
+        val showBaseCustomIcon = !showScrollToggleIcon && !showClickableIcon && (settings?.useCustomCursorIcon == true)
+
+        when {
+            showScrollToggleIcon -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(scrollToggleIconImageUri)
+                        .build(),
+                    contentDescription = "Custom Scroll Toggle Cursor Icon",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(cursorSize.dp)
+                        .offset(
+                            x = with(density) { position.x.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
+                        )
                 )
             }
-        } else {
-            if (!cursorState.inScrollMode || scrollToggleIconImageUri == null) {
+            showClickableIcon -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(clickableImageUri)
+                        .build(),
+                    contentDescription = "Custom Clickable Cursor Icon",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(cursorSize.dp)
+                        .offset(
+                            x = with(density) { position.x.toDp() } - if (settings?.clickableImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
+                            y = with(density) { position.y.toDp() } - if (settings?.clickableImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
+                        )
+                )
+            }
+            showBaseCustomIcon -> {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(iconImageUri)
@@ -111,20 +138,20 @@ fun CursorOverlay(
 //                    customImageLoaded = false
 //                }
                 )
-            } else {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(scrollToggleIconImageUri)
-                        .build(),
-                    contentDescription = "Custom Scroll Toggle Cursor Icon",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(cursorSize.dp)
-                        .offset(
-                            x = with(density) { position.x.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp,
-                            y = with(density) { position.y.toDp() } - if (settings?.scrollToggleImageAlignment == IconAlignment.CENTER) (cursorSize/2).dp else 0.dp
-                        )
-                )
+            }
+            else -> {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawDefaultCursor(
+                        position = position,
+                        cursorSize = cursorSize,
+                        opacity = opacity,
+                        cursorColor = cursorColor,
+                        matchBorder = matchBorder,
+                        roundedCorners = settings?.roundedCursorCorners ?: false,
+                        isHoldActive = cursorState.isHoldActive,
+                        isClickable = isClickable
+                    )
+                }
             }
         }
     }
