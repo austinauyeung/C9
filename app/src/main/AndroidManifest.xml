@@ -100,11 +100,11 @@
             android:theme="@style/Theme.C9"
             android:parentActivityName=".settings.ui.SettingsActivity" />
 
-        <activity
-            android:name=".core.logs.LogActivity"
-            android:exported="false"
-            android:theme="@style/Theme.C9"
-            android:parentActivityName=".settings.ui.DebugOptionsActivity" />
+<!--        <activity-->
+<!--            android:name=".core.logs.LogActivity"-->
+<!--            android:exported="false"-->
+<!--            android:theme="@style/Theme.C9"-->
+<!--            android:parentActivityName=".settings.ui.DebugOptionsActivity" />-->
 
         <activity
             android:name=".settings.ui.autohide.AutoHideAppsActivity"

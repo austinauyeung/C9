@@ -25,11 +25,6 @@ class DebugOptionsActivity : ComponentActivity() {
                     settingsState = settingsState,
                     onNavigateBack = {
                         finish()
-                    },
-                    onNavigateToLogScreen = {
-                        val intent = Intent(this, LogActivity::class.java)
-                        val options = ActivityOptionsCompat.makeBasic()
-                        startActivity(intent, options.toBundle())
                     }
                 )
             }

@@ -31,8 +31,7 @@ import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 @Composable
 fun DebugOptionsScreen(
     settingsState: SettingsState,
-    onNavigateBack: () -> Unit,
-    onNavigateToLogScreen: () -> Unit
+    onNavigateBack: () -> Unit
 ) {
     val uiState by settingsState.uiState.collectAsState()
     var showShizukuDialog by remember { mutableStateOf(false) }
@@ -59,23 +58,23 @@ fun DebugOptionsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            PreferenceCategory(title = "Logging") {
-                SwitchPreferenceItem(
-                    title = "Collect Logs",
-                    subtitle = "Logs will be written to the log screen",
-                    checked = uiState.collectLogs,
-                    onCheckedChange = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(collectLogs = v)
-                        }
-                    }
-                )
-                SimplePreferenceItem(
-                    title = "Log Screen",
-                    subtitle = "View application logs",
-                    onClick = onNavigateToLogScreen,
-                )
-            }
+//            PreferenceCategory(title = "Logging") {
+//                SwitchPreferenceItem(
+//                    title = "Collect Logs",
+//                    subtitle = "Logs will be written to the log screen",
+//                    checked = uiState.collectLogs,
+//                    onCheckedChange = { value ->
+//                        settingsState.updatePreference(value) { settings, v ->
+//                            settings.copy(collectLogs = v)
+//                        }
+//                    }
+//                )
+//                SimplePreferenceItem(
+//                    title = "Log Screen",
+//                    subtitle = "View application logs",
+//                    onClick = onNavigateToLogScreen,
+//                )
+//            }
 
             PreferenceCategory(title = "Shizuku") {
                 SwitchPreferenceItem(
