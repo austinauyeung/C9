@@ -81,11 +81,11 @@ fun LocationClickableIconScreen(
                 DropdownPreferenceItem(
                     title = "Icon Alignment",
                     subtitle =
-                        when (uiState.cursorImageAlignment) {
+                        when (uiState.clickableImageAlignment) {
                             IconAlignment.TOP_LEFT -> "Align to top-left of icon"
                             IconAlignment.CENTER -> "Align to center of icon"
                         },
-                    selectedOption = uiState.cursorImageAlignment,
+                    selectedOption = uiState.clickableImageAlignment,
                     options =
                         listOf(
                             IconAlignment.TOP_LEFT to "Top left",
@@ -93,7 +93,7 @@ fun LocationClickableIconScreen(
                         ),
                     onOptionSelected = { value ->
                         settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(cursorImageAlignment = v)
+                            settings.copy(clickableImageAlignment = v)
                         }
                     },
                     enabled = uiState.useCustomCursorIcon
