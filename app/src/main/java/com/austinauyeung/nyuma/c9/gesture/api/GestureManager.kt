@@ -303,7 +303,6 @@ class GestureManager(
         }
         if (!getGestureReady()) return false
         if (fromX.equalToDecimalPlaces(toX, 4) && fromY.equalToDecimalPlaces(toY, 4)) {
-            setGestureReady(true)
             return false
         }
 

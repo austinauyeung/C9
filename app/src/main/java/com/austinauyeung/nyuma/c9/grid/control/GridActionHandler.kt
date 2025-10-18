@@ -16,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Handles key events for the grid cursor.
@@ -28,6 +29,17 @@ class GridActionHandler(
     private val modeCoordinator: ModeCoordinator,
     private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT }
 ) {
+    // Separate from gesture ready, which is used for dispatch implementation (e.g. during a drag, gestureReady becomes true to initiate next delta)
+    // Prevents overlapping gesture categories
+    private enum class CurrentAction {
+        ACTIVATE,
+        NUMBER,
+        SCROLL,
+        ZOOM,
+        ACTION
+    }
+    private var currentAction: CurrentAction? = null
+
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
     private var wasOverlayActivated: Boolean = false
@@ -144,19 +156,27 @@ class GridActionHandler(
 
             return when (effectiveKeyCode) {
                 in numKeys -> {
-                    handleNumberKey(event, effectiveKeyCode)
+                    if (currentAction == null) {
+                        handleNumberKey(event, effectiveKeyCode)
+                    } else false
                 }
 
                 in scrollKeys -> {
-                    handleScrollKey(event, effectiveKeyCode)
+                    if ((currentAction == CurrentAction.SCROLL) || (currentAction == null)) {
+                        handleScrollKey(event, effectiveKeyCode)
+                    } else false
                 }
 
                 in zoomKeys -> {
-                    handleZoomKey(event)
+                    if ((currentAction == CurrentAction.ZOOM) || (currentAction == null)) {
+                        handleZoomKey(event)
+                    } else false
                 }
 
                 in actionKeys -> {
-                    handleActionKey(event)
+                    if ((currentAction == CurrentAction.ACTION) || (currentAction == null)) {
+                        handleActionKey(event)
+                    } else false
                 }
 
                 else -> false
@@ -175,6 +195,7 @@ class GridActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ACTIVATE
                 cancelActivationJob()
 
                 activationKeyPressStartTime = System.currentTimeMillis()
@@ -201,6 +222,7 @@ class GridActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 isActivationKeyPressed = false
                 cancelActivationJob()
 
@@ -225,6 +247,7 @@ class GridActionHandler(
     }
 
     private fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
+        // currentAction not set to allow gestures
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 if (heldNumberKeyCode != null) {
@@ -260,6 +283,7 @@ class GridActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.SCROLL
                 cancelContinuousGesture()
                 val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
@@ -292,6 +316,7 @@ class GridActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 cancelContinuousGesture()
             }
         }
@@ -335,6 +360,7 @@ class GridActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ZOOM
                 cancelContinuousGesture()
                 val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
@@ -363,6 +389,7 @@ class GridActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 cancelContinuousGesture()
             }
         }
@@ -381,6 +408,7 @@ class GridActionHandler(
     private fun handleActionKey(event: KeyEvent): Boolean {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ACTION
                 backgroundScope.launch {
                     val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
@@ -393,6 +421,7 @@ class GridActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 backgroundScope.launch {
                     val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
