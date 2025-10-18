@@ -37,7 +37,7 @@ class CoreManager(
     private lateinit var cursorActionHandler: CursorActionHandler
     lateinit var gridStateManager: GridStateManager
     private lateinit var gridActionHandler: GridActionHandler
-    private lateinit var modeCoordinator: ModeCoordinator
+    lateinit var modeCoordinator: ModeCoordinator
     private lateinit var notificationManager: NotificationManager
 
     private val screenDimensionsFlow = orientationHandler.screenDimensions
@@ -220,16 +220,12 @@ class CoreManager(
         try {
             if (settings.showNotification) {
                 when (mode) {
-                    ModeCoordinator.OverlayMode.GRID -> {
-                        notificationManager.showNotification(ModeCoordinator.OverlayMode.GRID)
-                    }
-
-                    ModeCoordinator.OverlayMode.CURSOR -> {
-                        notificationManager.showNotification(ModeCoordinator.OverlayMode.CURSOR)
-                    }
-
-                    ModeCoordinator.OverlayMode.NONE -> {
+                    ModeCoordinator.OverlayMode.OFF -> {
                         notificationManager.hideNotification()
+                    }
+
+                    else -> {
+                        notificationManager.showNotification(mode)
                     }
                 }
             } else {
@@ -241,7 +237,7 @@ class CoreManager(
     }
 
     // Invoked when setting activation key
-    fun forceHideAllOverlays() {
+    fun forceHideAllOverlays(fromAutoHide: Boolean) {
         Logger.d("Force hiding all overlays")
 
         try {
@@ -253,8 +249,8 @@ class CoreManager(
                 cursorStateManager.hideCursor()
             }
 
-            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID)
-            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR)
+            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID, fromAutoHide)
+            modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR, fromAutoHide)
 
             gridActionHandler.cleanup()
             cursorActionHandler.cleanup()

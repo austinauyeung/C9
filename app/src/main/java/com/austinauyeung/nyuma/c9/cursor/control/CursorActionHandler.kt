@@ -306,7 +306,7 @@ class CursorActionHandler(
                             wasActivated = cursorStateManager.isCursorVisible()
 
                             if (!wasActivated) {
-                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR)
+                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR, false)
                                 gestureManager.setGestureReady(true)
                             }
                         }

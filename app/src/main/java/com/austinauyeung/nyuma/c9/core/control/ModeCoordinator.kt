@@ -10,31 +10,33 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class ModeCoordinator {
     enum class OverlayMode {
-        NONE,
+        OFF,
+        AUTOHIDDEN,
         GRID,
-        CURSOR,
+        CURSOR
     }
 
-    private val _activeMode = MutableStateFlow(OverlayMode.NONE)
+    private val _activeMode = MutableStateFlow(OverlayMode.OFF)
     val activeMode: StateFlow<OverlayMode> = _activeMode.asStateFlow()
 
     fun requestActivation(mode: OverlayMode): Boolean {
         val currentMode = _activeMode.value
-
-        if (currentMode == OverlayMode.NONE || currentMode == mode) {
-            val newMode = if (currentMode == mode) OverlayMode.NONE else mode
-            _activeMode.value = newMode
-            Logger.d("Overlay mode changed: $currentMode -> $newMode")
-            return true
+        val mismatch1 = (currentMode == OverlayMode.GRID) && (mode == OverlayMode.CURSOR)
+        val mismatch2 = (currentMode == OverlayMode.CURSOR) && (mode == OverlayMode.GRID)
+        if (mismatch1 || mismatch2) {
+            Logger.d("Cannot activate $mode, $currentMode is already active")
+            return false
         }
 
-        Logger.d("Cannot activate $mode, $currentMode is already active")
-        return false
+        val newMode = if (currentMode == mode) OverlayMode.OFF else mode
+        _activeMode.value = newMode
+        Logger.d("Overlay mode changed: $currentMode -> $newMode")
+        return true
     }
 
-    fun deactivate(mode: OverlayMode) {
+    fun deactivate(mode: OverlayMode, fromAutoHide: Boolean) {
         if (_activeMode.value == mode) {
-            _activeMode.value = OverlayMode.NONE
+            _activeMode.value = if (fromAutoHide) OverlayMode.AUTOHIDDEN else OverlayMode.OFF
             Logger.d("Overlay mode deactivated: $mode")
         }
     }

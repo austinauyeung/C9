@@ -228,7 +228,7 @@ class SettingsState(
 
     fun requestHideAllOverlays() {
         val serviceInstance = AppAccessibilityService.getInstance()
-        serviceInstance?.forceHideAllOverlays()
+        serviceInstance?.forceHideAllOverlays(false)
     }
 
     fun updateAllowPassthrough(allow: Boolean) {

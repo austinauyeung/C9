@@ -189,7 +189,7 @@ class GridActionHandler(
                             wasOverlayActivated = gridStateManager.isGridVisible()
 
                             if (!wasOverlayActivated) {
-                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID)
+                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.GRID, false)
                                 gestureManager.setGestureReady(true)
                             }
                         }

@@ -22,6 +22,7 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.austinauyeung.nyuma.c9.C9
+import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.control.CoreManager
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.control.OverlayManager
@@ -63,14 +64,13 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     private lateinit var overlayManager: OverlayManager
     private lateinit var orientationHandler: OrientationHandler
 
-    private var lastOverlayType: ModeCoordinator.OverlayMode = ModeCoordinator.OverlayMode.CURSOR
+    private var lastOverlayType: ModeCoordinator.OverlayMode = ModeCoordinator.OverlayMode.OFF
 
     private val keysPressed: MutableSet<Int> = mutableSetOf()
 
     private var lastKeyboardState = false
     private var lastLockScreenState = false
-    private var lastStateChanged = false
-    private var lastAppState = false
+    private var lastAppState: Boolean? = null
     private var autoHideJob: Job? = null
     private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
     private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
@@ -81,7 +81,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             when (intent.action) {
                 ACTION_ACTIVATE_GRID -> {
                     backgroundScope.launch {
-                        coreManager.activateGridMode()
+                        coreManager.activateGridMode(false)
                     }
                 }
                 ACTION_RESET_GRID -> {
@@ -91,7 +91,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 }
                 ACTION_ACTIVATE_CURSOR -> {
                     backgroundScope.launch {
-                        coreManager.activateCursorMode()
+                        coreManager.activateCursorMode(false)
                     }
                 }
                 ACTION_TOGGLE_CURSOR -> {
@@ -242,9 +242,9 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
-            Logger.i("Overlay accessibility shizuku connected")
+            Logger.i("Overlay accessibility service connected")
         } catch (e: Exception) {
-            Logger.e("Error initializing shizuku", e)
+            Logger.e("Error initializing service", e)
             if (!::serviceJob.isInitialized) {
                 serviceJob = SupervisorJob()
             }
@@ -252,21 +252,49 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     }
 
     private fun autoHideCursor() {
-        if (coreManager.gridStateManager.gridState.value != null) {
-            lastOverlayType = ModeCoordinator.OverlayMode.GRID
-        } else if (coreManager.cursorStateManager.cursorState.value != null) {
-            lastOverlayType = ModeCoordinator.OverlayMode.CURSOR
+        val currentOverlay = coreManager.modeCoordinator.activeMode.value
+        val cursorOff = currentOverlay == ModeCoordinator.OverlayMode.OFF
+        val cursorAlreadyHidden = currentOverlay == ModeCoordinator.OverlayMode.AUTOHIDDEN
+        if (cursorOff || cursorAlreadyHidden)
+            return
+
+        lastOverlayType = currentOverlay
+        if (lastOverlayType == ModeCoordinator.OverlayMode.CURSOR) {
             coreManager.cursorStateManager.cursorState.value?.let { cursor ->
                 coreManager.cursorStateManager.setLastCursorPosition(Offset(cursor.position.x, cursor.position.y))
             }
         }
 
         Logger.d("Hiding cursor overlay")
-        forceHideAllOverlays()
+        forceHideAllOverlays(true)
     }
 
     private fun attemptCursorRestore() {
+        val currentOverlay = coreManager.modeCoordinator.activeMode.value
+        if (currentOverlay != ModeCoordinator.OverlayMode.AUTOHIDDEN)
+            return
+
         Logger.d("Restoring cursor overlay")
+        val settings = C9.getInstance().getSettingsFlow().value
+        val gridMapped = settings.gridActivationKey != ApplicationConstants.OVERLAY_DISABLED
+        val gridLost = (lastOverlayType == ModeCoordinator.OverlayMode.GRID) && !gridMapped
+        val cursorMapped = settings.cursorActivationKey != ApplicationConstants.OVERLAY_DISABLED
+        val cursorLost = (lastOverlayType == ModeCoordinator.OverlayMode.CURSOR) && !cursorMapped
+
+        // Edge case: cursor previously autohidden and then cleared
+        if (gridLost || cursorLost) {
+            lastOverlayType = ModeCoordinator.OverlayMode.OFF
+        }
+
+        // If no previous overlay type, default to any mapped cursor
+        if (lastOverlayType == ModeCoordinator.OverlayMode.OFF) {
+            lastOverlayType = when {
+                cursorMapped -> ModeCoordinator.OverlayMode.CURSOR
+                gridMapped -> ModeCoordinator.OverlayMode.GRID
+                else -> ModeCoordinator.OverlayMode.OFF
+            }
+        }
+
         when (lastOverlayType) {
             ModeCoordinator.OverlayMode.GRID -> {
                 coreManager.activateGridMode(toggle = false)
@@ -301,21 +329,14 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             }
         }
 
-        if (lastStateChanged) {
-            onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState)
-        }
-        lastStateChanged = false
+        onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState!!)
     }
 
     private fun checkKeyboardVisibility() {
         try {
-            val isKeyboardVisible = isImeWindowPresent() ||
+            lastKeyboardState = isImeWindowPresent() ||
                     windowHeightMethod.invoke(imm) as Int > 0
-            if (isKeyboardVisible != lastKeyboardState) {
-                Logger.d("Keyboard visibility changed, visible: $isKeyboardVisible")
-                lastKeyboardState = isKeyboardVisible
-                lastStateChanged = true
-            }
+            Logger.d("Autohide by keyboard: $lastKeyboardState")
         } catch (e: Exception) {
             Logger.e("Error checking keyboard visibility", e)
         }
@@ -332,18 +353,14 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun checkAppVisibility() {
         try {
-            val isAppVisible = shouldAutoHideInCurrentApp()
-            if (isAppVisible != lastAppState) {
-                Logger.d("App visibility changed, visible: $isAppVisible")
-                lastAppState = isAppVisible
-                lastStateChanged = true
-            }
+            lastAppState = shouldHideInCurrentApp()
+            Logger.d("Autohide by current app: $lastAppState")
         } catch (e: Exception) {
             Logger.e("Error checking app visibility", e)
         }
     }
 
-    private fun shouldAutoHideInCurrentApp(): Boolean {
+    private fun shouldHideInCurrentApp(): Boolean {
         val settings = C9.getInstance().getSettingsFlow().value
         if (settings.autoHideApps.isEmpty()) return settings.applicationListType == AppListType.ALLOW_LIST
 
@@ -373,22 +390,18 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun checkLockScreenVisibility() {
         try {
-            val isLockScreenVisible = keyguardManager.isKeyguardLocked
-            if (isLockScreenVisible != lastLockScreenState) {
-                Logger.d("Lock screen visibility changed, visible: $isLockScreenVisible")
-                lastLockScreenState = isLockScreenVisible
-                lastStateChanged = true
-            }
+            lastLockScreenState = keyguardManager.isKeyguardLocked
+            Logger.d("Autohide by lockscreen: $lastLockScreenState")
         } catch (e: Exception) {
             Logger.e("Error checking lock screen visibility", e)
         }
     }
 
-    private fun onAutoHideConditionChanged(visible: Boolean) {
+    private fun onAutoHideConditionChanged(shouldHide: Boolean) {
         autoHideJob?.cancel()
         autoHideJob = mainScope.launch {
             delay(100L)
-            if (visible) {
+            if (shouldHide) {
                 autoHideCursor()
             } else {
                 attemptCursorRestore()
@@ -415,8 +428,8 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         }
     }
 
-    fun forceHideAllOverlays() {
-        coreManager.forceHideAllOverlays()
+    fun forceHideAllOverlays(fromAutoHide: Boolean) {
+        coreManager.forceHideAllOverlays(fromAutoHide)
         overlayManager.updateOverlayUI()
     }
 
