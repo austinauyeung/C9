@@ -73,6 +73,7 @@ object Defaults {
         val CLICKABLE_LIST_TYPE = AppListType.DENY_LIST
         const val IGNORE_NUMPAD = false
         const val CHECK_CLICKABLE = false
+        const val KEEP_CURRENT_GRID_TRANSPARENT = true
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

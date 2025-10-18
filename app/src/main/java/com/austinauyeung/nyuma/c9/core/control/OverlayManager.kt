@@ -158,7 +158,8 @@ class OverlayManager(
                                 hideNumbers = currentSettings.hideNumbers,
                                 orientation = currentOrientation,
                                 useRotatedNumbers = currentSettings.rotateButtonsWithOrientation,
-                                gridLineVisibility = currentSettings.gridLineVisibility
+                                gridLineVisibility = currentSettings.gridLineVisibility,
+                                keepCurrentGridTransparent = currentSettings.keepCurrentGridTransparent
                             )
                         }
 

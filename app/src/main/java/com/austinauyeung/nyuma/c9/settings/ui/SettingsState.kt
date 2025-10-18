@@ -112,7 +112,8 @@ class SettingsState(
                             applicationListType = settings.applicationListType,
                             clickableListType = settings.clickableListType,
                             ignoreNumpad = settings.ignoreNumpad,
-                            checkClickable = settings.checkClickable
+                            checkClickable = settings.checkClickable,
+                            keepCurrentGridTransparent = settings.keepCurrentGridTransparent,
                         )
                     }
                 }
@@ -206,7 +207,8 @@ class SettingsState(
             applicationListType = _uiState.value.applicationListType,
             clickableListType = _uiState.value.clickableListType,
             ignoreNumpad = _uiState.value.ignoreNumpad,
-            checkClickable = _uiState.value.checkClickable
+            checkClickable = _uiState.value.checkClickable,
+            keepCurrentGridTransparent = _uiState.value.keepCurrentGridTransparent
         )
     }
 
@@ -318,5 +320,6 @@ data class SettingsUiState(
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
     val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
     val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
-    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
+    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE,
+    val keepCurrentGridTransparent: Boolean = Defaults.Settings.KEEP_CURRENT_GRID_TRANSPARENT
 )

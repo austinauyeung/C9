@@ -85,6 +85,7 @@ class SettingsRepositoryImpl(
         private val CLICKABLE_LIST_TYPE = stringPreferencesKey("clickable_list_type")
         private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
         private val CHECK_CLICKABLE = booleanPreferencesKey("check_clickable")
+        private val KEEP_CURRENT_GRID_TRANSPARENT = booleanPreferencesKey("keep_current_grid_transparent")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -295,7 +296,9 @@ class SettingsRepositoryImpl(
                     ignoreNumpad = preferences[IGNORE_NUMPAD]
                         ?: OverlaySettings.DEFAULT.ignoreNumpad,
                     checkClickable = preferences[CHECK_CLICKABLE]
-                        ?: OverlaySettings.DEFAULT.checkClickable
+                        ?: OverlaySettings.DEFAULT.checkClickable,
+                    keepCurrentGridTransparent = preferences[KEEP_CURRENT_GRID_TRANSPARENT]
+                        ?: OverlaySettings.DEFAULT.keepCurrentGridTransparent
                 )
 
                 settings
@@ -363,6 +366,7 @@ class SettingsRepositoryImpl(
                 preferences[CLICKABLE_LIST_TYPE] = settings.clickableListType.name
                 preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
                 preferences[CHECK_CLICKABLE] = settings.checkClickable
+                preferences[KEEP_CURRENT_GRID_TRANSPARENT] = settings.keepCurrentGridTransparent
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

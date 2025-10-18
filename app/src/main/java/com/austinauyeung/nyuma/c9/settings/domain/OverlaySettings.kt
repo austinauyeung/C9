@@ -74,7 +74,8 @@ data class OverlaySettings(
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
     val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
     val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
-    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
+    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE,
+    val keepCurrentGridTransparent: Boolean = Defaults.Settings.KEEP_CURRENT_GRID_TRANSPARENT
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

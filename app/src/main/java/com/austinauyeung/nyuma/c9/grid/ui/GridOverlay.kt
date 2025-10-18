@@ -7,9 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -35,7 +38,8 @@ fun GridOverlay(
     hideNumbers: Boolean = false,
     orientation: OrientationUtil.Orientation = OrientationUtil.Orientation.PORTRAIT,
     useRotatedNumbers: Boolean = false,
-    gridLineVisibility: GridLineVisibility = GridLineVisibility.SHOW_ALL
+    gridLineVisibility: GridLineVisibility = GridLineVisibility.SHOW_ALL,
+    keepCurrentGridTransparent: Boolean = true
 ) {
     val textMeasurer = rememberTextMeasurer()
     val gridBackground = colorResource(id = R.color.grid_background)
@@ -85,6 +89,23 @@ fun GridOverlay(
             color = gridBackground.copy(alpha = backgroundAlpha),
             size = size,
         )
+
+        // Keep current grid transparent
+        if (keepCurrentGridTransparent) {
+            drawIntoCanvas { canvas ->
+                val paint = Paint().apply {
+                    blendMode = BlendMode.Clear
+                }
+
+                canvas.drawRect(
+                    grid.x,
+                    grid.y,
+                    grid.x + grid.width,
+                    grid.y + grid.height,
+                    paint
+                )
+            }
+        }
 
         if (!hideNumbers) {
             for (row in 0 until GridConstants.DIMENSION) {

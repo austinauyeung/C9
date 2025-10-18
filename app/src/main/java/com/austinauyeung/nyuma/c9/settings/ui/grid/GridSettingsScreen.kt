@@ -185,6 +185,17 @@ fun GridSettingsScreen(
                 )
 
                 SwitchPreferenceItem(
+                    title = "Keep Current Grid Transparent",
+                    subtitle = "Apply overlay opacity only around the grid",
+                    checked = uiState.keepCurrentGridTransparent,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(keepCurrentGridTransparent = v)
+                        }
+                    },
+                )
+
+                SwitchPreferenceItem(
                     title = "Hide Numbers",
                     subtitle = "Hide cell numbers in the grid",
                     checked = uiState.hideNumbers,
