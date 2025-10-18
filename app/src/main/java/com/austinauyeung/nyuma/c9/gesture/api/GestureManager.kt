@@ -12,6 +12,7 @@ import com.austinauyeung.nyuma.c9.core.util.VersionUtil
 import com.austinauyeung.nyuma.c9.gesture.ui.GesturePath
 import com.austinauyeung.nyuma.c9.gesture.ui.GestureType
 import com.austinauyeung.nyuma.c9.gesture.ui.animateGesturePath
+import com.austinauyeung.nyuma.c9.gesture.ui.endStationaryGesture
 import com.austinauyeung.nyuma.c9.gesture.ui.showStationaryGesture
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +46,7 @@ class GestureManager(
     private val _isReady = MutableStateFlow(true)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
     private var gestureTimeoutJob: Job? = null
+    private var currentTapVisual: String = ""
 
     fun setGestureReady(ready: Boolean) {
         gestureReady.set(ready)
@@ -294,7 +296,11 @@ class GestureManager(
         if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
             return true
         }
-
+        if (shouldShowGestures) {
+            // Need to fix visualization lag; remove drag visualization for now
+            endVisualizeTap()
+            // visualizeTap(toX, toY)
+        }
         if (!getGestureReady()) return false
         if (fromX.equalToDecimalPlaces(toX, 4) && fromY.equalToDecimalPlaces(toY, 4)) {
             setGestureReady(true)
@@ -320,6 +326,9 @@ class GestureManager(
 
         if (!getGestureReady()) return false
         setGestureReady(false)
+        if (shouldShowGestures) {
+            endVisualizeTap()
+        }
 
         try {
             Logger.d("Ending tap at ($x, $y)")
@@ -353,6 +362,7 @@ class GestureManager(
         endY: Float,
         duration: Long
     ) {
+        _gesturePaths.value = emptyList()
         val gestureId = "scroll_${System.currentTimeMillis()}_$direction"
 
         animateGesturePath(
@@ -367,14 +377,20 @@ class GestureManager(
     }
 
     private fun visualizeTap(x: Float, y: Float) {
-        val gestureId = "tap_${System.currentTimeMillis()}"
+        _gesturePaths.value = emptyList()
+        currentTapVisual = "tap_${System.currentTimeMillis()}"
         showStationaryGesture(
-            gestureId = gestureId,
+            gestureId = currentTapVisual,
             position = Offset(x, y),
-            duration = GestureConstants.TAP_DURATION,
             type = GestureType.TAP,
-            pathsFlow = _gesturePaths,
-            coroutineScope = serviceScope
+            pathsFlow = _gesturePaths
+        )
+    }
+
+    private fun endVisualizeTap() {
+        endStationaryGesture(
+            gestureId = currentTapVisual,
+            pathsFlow = _gesturePaths
         )
     }
 
@@ -384,6 +400,7 @@ class GestureManager(
         finger1EndX: Float, finger1EndY: Float,
         finger2EndX: Float, finger2EndY: Float
     ) {
+        _gesturePaths.value = emptyList()
         val gestureId1 = "zoom_finger1_${System.currentTimeMillis()}"
         val gestureId2 = "zoom_finger2_${System.currentTimeMillis()}"
         val settings = settingsFlow.value
