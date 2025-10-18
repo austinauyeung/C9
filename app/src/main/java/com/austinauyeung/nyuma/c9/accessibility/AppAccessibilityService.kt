@@ -70,7 +70,9 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private var lastKeyboardState = false
     private var lastLockScreenState = false
-    private var lastAppState: Boolean? = null
+    private var lastApp: String? = null
+    private var lastAppState = false
+    private var lastStateChanged = false
     private var autoHideJob: Job? = null
     private val keyguardManager by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
     private val imm by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
@@ -329,14 +331,21 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             }
         }
 
-        onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState!!)
+        if (lastStateChanged) {
+            onAutoHideConditionChanged(lastKeyboardState || lastLockScreenState || lastAppState)
+        }
+        lastStateChanged = false
     }
 
     private fun checkKeyboardVisibility() {
         try {
-            lastKeyboardState = isImeWindowPresent() ||
+            val isKeyboardVisible = isImeWindowPresent() ||
                     windowHeightMethod.invoke(imm) as Int > 0
-            Logger.d("Autohide by keyboard: $lastKeyboardState")
+            if (isKeyboardVisible != lastKeyboardState) {
+                Logger.d("Autohide by keyboard: $lastKeyboardState")
+                lastKeyboardState = isKeyboardVisible
+                lastStateChanged = true
+            }
         } catch (e: Exception) {
             Logger.e("Error checking keyboard visibility", e)
         }
@@ -353,24 +362,31 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun checkAppVisibility() {
         try {
-            lastAppState = shouldHideInCurrentApp()
-            Logger.d("Autohide by current app: $lastAppState")
+            val (app, appState) = shouldHideInCurrentApp()
+            if (app != null && app != lastApp) {
+                Logger.d("Autohide by current app: $appState")
+                lastApp = app
+                lastAppState = appState
+                lastStateChanged = true
+            }
         } catch (e: Exception) {
             Logger.e("Error checking app visibility", e)
         }
     }
 
-    private fun shouldHideInCurrentApp(): Boolean {
+    private fun shouldHideInCurrentApp(): Pair<String?, Boolean> {
         val settings = C9.getInstance().getSettingsFlow().value
-        if (settings.autoHideApps.isEmpty()) return settings.applicationListType == AppListType.ALLOW_LIST
+        val appWindow = windows
+            ?.firstOrNull { it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.root != null }
+        val appName = appWindow?.root?.packageName?.toString()
 
-        for (window in windows) {
-            val pkg = window.root?.packageName?.toString()
-            if (pkg != null && pkg in settings.autoHideApps) {
-                return settings.applicationListType == AppListType.DENY_LIST
-            }
+        if (settings.autoHideApps.isEmpty()) return Pair(appName, settings.applicationListType == AppListType.ALLOW_LIST)
+
+        if (appWindow != null && appName in settings.autoHideApps) {
+            return Pair(appName, settings.applicationListType == AppListType.DENY_LIST)
         }
-        return settings.applicationListType == AppListType.ALLOW_LIST
+
+        return Pair(appName, settings.applicationListType == AppListType.ALLOW_LIST)
     }
 
     fun showClickableInCurrentApp(): Boolean {
@@ -390,8 +406,12 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private fun checkLockScreenVisibility() {
         try {
-            lastLockScreenState = keyguardManager.isKeyguardLocked
-            Logger.d("Autohide by lockscreen: $lastLockScreenState")
+            val isLockScreenVisible = keyguardManager.isKeyguardLocked
+            if (isLockScreenVisible != lastLockScreenState) {
+                Logger.d("Autohide by lockscreen: $lastLockScreenState")
+                lastLockScreenState = isLockScreenVisible
+                lastStateChanged = true
+            }
         } catch (e: Exception) {
             Logger.e("Error checking lock screen visibility", e)
         }
