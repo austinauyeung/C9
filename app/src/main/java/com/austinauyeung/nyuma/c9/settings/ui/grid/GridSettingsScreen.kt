@@ -196,6 +196,17 @@ fun GridSettingsScreen(
                     )
                 }
 
+                SwitchPreferenceItem(
+                    title = "Keep Current Grid Transparent",
+                    subtitle = "Exclude current grid from background color",
+                    checked = uiState.keepCurrentGridTransparent,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(keepCurrentGridTransparent = v)
+                        }
+                    },
+                )
+
                 SimplePreferenceItem(
                     title = "Lines Color",
                     subtitle = "Current ARGB hex value: #${uiState.gridCursorLinesHex}",
@@ -215,6 +226,39 @@ fun GridSettingsScreen(
                     )
                 }
 
+                SliderPreferenceItem(
+                    title = "Line Width",
+                    value = uiState.gridCursorLineWidth.toFloat(),
+                    valueRange = GridConstants.GRID_LINE_MIN_WIDTH.toFloat()..GridConstants.GRID_LINE_MAX_WIDTH.toFloat(),
+                    steps = 3,
+                    valueText = "${uiState.gridCursorLineWidth}",
+                    onValueChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(gridCursorLineWidth = v.toInt())
+                        }
+                    },
+                )
+
+                DropdownPreferenceItem(
+                    title = "Grid Lines",
+                    subtitle = when (uiState.gridLineVisibility) {
+                        GridLineVisibility.SHOW_ALL -> "Show all grid lines"
+                        GridLineVisibility.FINAL_LEVEL_ONLY -> "Show grid lines in final subgrid only"
+                        GridLineVisibility.HIDE_ALL -> "Hide all grid lines"
+                    },
+                    selectedOption = uiState.gridLineVisibility,
+                    options = listOf(
+                        GridLineVisibility.SHOW_ALL to "Show",
+                        GridLineVisibility.FINAL_LEVEL_ONLY to "Final",
+                        GridLineVisibility.HIDE_ALL to "Hide"
+                    ),
+                    onOptionSelected = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(gridLineVisibility = v)
+                        }
+                    },
+                )
+
                 SimplePreferenceItem(
                     title = "Numbers Color",
                     subtitle = "Current ARGB hex value: #${uiState.gridCursorNumbersHex}",
@@ -233,17 +277,6 @@ fun GridSettingsScreen(
                         title = "Numbers Color"
                     )
                 }
-
-                SwitchPreferenceItem(
-                    title = "Keep Current Grid Transparent",
-                    subtitle = "Exclude current grid from background opacity",
-                    checked = uiState.keepCurrentGridTransparent,
-                    onCheckedChange = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(keepCurrentGridTransparent = v)
-                        }
-                    },
-                )
 
                 SwitchPreferenceItem(
                     title = "Hide Numbers",
@@ -268,39 +301,6 @@ fun GridSettingsScreen(
                         }
                     },
                     enabled = !uiState.hideNumbers
-                )
-
-                DropdownPreferenceItem(
-                    title = "Grid Lines",
-                    subtitle = when (uiState.gridLineVisibility) {
-                        GridLineVisibility.SHOW_ALL -> "Show all grid lines"
-                        GridLineVisibility.FINAL_LEVEL_ONLY -> "Show grid lines in final subgrid only"
-                        GridLineVisibility.HIDE_ALL -> "Hide all grid lines"
-                    },
-                    selectedOption = uiState.gridLineVisibility,
-                    options = listOf(
-                        GridLineVisibility.SHOW_ALL to "Show",
-                        GridLineVisibility.FINAL_LEVEL_ONLY to "Final",
-                        GridLineVisibility.HIDE_ALL to "Hide"
-                    ),
-                    onOptionSelected = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(gridLineVisibility = v)
-                        }
-                    },
-                )
-
-                SliderPreferenceItem(
-                    title = "Line Width",
-                    value = uiState.gridCursorLineWidth.toFloat(),
-                    valueRange = GridConstants.GRID_LINE_MIN_WIDTH.toFloat()..GridConstants.GRID_LINE_MAX_WIDTH.toFloat(),
-                    steps = 3,
-                    valueText = "${uiState.gridCursorLineWidth}",
-                    onValueChange = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(gridCursorLineWidth = v.toInt())
-                        }
-                    },
                 )
             }
         }
