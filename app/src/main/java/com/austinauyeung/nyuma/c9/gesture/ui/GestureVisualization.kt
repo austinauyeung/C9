@@ -136,10 +136,8 @@ fun animateGesturePath(
 fun showStationaryGesture(
     gestureId: String,
     position: Offset,
-    duration: Long,
     type: GestureType,
-    pathsFlow: MutableStateFlow<List<GesturePath>>,
-    coroutineScope: CoroutineScope,
+    pathsFlow: MutableStateFlow<List<GesturePath>>
 ) {
     val path =
         GesturePath(
@@ -149,11 +147,13 @@ fun showStationaryGesture(
             startTime = System.currentTimeMillis(),
         )
     pathsFlow.update { it + path }
+}
 
-    coroutineScope.launch {
-        delay(duration)
-        pathsFlow.update { currentPaths ->
-            currentPaths.filter { it.id != gestureId }
-        }
+fun endStationaryGesture(
+    gestureId: String,
+    pathsFlow: MutableStateFlow<List<GesturePath>>,
+) {
+    pathsFlow.update { currentPaths ->
+        currentPaths.filter { it.id != gestureId }
     }
 }

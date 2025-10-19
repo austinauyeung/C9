@@ -39,6 +39,17 @@ class CursorActionHandler(
     private val orientationProvider: () -> OrientationUtil.Orientation = { OrientationUtil.Orientation.PORTRAIT },
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
 ) {
+    // Separate from gesture ready, which is used for dispatch implementation (e.g. during a drag, gestureReady becomes true to initiate next delta)
+    // Prevents overlapping gesture categories
+    private enum class CurrentAction {
+        ACTIVATE,
+        MOVEMENT,
+        SCROLL,
+        ZOOM,
+        ACTION
+    }
+    private var currentAction: CurrentAction? = null
+
     private var activationKeyPressStartTime: Long = -1
     private var isActivationKeyPressed: Boolean = false
     private var wasActivated: Boolean = false
@@ -257,20 +268,24 @@ class CursorActionHandler(
 
 
             return when (event.keyCode) {
-                in movementKeys -> {
-                    handleMovementKey(event, effectiveKeyCode)
-                }
+                in movementKeys -> handleMovementKey(event, effectiveKeyCode)
 
                 in scrollKeys -> {
-                    handleScrollKey(event, effectiveKeyCode)
+                    if ((currentAction == CurrentAction.SCROLL) || (currentAction == null)) {
+                        handleScrollKey(event, effectiveKeyCode)
+                    } else false
                 }
 
                 in zoomKeys -> {
-                    handleZoomKey(event)
+                    if ((currentAction == CurrentAction.ZOOM) || (currentAction == null)) {
+                        handleZoomKey(event)
+                    } else false
                 }
 
                 in actionKeys -> {
-                    handleActionKey(event)
+                    if ((currentAction == CurrentAction.ACTION) || (currentAction == null)) {
+                        handleActionKey(event)
+                    } else false
                 }
 
                 in disableKeys -> {
@@ -292,6 +307,7 @@ class CursorActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ACTIVATE
                 cancelActivationJob()
 
                 activationKeyPressStartTime = System.currentTimeMillis()
@@ -306,7 +322,7 @@ class CursorActionHandler(
                             wasActivated = cursorStateManager.isCursorVisible()
 
                             if (!wasActivated) {
-                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR)
+                                modeCoordinator.deactivate(ModeCoordinator.OverlayMode.CURSOR, false)
                                 gestureManager.setGestureReady(true)
                             }
                         }
@@ -318,6 +334,7 @@ class CursorActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 isActivationKeyPressed = false
                 cancelActivationJob()
 
@@ -358,6 +375,7 @@ class CursorActionHandler(
             else -> return false
         }
 
+        // currentAction not set to allow gestures
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 startMovingCursor(direction)
@@ -379,6 +397,7 @@ class CursorActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.SCROLL
                 cancelContinuousGesture()
 
                 val direction = when (keyCode) {
@@ -406,6 +425,7 @@ class CursorActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 cancelContinuousGesture()
             }
         }
@@ -418,6 +438,7 @@ class CursorActionHandler(
 
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ZOOM
                 cancelContinuousGesture()
 
                 val isZoomIn = when (event.keyCode) {
@@ -441,6 +462,7 @@ class CursorActionHandler(
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 cancelContinuousGesture()
             }
         }
@@ -450,10 +472,12 @@ class CursorActionHandler(
     private fun handleActionKey(event: KeyEvent): Boolean {
         return when (event.action) {
             KeyEvent.ACTION_DOWN -> {
+                currentAction = CurrentAction.ACTION
                 handleActionKeyDown()
             }
 
             KeyEvent.ACTION_UP -> {
+                currentAction = null
                 handleActionKeyUp()
             }
 

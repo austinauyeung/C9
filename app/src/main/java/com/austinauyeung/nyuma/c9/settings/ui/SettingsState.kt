@@ -54,7 +54,6 @@ class SettingsState(
                         currentState.copy(
                             activationDuration = settings.activationDuration,
                             gridLevels = settings.gridLevels,
-                            overlayOpacity = settings.overlayOpacity,
                             persistOverlay = settings.persistOverlay,
                             hideNumbers = settings.hideNumbers,
                             gridLineVisibility = settings.gridLineVisibility,
@@ -112,7 +111,13 @@ class SettingsState(
                             applicationListType = settings.applicationListType,
                             clickableListType = settings.clickableListType,
                             ignoreNumpad = settings.ignoreNumpad,
-                            checkClickable = settings.checkClickable
+                            checkClickable = settings.checkClickable,
+                            keepCurrentGridTransparent = settings.keepCurrentGridTransparent,
+                            gridCursorBackgroundHex = settings.gridCursorBackgroundHex,
+                            gridCursorLinesHex = settings.gridCursorLinesHex,
+                            gridCursorNumbersHex = settings.gridCursorNumbersHex,
+                            gridCursorLineWidth = settings.gridCursorLineWidth,
+                            gridCursorFontSize = settings.gridCursorFontSize
                         )
                     }
                 }
@@ -148,7 +153,6 @@ class SettingsState(
         return OverlaySettings(
             activationDuration = _uiState.value.activationDuration,
             gridLevels = _uiState.value.gridLevels,
-            overlayOpacity = _uiState.value.overlayOpacity,
             persistOverlay = _uiState.value.persistOverlay,
             hideNumbers = _uiState.value.hideNumbers,
             gridLineVisibility = _uiState.value.gridLineVisibility,
@@ -206,7 +210,13 @@ class SettingsState(
             applicationListType = _uiState.value.applicationListType,
             clickableListType = _uiState.value.clickableListType,
             ignoreNumpad = _uiState.value.ignoreNumpad,
-            checkClickable = _uiState.value.checkClickable
+            checkClickable = _uiState.value.checkClickable,
+            keepCurrentGridTransparent = _uiState.value.keepCurrentGridTransparent,
+            gridCursorBackgroundHex = _uiState.value.gridCursorBackgroundHex,
+            gridCursorLinesHex = _uiState.value.gridCursorLinesHex,
+            gridCursorNumbersHex = _uiState.value.gridCursorNumbersHex,
+            gridCursorLineWidth = _uiState.value.gridCursorLineWidth,
+            gridCursorFontSize = _uiState.value.gridCursorFontSize
         )
     }
 
@@ -228,7 +238,7 @@ class SettingsState(
 
     fun requestHideAllOverlays() {
         val serviceInstance = AppAccessibilityService.getInstance()
-        serviceInstance?.forceHideAllOverlays()
+        serviceInstance?.forceHideAllOverlays(false)
     }
 
     fun updateAllowPassthrough(allow: Boolean) {
@@ -255,7 +265,6 @@ class SettingsState(
 data class SettingsUiState(
     val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
-    val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,
     val isAccessibilityServiceEnabled: Boolean = false,
     val showInvalidSettingError: Boolean = false,
@@ -318,5 +327,11 @@ data class SettingsUiState(
     val applicationListType: AppListType = Defaults.Settings.APPLICATION_LIST_TYPE,
     val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
     val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
-    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE
+    val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE,
+    val keepCurrentGridTransparent: Boolean = Defaults.Settings.KEEP_CURRENT_GRID_TRANSPARENT,
+    val gridCursorBackgroundHex: String = Defaults.Settings.GRID_CURSOR_BACKGROUND_HEX,
+    val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
+    val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
+    val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
 )

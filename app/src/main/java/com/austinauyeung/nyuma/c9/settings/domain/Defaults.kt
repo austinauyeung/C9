@@ -22,7 +22,6 @@ object Defaults {
     object Settings {
         const val ACTIVATION_DURATION = ApplicationConstants.DEFAULT_ACTIVATION_HOLD_DURATION
         const val GRID_LEVELS = GridConstants.DEFAULT_LEVELS
-        const val OVERLAY_OPACITY = GridConstants.DEFAULT_OPACITY
         const val PERSIST_OVERLAY = GridConstants.PERSIST_OVERLAY
         const val HIDE_NUMBERS = GridConstants.HIDE_NUMBERS
         val GRID_LINE_VISIBILITY = GridLineVisibility.SHOW_ALL
@@ -73,6 +72,12 @@ object Defaults {
         val CLICKABLE_LIST_TYPE = AppListType.DENY_LIST
         const val IGNORE_NUMPAD = false
         const val CHECK_CLICKABLE = false
+        const val KEEP_CURRENT_GRID_TRANSPARENT = true
+        const val GRID_CURSOR_BACKGROUND_HEX = GridConstants.GRID_BACKGROUND_HEX
+        const val GRID_CURSOR_LINES_HEX = GridConstants.GRID_LINES_HEX
+        const val GRID_CURSOR_NUMBERS_HEX = GridConstants.GRID_NUMBERS_HEX
+        const val GRID_CURSOR_LINE_WIDTH = GridConstants.GRID_LINE_WIDTH
+        const val GRID_CURSOR_FONT_SIZE = GridConstants.GRID_FONT_SIZE
 
         const val CONTINUOUS_SCROLL_DURATION = GestureConstants.MIN_SCROLL_DURATION
         const val CONTINUOUS_SCROLL_MULTIPLIER = GestureConstants.MAX_SCROLL_MULTIPLIER

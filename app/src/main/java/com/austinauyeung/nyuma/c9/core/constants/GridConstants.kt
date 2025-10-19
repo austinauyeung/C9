@@ -14,8 +14,15 @@ object GridConstants {
         arrayOf(7, 8, 9),
     )
 
-    const val MIN_OPACITY = 0
-    const val MAX_OPACITY = 80
-    const val DEFAULT_OPACITY = 20
-    const val GRID_FONT_SIZE = 0.5f // Percentage of cell dimensions
+    const val GRID_FONT_SIZE = 5 // (/10 = percentage of cell dimensions)
+    const val GRID_MIN_FONT_SIZE = 2
+    const val GRID_MAX_FONT_SIZE = 8
+
+    // Appearance
+    const val GRID_BACKGROUND_HEX = "22000000"
+    const val GRID_LINES_HEX = "22000000"
+    const val GRID_NUMBERS_HEX = "22000000"
+    const val GRID_LINE_WIDTH = 1
+    const val GRID_LINE_MIN_WIDTH = 1
+    const val GRID_LINE_MAX_WIDTH = 5
 }

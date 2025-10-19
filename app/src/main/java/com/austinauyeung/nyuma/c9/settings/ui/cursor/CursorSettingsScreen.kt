@@ -76,6 +76,8 @@ import java.io.FileOutputStream
 import java.util.Locale
 import java.util.UUID
 import kotlin.math.round
+import androidx.core.graphics.toColorInt
+import com.austinauyeung.nyuma.c9.settings.ui.ColorPickerDialog
 
 /**
  * Standard cursor settings screen.
@@ -439,7 +441,7 @@ fun CursorSettingsScreen(
 
                 SimplePreferenceItem(
                     title = "Cursor Color",
-                    subtitle = "Current hex value: #${uiState.standardCursorHex}",
+                    subtitle = "Current RGB hex value: #${uiState.standardCursorHex}",
                     onClick = { showColorPickerDialog = true }
                 )
 
@@ -462,7 +464,8 @@ fun CursorSettingsScreen(
                                 settings.copy(standardCursorHex = v)
                             }
                         },
-                        onDismiss = { showColorPickerDialog = false }
+                        onDismiss = { showColorPickerDialog = false },
+                        title = "Cursor Color"
                     )
                 }
             }
@@ -514,123 +517,6 @@ fun CursorSettingsScreen(
             }
         }
     }
-}
-
-@Composable
-fun ColorPickerDialog(
-    initialColorHex: String,
-    onColorSelected: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var colorHex by remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = initialColorHex,
-                selection = TextRange(initialColorHex.length)
-            )
-        )
-    }
-    var isError by remember { mutableStateOf(false) }
-
-    val previewColor = try {
-        Color(android.graphics.Color.parseColor("#${colorHex.text}"))
-        isError = false
-        Color(android.graphics.Color.parseColor("#${colorHex.text}"))
-    } catch (e: Exception) {
-        isError = true
-        Color.Black
-    }
-
-    val saveAction = {
-        if (!isError) {
-            onColorSelected(colorHex.text)
-            onDismiss()
-        }
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Cursor Color") },
-        text = {
-            Column {
-                Text("Enter a hex value. A preview is shown on the right.")
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = colorHex,
-                    onValueChange = { input ->
-                        val filtered = input.text.filter {
-                            it.isDigit() || it in 'A'..'F' || it in 'a'..'f'
-                        }.take(6)
-
-                        val newSelection = TextRange(
-                            start = minOf(filtered.length, input.selection.start),
-                            end = minOf(filtered.length, input.selection.end)
-                        )
-
-                        colorHex = TextFieldValue(
-                            text = filtered,
-                            selection = newSelection,
-                            composition = input.composition
-                        )
-                        try {
-                            Color(android.graphics.Color.parseColor("#$filtered"))
-                            isError = false
-                        } catch (e: Exception) {
-                            isError = true
-                        }
-                    },
-                    label = { Text("Hex value") },
-                    singleLine = true,
-                    isError = isError,
-                    prefix = { Text("#") },
-                    supportingText = {
-                        if (isError) {
-                            Text(
-                                text = "Invalid hex code",
-                                color = Color.Red,
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
-                    },
-                    trailingIcon = {
-                        if (!isError) {
-                            Box(
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .background(previewColor)
-                                    .border(2.dp, Color.Black)
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (!isError) {
-                                saveAction()
-                            }
-                        }
-                    )
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if (!isError) saveAction()
-                },
-                enabled = !isError
-            ) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
 }
 
 fun clearImage(imagePath: String?, onCleared: () -> Unit) {

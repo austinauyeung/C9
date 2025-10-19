@@ -26,7 +26,6 @@ class SettingsRepositoryImpl(
     companion object {
         private val ACTIVATION_DURATION = longPreferencesKey("activation_duration")
         private val GRID_LEVELS = intPreferencesKey("grid_levels")
-        private val OVERLAY_OPACITY = intPreferencesKey("overlay_opacity")
         private val PERSIST_OVERLAY = booleanPreferencesKey("persist_overlay")
         private val HIDE_NUMBERS = booleanPreferencesKey("hide_numbers")
         private val GRID_LINE_VISIBILITY = stringPreferencesKey("grid_line_visibility")
@@ -85,6 +84,12 @@ class SettingsRepositoryImpl(
         private val CLICKABLE_LIST_TYPE = stringPreferencesKey("clickable_list_type")
         private val IGNORE_NUMPAD = booleanPreferencesKey("ignore_numpad")
         private val CHECK_CLICKABLE = booleanPreferencesKey("check_clickable")
+        private val KEEP_CURRENT_GRID_TRANSPARENT = booleanPreferencesKey("keep_current_grid_transparent")
+        private val GRID_CURSOR_BACKGROUND_HEX = stringPreferencesKey("grid_cursor_background_hex")
+        private val GRID_CURSOR_LINES_HEX = stringPreferencesKey("grid_cursor_lines_hex")
+        private val GRID_CURSOR_NUMBERS_HEX = stringPreferencesKey("grid_cursor_numbers_hex")
+        private val GRID_CURSOR_LINE_WIDTH = intPreferencesKey("grid_cursor_line_width")
+        private val GRID_CURSOR_FONT_SIZE = intPreferencesKey("grid_cursor_font_size")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -194,8 +199,6 @@ class SettingsRepositoryImpl(
                     activationDuration = preferences[ACTIVATION_DURATION]
                         ?: OverlaySettings.DEFAULT.activationDuration,
                     gridLevels = preferences[GRID_LEVELS] ?: OverlaySettings.DEFAULT.gridLevels,
-                    overlayOpacity = preferences[OVERLAY_OPACITY]
-                        ?: OverlaySettings.DEFAULT.overlayOpacity,
                     persistOverlay = preferences[PERSIST_OVERLAY]
                         ?: OverlaySettings.DEFAULT.persistOverlay,
                     hideNumbers = preferences[HIDE_NUMBERS] ?: OverlaySettings.DEFAULT.hideNumbers,
@@ -295,7 +298,17 @@ class SettingsRepositoryImpl(
                     ignoreNumpad = preferences[IGNORE_NUMPAD]
                         ?: OverlaySettings.DEFAULT.ignoreNumpad,
                     checkClickable = preferences[CHECK_CLICKABLE]
-                        ?: OverlaySettings.DEFAULT.checkClickable
+                        ?: OverlaySettings.DEFAULT.checkClickable,
+                    keepCurrentGridTransparent = preferences[KEEP_CURRENT_GRID_TRANSPARENT]
+                        ?: OverlaySettings.DEFAULT.keepCurrentGridTransparent,
+                    gridCursorBackgroundHex = preferences[GRID_CURSOR_BACKGROUND_HEX]
+                        ?: OverlaySettings.DEFAULT.gridCursorBackgroundHex,
+                    gridCursorLinesHex = preferences[GRID_CURSOR_LINES_HEX]
+                        ?: OverlaySettings.DEFAULT.gridCursorLinesHex,
+                    gridCursorNumbersHex = preferences[GRID_CURSOR_NUMBERS_HEX]
+                        ?: OverlaySettings.DEFAULT.gridCursorNumbersHex,
+                    gridCursorLineWidth = preferences[GRID_CURSOR_LINE_WIDTH] ?: OverlaySettings.DEFAULT.gridCursorLineWidth,
+                    gridCursorFontSize = preferences[GRID_CURSOR_FONT_SIZE] ?: OverlaySettings.DEFAULT.gridCursorFontSize
                 )
 
                 settings
@@ -307,7 +320,6 @@ class SettingsRepositoryImpl(
             dataStore.edit { preferences ->
                 preferences[ACTIVATION_DURATION] = settings.activationDuration
                 preferences[GRID_LEVELS] = settings.gridLevels
-                preferences[OVERLAY_OPACITY] = settings.overlayOpacity
                 preferences[PERSIST_OVERLAY] = settings.persistOverlay
                 preferences[HIDE_NUMBERS] = settings.hideNumbers
                 preferences[GRID_LINE_VISIBILITY] = settings.gridLineVisibility.name
@@ -363,6 +375,12 @@ class SettingsRepositoryImpl(
                 preferences[CLICKABLE_LIST_TYPE] = settings.clickableListType.name
                 preferences[IGNORE_NUMPAD] = settings.ignoreNumpad
                 preferences[CHECK_CLICKABLE] = settings.checkClickable
+                preferences[KEEP_CURRENT_GRID_TRANSPARENT] = settings.keepCurrentGridTransparent
+                preferences[GRID_CURSOR_BACKGROUND_HEX] = settings.gridCursorBackgroundHex
+                preferences[GRID_CURSOR_LINES_HEX] = settings.gridCursorLinesHex
+                preferences[GRID_CURSOR_NUMBERS_HEX] = settings.gridCursorNumbersHex
+                preferences[GRID_CURSOR_LINE_WIDTH] = settings.gridCursorLineWidth
+                preferences[GRID_CURSOR_FONT_SIZE] = settings.gridCursorFontSize
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

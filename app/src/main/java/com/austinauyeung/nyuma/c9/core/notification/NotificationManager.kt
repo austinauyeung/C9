@@ -51,14 +51,19 @@ class NotificationManager(private val context: Context) {
                 ModeCoordinator.OverlayMode.GRID -> Triple(
                     "Grid Cursor Active",
                     "Tap to open settings",
-                    R.drawable.ic_stat_name
+                    R.drawable.ic_blur_on
                 )
                 ModeCoordinator.OverlayMode.CURSOR -> Triple(
                     "Standard Cursor Active",
                     "Tap to open settings",
-                    R.drawable.ic_stat_name
+                    R.drawable.ic_blur_on
                 )
-                ModeCoordinator.OverlayMode.NONE -> {
+                ModeCoordinator.OverlayMode.AUTOHIDDEN -> Triple(
+                    "Cursor Autohidden",
+                    "Tap to open settings",
+                    R.drawable.ic_blur_off
+                )
+                ModeCoordinator.OverlayMode.OFF -> {
                     hideNotification()
                     return
                 }

@@ -7,9 +7,5 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grid_background">#44000000</color>
-    <color name="grid_border">#FFFFFF</color>
-    <color name="grid_selected_cell">#B3E5FC</color>
-    <color name="grid_selected_cell_border">#0288D1</color>
     <color name="highlight_color">#FF0000</color> <!-- Red for high visibility -->
 </resources>
