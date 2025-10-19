@@ -30,11 +30,13 @@ import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.ColorPickerDialog
 import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.NoteItem
 import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
 import com.austinauyeung.nyuma.c9.settings.ui.SetKeyPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.SettingsState
+import com.austinauyeung.nyuma.c9.settings.ui.SimplePreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.SliderPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.SwitchPreferenceItem
 
@@ -69,6 +71,10 @@ fun GridSettingsScreen(
             KeyEvent.KEYCODE_DPAD_RIGHT to "Scroll right",
             KeyEvent.KEYCODE_DPAD_CENTER to "Double tap",
         )
+
+    var showBackgroundColorPickerDialog by remember { mutableStateOf(false) }
+    var showLinesColorPickerDialog by remember { mutableStateOf(false) }
+    var showNumbersColorPickerDialog by remember { mutableStateOf(false) }
 
     val currentKeyDescription =
         if (
@@ -171,22 +177,66 @@ fun GridSettingsScreen(
             }
 
             PreferenceCategory(title = "Appearance") {
-                SliderPreferenceItem(
-                    title = "Overlay Opacity",
-                    value = uiState.overlayOpacity.toFloat(),
-                    valueRange = GridConstants.MIN_OPACITY.toFloat()..GridConstants.MAX_OPACITY.toFloat(),
-                    valueText = "${uiState.overlayOpacity}%",
-                    onValueChange = { value ->
-                        settingsState.updatePreference(value) { settings, v ->
-                            settings.copy(overlayOpacity = v.toInt())
-                        }
-                    },
-                    steps = 7,
+                SimplePreferenceItem(
+                    title = "Background Color",
+                    subtitle = "Current ARGB hex value: #${uiState.gridCursorBackgroundHex}",
+                    onClick = { showBackgroundColorPickerDialog = true }
                 )
+
+                if (showBackgroundColorPickerDialog) {
+                    ColorPickerDialog(
+                        initialColorHex = uiState.gridCursorBackgroundHex,
+                        onColorSelected = { newColorHex ->
+                            settingsState.updatePreference(newColorHex) { settings, v ->
+                                settings.copy(gridCursorBackgroundHex = v)
+                            }
+                        },
+                        onDismiss = { showBackgroundColorPickerDialog = false },
+                        title = "Background Color"
+                    )
+                }
+
+                SimplePreferenceItem(
+                    title = "Lines Color",
+                    subtitle = "Current ARGB hex value: #${uiState.gridCursorLinesHex}",
+                    onClick = { showLinesColorPickerDialog = true }
+                )
+
+                if (showLinesColorPickerDialog) {
+                    ColorPickerDialog(
+                        initialColorHex = uiState.gridCursorLinesHex,
+                        onColorSelected = { newColorHex ->
+                            settingsState.updatePreference(newColorHex) { settings, v ->
+                                settings.copy(gridCursorLinesHex = v)
+                            }
+                        },
+                        onDismiss = { showLinesColorPickerDialog = false },
+                        title = "Lines Color"
+                    )
+                }
+
+                SimplePreferenceItem(
+                    title = "Numbers Color",
+                    subtitle = "Current ARGB hex value: #${uiState.gridCursorNumbersHex}",
+                    onClick = { showNumbersColorPickerDialog = true }
+                )
+
+                if (showNumbersColorPickerDialog) {
+                    ColorPickerDialog(
+                        initialColorHex = uiState.gridCursorNumbersHex,
+                        onColorSelected = { newColorHex ->
+                            settingsState.updatePreference(newColorHex) { settings, v ->
+                                settings.copy(gridCursorNumbersHex = v)
+                            }
+                        },
+                        onDismiss = { showNumbersColorPickerDialog = false },
+                        title = "Numbers Color"
+                    )
+                }
 
                 SwitchPreferenceItem(
                     title = "Keep Current Grid Transparent",
-                    subtitle = "Apply overlay opacity only around the grid",
+                    subtitle = "Exclude current grid from background opacity",
                     checked = uiState.keepCurrentGridTransparent,
                     onCheckedChange = { value ->
                         settingsState.updatePreference(value) { settings, v ->
@@ -206,6 +256,20 @@ fun GridSettingsScreen(
                     },
                 )
 
+                SliderPreferenceItem(
+                    title = "Numbers Font Size",
+                    value = uiState.gridCursorFontSize.toFloat(),
+                    valueRange = GridConstants.GRID_MIN_FONT_SIZE.toFloat()..GridConstants.GRID_MAX_FONT_SIZE.toFloat(),
+                    steps = 5,
+                    valueText = "${uiState.gridCursorFontSize}0%",
+                    onValueChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(gridCursorFontSize = v.toInt())
+                        }
+                    },
+                    enabled = !uiState.hideNumbers
+                )
+
                 DropdownPreferenceItem(
                     title = "Grid Lines",
                     subtitle = when (uiState.gridLineVisibility) {
@@ -222,6 +286,19 @@ fun GridSettingsScreen(
                     onOptionSelected = { value ->
                         settingsState.updatePreference(value) { settings, v ->
                             settings.copy(gridLineVisibility = v)
+                        }
+                    },
+                )
+
+                SliderPreferenceItem(
+                    title = "Line Width",
+                    value = uiState.gridCursorLineWidth.toFloat(),
+                    valueRange = GridConstants.GRID_LINE_MIN_WIDTH.toFloat()..GridConstants.GRID_LINE_MAX_WIDTH.toFloat(),
+                    steps = 3,
+                    valueText = "${uiState.gridCursorLineWidth}",
+                    onValueChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(gridCursorLineWidth = v.toInt())
                         }
                     },
                 )

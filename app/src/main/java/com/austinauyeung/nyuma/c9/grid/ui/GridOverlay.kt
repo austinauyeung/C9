@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +26,8 @@ import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
+import androidx.core.graphics.toColorInt
+import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 
 /**
  * Renders the grid cursor overlay.
@@ -34,40 +35,26 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 @Composable
 fun GridOverlay(
     grid: Grid,
-    opacity: Int = 0,
-    hideNumbers: Boolean = false,
+    settings: OverlaySettings,
     orientation: OrientationUtil.Orientation = OrientationUtil.Orientation.PORTRAIT,
-    useRotatedNumbers: Boolean = false,
-    gridLineVisibility: GridLineVisibility = GridLineVisibility.SHOW_ALL,
-    keepCurrentGridTransparent: Boolean = true
+    useRotatedNumbers: Boolean = false
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val gridBackground = colorResource(id = R.color.grid_background)
-    val gridBorderColor = colorResource(id = R.color.grid_border)
-
     val (cellWidth, cellHeight) = grid.getCellSize()
 
     val density = LocalDensity.current
     val fontSize = (minOf(
         cellWidth,
         cellHeight
-    ) * GridConstants.GRID_FONT_SIZE / density.density).sp
+    ) * (settings.gridCursorFontSize / 10f) / density.density).sp
 
-    val textStyle =
-        remember(fontSize) {
-            TextStyle(
-                color = Color.White,
-                fontWeight = FontWeight.W300,
-                fontSize = fontSize,
-            )
-        }
+    val textStyle = TextStyle(
+        color = Color("#${settings.gridCursorNumbersHex}".toColorInt()),
+        fontWeight = FontWeight.W300,
+        fontSize = fontSize,
+    )
 
-    val backgroundAlpha = remember(opacity) { opacity * 0.01f }
-
-    val gridStrokeWidth = dimensionResource(R.dimen.grid_stroke_width).value
-    val borderStrokeWidth = dimensionResource(R.dimen.grid_border_width).value
-
-    val shouldShowGridLines = when (gridLineVisibility) {
+    val shouldShowGridLines = when (settings.gridLineVisibility) {
         GridLineVisibility.SHOW_ALL -> true
         GridLineVisibility.FINAL_LEVEL_ONLY -> grid.level == GridConstants.MAX_LEVELS
         GridLineVisibility.HIDE_ALL -> false
@@ -86,12 +73,12 @@ fun GridOverlay(
             .fillMaxSize(),
     ) {
         drawRect(
-            color = gridBackground.copy(alpha = backgroundAlpha),
+            color = Color("#${settings.gridCursorBackgroundHex}".toColorInt()),
             size = size,
         )
 
         // Keep current grid transparent
-        if (keepCurrentGridTransparent) {
+        if (settings.keepCurrentGridTransparent) {
             drawIntoCanvas { canvas ->
                 val paint = Paint().apply {
                     blendMode = BlendMode.Clear
@@ -107,7 +94,7 @@ fun GridOverlay(
             }
         }
 
-        if (!hideNumbers) {
+        if (!settings.hideNumbers) {
             for (row in 0 until GridConstants.DIMENSION) {
                 for (col in 0 until GridConstants.DIMENSION) {
                     drawCell(
@@ -123,17 +110,17 @@ fun GridOverlay(
         }
 
         drawRect(
-            color = Color.White,
+            color = Color("#${settings.gridCursorLinesHex}".toColorInt()),
             topLeft = Offset(grid.x, grid.y),
             size = Size(grid.width, grid.height),
-            style = Stroke(width = borderStrokeWidth),
+            style = Stroke(width = settings.gridCursorLineWidth.toFloat()),
         )
 
         if (shouldShowGridLines) {
             drawGridLines(
                 grid = grid,
-                gridBorderColor = gridBorderColor,
-                gridStrokeWidth = gridStrokeWidth,
+                gridBorderColor = Color("#${settings.gridCursorLinesHex}".toColorInt()),
+                gridStrokeWidth = settings.gridCursorLineWidth.toFloat() * 6,
             )
         }
     }

@@ -154,12 +154,9 @@ class OverlayManager(
                         currentGrid?.let { activeGrid ->
                             GridOverlay(
                                 grid = activeGrid,
-                                opacity = currentSettings.overlayOpacity,
-                                hideNumbers = currentSettings.hideNumbers,
+                                settings = currentSettings,
                                 orientation = currentOrientation,
-                                useRotatedNumbers = currentSettings.rotateButtonsWithOrientation,
-                                gridLineVisibility = currentSettings.gridLineVisibility,
-                                keepCurrentGridTransparent = currentSettings.keepCurrentGridTransparent
+                                useRotatedNumbers = currentSettings.rotateButtonsWithOrientation
                             )
                         }
 

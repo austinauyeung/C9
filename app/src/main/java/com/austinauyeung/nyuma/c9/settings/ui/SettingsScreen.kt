@@ -5,6 +5,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.view.KeyEvent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,6 +33,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -37,11 +42,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,9 +65,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toColorInt
 import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
@@ -944,4 +955,122 @@ suspend fun loadInstalledApps(packageManager: PackageManager, includeSystemApps:
             emptyList()
         }
     }
+}
+
+@Composable
+fun ColorPickerDialog(
+    initialColorHex: String,
+    onColorSelected: (String) -> Unit,
+    onDismiss: () -> Unit,
+    title: String
+) {
+    var colorHex by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = initialColorHex,
+                selection = TextRange(initialColorHex.length)
+            )
+        )
+    }
+    var isError by remember { mutableStateOf(false) }
+
+    val previewColor = try {
+        Color("#${colorHex.text}".toColorInt())
+        isError = false
+        Color("#${colorHex.text}".toColorInt())
+    } catch (e: Exception) {
+        isError = true
+        Color.Black
+    }
+
+    val saveAction = {
+        if (!isError) {
+            onColorSelected(colorHex.text)
+            onDismiss()
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column {
+                Text("Enter a hex value. A preview is shown on the right.")
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = colorHex,
+                    onValueChange = { input ->
+                        val filtered = input.text.filter {
+                            it.isDigit() || it in 'A'..'F' || it in 'a'..'f'
+                        }.take(8)
+
+                        val newSelection = TextRange(
+                            start = minOf(filtered.length, input.selection.start),
+                            end = minOf(filtered.length, input.selection.end)
+                        )
+
+                        colorHex = TextFieldValue(
+                            text = filtered,
+                            selection = newSelection,
+                            composition = input.composition
+                        )
+                        try {
+                            Color("#$filtered".toColorInt())
+                            isError = false
+                        } catch (e: Exception) {
+                            isError = true
+                        }
+                    },
+                    label = { Text("Hex value") },
+                    singleLine = true,
+                    isError = isError,
+                    prefix = { Text("#") },
+                    supportingText = {
+                        if (isError) {
+                            Text(
+                                text = "Invalid hex code",
+                                color = Color.Red,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (!isError) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(previewColor)
+                                    .border(2.dp, Color.Black)
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (!isError) {
+                                saveAction()
+                            }
+                        }
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (!isError) saveAction()
+                },
+                enabled = !isError
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

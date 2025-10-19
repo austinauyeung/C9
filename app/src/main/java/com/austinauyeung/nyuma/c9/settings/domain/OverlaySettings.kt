@@ -16,7 +16,6 @@ import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
 data class OverlaySettings(
     val activationDuration: Long = Defaults.Settings.ACTIVATION_DURATION,
     val gridLevels: Int = Defaults.Settings.GRID_LEVELS,
-    val overlayOpacity: Int = Defaults.Settings.OVERLAY_OPACITY,
     val persistOverlay: Boolean = Defaults.Settings.PERSIST_OVERLAY,
     val hideNumbers: Boolean = Defaults.Settings.HIDE_NUMBERS,
     val gridLineVisibility: GridLineVisibility = Defaults.Settings.GRID_LINE_VISIBILITY,
@@ -75,7 +74,12 @@ data class OverlaySettings(
     val clickableListType: AppListType = Defaults.Settings.CLICKABLE_LIST_TYPE,
     val ignoreNumpad: Boolean = Defaults.Settings.IGNORE_NUMPAD,
     val checkClickable: Boolean = Defaults.Settings.CHECK_CLICKABLE,
-    val keepCurrentGridTransparent: Boolean = Defaults.Settings.KEEP_CURRENT_GRID_TRANSPARENT
+    val keepCurrentGridTransparent: Boolean = Defaults.Settings.KEEP_CURRENT_GRID_TRANSPARENT,
+    val gridCursorBackgroundHex: String = Defaults.Settings.GRID_CURSOR_BACKGROUND_HEX,
+    val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
+    val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
+    val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
 ) {
     companion object {
         val DEFAULT = OverlaySettings()
@@ -93,6 +97,14 @@ data class OverlaySettings(
             buildList {
                 if (gridLevels !in GridConstants.MIN_LEVELS..GridConstants.MAX_LEVELS) {
                     add("Grid levels must be between ${GridConstants.MIN_LEVELS} and ${GridConstants.MAX_LEVELS}")
+                }
+
+                if (gridCursorLineWidth !in GridConstants.GRID_LINE_MIN_WIDTH..GridConstants.GRID_LINE_MAX_WIDTH) {
+                    add("Grid cursor line width must be between ${GridConstants.GRID_LINE_MIN_WIDTH} and ${GridConstants.GRID_LINE_MAX_WIDTH}")
+                }
+
+                if (gridCursorFontSize !in GridConstants.GRID_MIN_FONT_SIZE..GridConstants.GRID_MAX_FONT_SIZE) {
+                    add("Grid cursor font size must be between ${GridConstants.GRID_MIN_FONT_SIZE} and ${GridConstants.GRID_MAX_FONT_SIZE}")
                 }
 
                 if (!isValidRemappableKey(gridActivationKey)) {
@@ -132,10 +144,8 @@ data class OverlaySettings(
     fun sanitized(): OverlaySettings {
         return copy(
             gridLevels = gridLevels.coerceIn(GridConstants.MIN_LEVELS, GridConstants.MAX_LEVELS),
-            overlayOpacity = overlayOpacity.coerceIn(
-                GridConstants.MIN_OPACITY,
-                GridConstants.MAX_OPACITY
-            ),
+            gridCursorLineWidth = gridCursorLineWidth.coerceIn(GridConstants.GRID_LINE_MIN_WIDTH, GridConstants.GRID_LINE_MAX_WIDTH),
+            gridCursorFontSize = gridCursorFontSize.coerceIn(GridConstants.GRID_MIN_FONT_SIZE, GridConstants.GRID_MAX_FONT_SIZE),
             cursorSpeed = cursorSpeed.coerceIn(
                 CursorConstants.MIN_SPEED,
                 CursorConstants.MAX_SPEED
