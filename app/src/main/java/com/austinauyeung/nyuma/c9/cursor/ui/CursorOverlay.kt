@@ -23,7 +23,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
-import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.cursor.domain.CursorState
 import com.austinauyeung.nyuma.c9.cursor.domain.IconAlignment
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings

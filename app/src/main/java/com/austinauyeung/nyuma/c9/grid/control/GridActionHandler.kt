@@ -1,7 +1,6 @@
 package com.austinauyeung.nyuma.c9.grid.control
 
 import android.view.KeyEvent
-import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -16,7 +15,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Handles key events for the grid cursor.

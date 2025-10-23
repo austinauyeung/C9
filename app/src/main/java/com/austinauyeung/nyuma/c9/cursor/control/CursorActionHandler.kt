@@ -2,7 +2,6 @@ package com.austinauyeung.nyuma.c9.cursor.control
 
 import android.view.KeyEvent
 import androidx.compose.ui.geometry.Offset
-import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
