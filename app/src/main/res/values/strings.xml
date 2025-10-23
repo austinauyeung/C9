@@ -5,15 +5,9 @@
     <string name="accessibility_service_label">C9</string>
 
     <!-- Service -->
-    <string name="notification_service_running">Service is running</string>
-    <string name="notification_channel_name">C9 Service</string>
-    <string name="notification_channel_description">Shows when the C9 overlay service is running</string>
 
     <!-- Settings -->
     <string name="settings_title">C9: Click on 9 keys</string>
-    <string name="settings_service_status">Service Status</string>
-    <string name="settings_service_enabled">Enabled</string>
-    <string name="settings_service_disabled">Tap to enable accessibility service</string>
 
     <!-- Grid Levels -->
     <string name="settings_grid_levels_2">Two levels (81 cells)</string>
@@ -21,16 +15,9 @@
     <string name="settings_grid_levels_4">Four levels (6561 cells)</string>
 
     <!-- Activation -->
-    <string name="settings_activation_press">Press asterisk (*) key</string>
-    <string name="settings_activation_hold">Hold asterisk (*) key</string>
 
     <!-- Status Messages -->
-    <string name="status_grid_activated">Grid activated</string>
-    <string name="status_grid_deactivated">Grid deactivated</string>
 
     <!-- Error Messages -->
-    <string name="error_key_handling">Failed to process key input</string>
-    <string name="error_click_failed">Failed to perform click action</string>
-    <string name="error_invalid_settings">Invalid settings configuration</string>
 
 </resources>
