@@ -83,7 +83,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             when (intent.action) {
                 ACTION_ACTIVATE_GRID -> {
                     backgroundScope.launch {
-                        coreManager.activateGridMode(false)
+                        coreManager.activateGridMode(true)
                     }
                 }
                 ACTION_RESET_GRID -> {
@@ -93,7 +93,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 }
                 ACTION_ACTIVATE_CURSOR -> {
                     backgroundScope.launch {
-                        coreManager.activateCursorMode(false)
+                        coreManager.activateCursorMode(true)
                     }
                 }
                 ACTION_TOGGLE_CURSOR -> {
@@ -299,11 +299,11 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
         when (lastOverlayType) {
             ModeCoordinator.OverlayMode.GRID -> {
-                coreManager.activateGridMode(toggle = false)
+                coreManager.activateGridMode()
             }
 
             ModeCoordinator.OverlayMode.CURSOR -> {
-                coreManager.activateCursorMode(toggle = false)
+                coreManager.activateCursorMode()
             }
 
             else -> {}
