@@ -78,7 +78,7 @@ Because of their different navigation paradigms, each cursor mode maps gestures 
 <br />
 
 <div align="center">
-<img src='./docs/gifs/Screen_recording_20250321_015105.gif' width=200>
+<img src='./docs/gifs/Screen_recording_20251023_000250.gif' width=200>
 </div>
 
 <br />
