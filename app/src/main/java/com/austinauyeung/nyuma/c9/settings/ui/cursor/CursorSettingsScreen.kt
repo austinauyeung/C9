@@ -613,17 +613,20 @@ class UnifiedImagePickerLauncher(
             }
         }
 
-        val intents = listOf(
-            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+        val intents = mutableListOf<Intent>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intents += Intent(MediaStore.ACTION_PICK_IMAGES).apply {
                 type = "image/*"
                 putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 1)
-            },
+            }
+        }
+        intents += listOf(
             Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/*"
                 addCategory(Intent.CATEGORY_OPENABLE)
             },
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-                type = "image/*"
+            Intent(Intent.ACTION_PICK).apply {
+                setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
             }
         )
 
