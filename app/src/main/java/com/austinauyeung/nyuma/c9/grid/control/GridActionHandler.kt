@@ -1,6 +1,7 @@
 package com.austinauyeung.nyuma.c9.grid.control
 
 import android.view.KeyEvent
+import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -154,27 +155,19 @@ class GridActionHandler(
 
             return when (effectiveKeyCode) {
                 in numKeys -> {
-                    if (currentAction == null) {
-                        handleNumberKey(event, effectiveKeyCode)
-                    } else false
+                    handleNumberKey(event, effectiveKeyCode)
                 }
 
                 in scrollKeys -> {
-                    if ((currentAction == CurrentAction.SCROLL) || (currentAction == null)) {
-                        handleScrollKey(event, effectiveKeyCode)
-                    } else false
+                    handleScrollKey(event, effectiveKeyCode)
                 }
 
                 in zoomKeys -> {
-                    if ((currentAction == CurrentAction.ZOOM) || (currentAction == null)) {
-                        handleZoomKey(event)
-                    } else false
+                    handleZoomKey(event)
                 }
 
                 in actionKeys -> {
-                    if ((currentAction == CurrentAction.ACTION) || (currentAction == null)) {
-                        handleActionKey(event)
-                    } else false
+                    handleActionKey(event)
                 }
 
                 else -> false
