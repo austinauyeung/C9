@@ -137,9 +137,9 @@ class CoreManager(
         }
     }
 
-    fun activateGridMode(toggle: Boolean = true): Boolean {
+    fun activateGridMode(keymapToggle: Boolean = false): Boolean {
         try {
-            if ((!gridStateManager.isGridVisible() || toggle) && modeCoordinator.requestActivation(
+            if ((!gridStateManager.isGridVisible() || keymapToggle) && modeCoordinator.requestActivation(
                     ModeCoordinator.OverlayMode.GRID
                 )) {
                 gridStateManager.toggleGridVisibility()
@@ -165,9 +165,9 @@ class CoreManager(
         }
     }
 
-    fun activateCursorMode(toggle: Boolean = true): Boolean {
+    fun activateCursorMode(keymapToggle: Boolean = false): Boolean {
         try {
-            if ((!cursorStateManager.isCursorVisible() || toggle) && modeCoordinator.requestActivation(
+            if ((!cursorStateManager.isCursorVisible() || keymapToggle) && modeCoordinator.requestActivation(
                     ModeCoordinator.OverlayMode.CURSOR
                 )) {
                 cursorStateManager.toggleCursorVisibility()

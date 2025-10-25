@@ -83,7 +83,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
             when (intent.action) {
                 ACTION_ACTIVATE_GRID -> {
                     backgroundScope.launch {
-                        coreManager.activateGridMode(false)
+                        coreManager.activateGridMode(true)
                     }
                 }
                 ACTION_RESET_GRID -> {
@@ -93,7 +93,7 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 }
                 ACTION_ACTIVATE_CURSOR -> {
                     backgroundScope.launch {
-                        coreManager.activateCursorMode(false)
+                        coreManager.activateCursorMode(true)
                     }
                 }
                 ACTION_TOGGLE_CURSOR -> {
@@ -284,9 +284,10 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
         val cursorLost = (lastOverlayType == ModeCoordinator.OverlayMode.CURSOR) && !cursorMapped
 
         // Edge case: cursor previously autohidden and then cleared
-        if (gridLost || cursorLost) {
-            lastOverlayType = ModeCoordinator.OverlayMode.OFF
-        }
+        // Commenting out for now; always triggers for a user with keymapper and both internally unmapped
+//        if (gridLost || cursorLost) {
+//            lastOverlayType = ModeCoordinator.OverlayMode.OFF
+//        }
 
         // If no previous overlay type, default to any mapped cursor
         if (lastOverlayType == ModeCoordinator.OverlayMode.OFF) {
@@ -299,11 +300,11 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
         when (lastOverlayType) {
             ModeCoordinator.OverlayMode.GRID -> {
-                coreManager.activateGridMode(toggle = false)
+                coreManager.activateGridMode()
             }
 
             ModeCoordinator.OverlayMode.CURSOR -> {
-                coreManager.activateCursorMode(toggle = false)
+                coreManager.activateCursorMode()
             }
 
             else -> {}

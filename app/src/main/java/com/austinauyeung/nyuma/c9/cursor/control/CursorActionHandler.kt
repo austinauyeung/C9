@@ -271,21 +271,15 @@ class CursorActionHandler(
                 in movementKeys -> handleMovementKey(event, effectiveKeyCode)
 
                 in scrollKeys -> {
-                    if ((currentAction == CurrentAction.SCROLL) || (currentAction == null)) {
-                        handleScrollKey(event, effectiveKeyCode)
-                    } else false
+                    handleScrollKey(event, effectiveKeyCode)
                 }
 
                 in zoomKeys -> {
-                    if ((currentAction == CurrentAction.ZOOM) || (currentAction == null)) {
-                        handleZoomKey(event)
-                    } else false
+                    handleZoomKey(event)
                 }
 
                 in actionKeys -> {
-                    if ((currentAction == CurrentAction.ACTION) || (currentAction == null)) {
-                        handleActionKey(event)
-                    } else false
+                    handleActionKey(event)
                 }
 
                 in disableKeys -> {

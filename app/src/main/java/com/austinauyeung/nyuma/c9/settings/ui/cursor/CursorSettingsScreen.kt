@@ -13,30 +13,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,10 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.datastore.core.IOException
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
@@ -59,6 +44,7 @@ import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.AppListType
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
+import com.austinauyeung.nyuma.c9.settings.ui.ColorPickerDialog
 import com.austinauyeung.nyuma.c9.settings.ui.DropdownPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.NoteItem
 import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
@@ -76,8 +62,6 @@ import java.io.FileOutputStream
 import java.util.Locale
 import java.util.UUID
 import kotlin.math.round
-import androidx.core.graphics.toColorInt
-import com.austinauyeung.nyuma.c9.settings.ui.ColorPickerDialog
 
 /**
  * Standard cursor settings screen.
@@ -629,17 +613,20 @@ class UnifiedImagePickerLauncher(
             }
         }
 
-        val intents = listOf(
-            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+        val intents = mutableListOf<Intent>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intents += Intent(MediaStore.ACTION_PICK_IMAGES).apply {
                 type = "image/*"
                 putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 1)
-            },
+            }
+        }
+        intents += listOf(
             Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/*"
                 addCategory(Intent.CATEGORY_OPENABLE)
             },
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-                type = "image/*"
+            Intent(Intent.ACTION_PICK).apply {
+                setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
             }
         )
 

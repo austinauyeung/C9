@@ -268,16 +268,15 @@ class GestureManager(
     suspend fun startTap(x: Float, y: Float): Boolean {
         try {
             Logger.d("Starting tap gesture at ($x, $y)")
-            if (shouldShowGestures) {
-                visualizeTap(x, y)
-            }
-
             if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
                 return defaultStrategy.immediateTap(x, y)
             }
 
             if (!getGestureReady()) return false
             setGestureReady(false)
+            if (shouldShowGestures) {
+                visualizeTap(x, y)
+            }
 
             return currentStrategy.startTap(x, y, completionListener)
         } catch (e: Exception) {

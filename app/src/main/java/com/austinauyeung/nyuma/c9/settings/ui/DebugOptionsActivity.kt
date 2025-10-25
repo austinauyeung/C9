@@ -1,13 +1,10 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.austinauyeung.nyuma.c9.C9
-import com.austinauyeung.nyuma.c9.core.logs.LogActivity
 import com.austinauyeung.nyuma.c9.core.ui.AppTheme
 
 class DebugOptionsActivity : ComponentActivity() {

@@ -16,7 +16,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Handles key events for the grid cursor.
@@ -156,27 +155,19 @@ class GridActionHandler(
 
             return when (effectiveKeyCode) {
                 in numKeys -> {
-                    if (currentAction == null) {
-                        handleNumberKey(event, effectiveKeyCode)
-                    } else false
+                    handleNumberKey(event, effectiveKeyCode)
                 }
 
                 in scrollKeys -> {
-                    if ((currentAction == CurrentAction.SCROLL) || (currentAction == null)) {
-                        handleScrollKey(event, effectiveKeyCode)
-                    } else false
+                    handleScrollKey(event, effectiveKeyCode)
                 }
 
                 in zoomKeys -> {
-                    if ((currentAction == CurrentAction.ZOOM) || (currentAction == null)) {
-                        handleZoomKey(event)
-                    } else false
+                    handleZoomKey(event)
                 }
 
                 in actionKeys -> {
-                    if ((currentAction == CurrentAction.ACTION) || (currentAction == null)) {
-                        handleActionKey(event)
-                    } else false
+                    handleActionKey(event)
                 }
 
                 else -> false

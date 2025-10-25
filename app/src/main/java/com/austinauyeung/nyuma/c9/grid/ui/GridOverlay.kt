@@ -14,19 +14,17 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
-import com.austinauyeung.nyuma.c9.R
+import androidx.core.graphics.toColorInt
 import com.austinauyeung.nyuma.c9.core.constants.GridConstants
 import com.austinauyeung.nyuma.c9.core.util.OrientationUtil
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.grid.domain.GridLineVisibility
-import androidx.core.graphics.toColorInt
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 
 /**
