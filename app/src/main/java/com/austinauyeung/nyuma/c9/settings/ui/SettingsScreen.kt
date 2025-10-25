@@ -155,7 +155,7 @@ fun SettingsScreen(
                     title = "Standard Cursor",
                     subtitle =
                     if (uiState.cursorActivationKey == OverlaySettings.KEY_NONE) {
-                        "Disabled"
+                        "Unmapped"
                     } else {
                         "Mapped"
                     },
