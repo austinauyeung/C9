@@ -39,6 +39,10 @@ class SettingsRepositoryImpl(
         private val CURSOR_ACCELERATION_DURATION = longPreferencesKey("cursor_acceleration_duration")
         private val GRID_ACTIVATION_KEY = intPreferencesKey("grid_activation_key")
         private val CURSOR_ACTIVATION_KEY = intPreferencesKey("cursor_activation_key")
+        private val SCROLL_UP_KEY = intPreferencesKey("scroll_up_key")
+        private val SCROLL_DOWN_KEY = intPreferencesKey("scroll_down_key")
+        private val SCROLL_LEFT_KEY = intPreferencesKey("scroll_left_key")
+        private val SCROLL_RIGHT_KEY = intPreferencesKey("scroll_right_key")
         private val CONTROL_SCHEME = stringPreferencesKey("control_scheme")
         private val CURSOR_EDGE_BEHAVIOR = stringPreferencesKey("cursor_edge_behavior")
         private val GESTURE_STYLE = stringPreferencesKey("gesture_style")
@@ -221,6 +225,14 @@ class SettingsRepositoryImpl(
                         ?: OverlaySettings.DEFAULT.gridActivationKey,
                     cursorActivationKey = preferences[CURSOR_ACTIVATION_KEY]
                         ?: OverlaySettings.DEFAULT.cursorActivationKey,
+                    scrollUpKey = preferences[SCROLL_UP_KEY]
+                        ?: OverlaySettings.DEFAULT.scrollUpKey,
+                    scrollDownKey = preferences[SCROLL_DOWN_KEY]
+                        ?: OverlaySettings.DEFAULT.scrollDownKey,
+                    scrollLeftKey = preferences[SCROLL_LEFT_KEY]
+                        ?: OverlaySettings.DEFAULT.scrollLeftKey,
+                    scrollRightKey = preferences[SCROLL_RIGHT_KEY]
+                        ?: OverlaySettings.DEFAULT.scrollRightKey,
                     controlScheme = controlScheme,
                     cursorEdgeBehavior = cursorEdgeBehavior,
                     gestureStyle = gestureStyle,
@@ -335,6 +347,10 @@ class SettingsRepositoryImpl(
                 preferences[CURSOR_ACCELERATION_DURATION] = settings.cursorAccelerationDuration
                 preferences[GRID_ACTIVATION_KEY] = settings.gridActivationKey
                 preferences[CURSOR_ACTIVATION_KEY] = settings.cursorActivationKey
+                preferences[SCROLL_UP_KEY] = settings.scrollUpKey
+                preferences[SCROLL_DOWN_KEY] = settings.scrollDownKey
+                preferences[SCROLL_LEFT_KEY] = settings.scrollLeftKey
+                preferences[SCROLL_RIGHT_KEY] = settings.scrollRightKey
                 preferences[CONTROL_SCHEME] = settings.controlScheme.name
                 preferences[CURSOR_EDGE_BEHAVIOR] = settings.cursorEdgeBehavior.name
                 preferences[GESTURE_STYLE] = settings.gestureStyle.name

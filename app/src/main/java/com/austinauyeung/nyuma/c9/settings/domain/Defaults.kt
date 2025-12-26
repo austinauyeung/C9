@@ -35,6 +35,10 @@ object Defaults {
         const val CURSOR_ACCELERATION_DURATION = GestureConstants.DEFAULT_ACCELERATION_DURATION
         const val GRID_ACTIVATION_KEY = KeyEvent.KEYCODE_POUND
         const val CURSOR_ACTIVATION_KEY = KeyEvent.KEYCODE_STAR
+        const val SCROLL_UP_KEY = KeyEvent.KEYCODE_2
+        const val SCROLL_DOWN_KEY = KeyEvent.KEYCODE_8
+        const val SCROLL_LEFT_KEY = KeyEvent.KEYCODE_4
+        const val SCROLL_RIGHT_KEY = KeyEvent.KEYCODE_6
         val CURSOR_EDGE_BEHAVIOR = ScreenEdgeBehavior.NONE
         val CONTROL_SCHEME = ControlScheme.STANDARD
         val GESTURE_STYLE = GestureStyle.FIXED

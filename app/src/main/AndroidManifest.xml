@@ -65,6 +65,12 @@
             android:parentActivityName=".settings.ui.cursor.CursorSettingsActivity" />
 
         <activity
+            android:name=".settings.ui.cursor.AssignScrollActivity"
+            android:exported="false"
+            android:theme="@style/Theme.C9"
+            android:parentActivityName=".settings.ui.cursor.CursorSettingsActivity" />
+
+        <activity
             android:name=".settings.ui.cursor.ScrollToggleIconActivity"
             android:exported="false"
             android:theme="@style/Theme.C9"

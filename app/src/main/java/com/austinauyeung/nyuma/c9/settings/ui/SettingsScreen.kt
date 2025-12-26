@@ -77,6 +77,7 @@ import com.austinauyeung.nyuma.c9.R
 import com.austinauyeung.nyuma.c9.core.constants.ApplicationConstants
 import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuStatus
+import com.austinauyeung.nyuma.c9.cursor.domain.ControlScheme
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -198,15 +199,17 @@ fun SettingsScreen(
                     )
                 }
 
+                // The enable switch currently only checks standard cursor settings
                 SwitchPreferenceItem(
                     title = "Rotate Buttons With Orientation",
-                    subtitle = "Rotate certain D-pad and numpad buttons with the screen",
-                    checked = uiState.rotateButtonsWithOrientation,
+                    subtitle = "Rotate certain D-pad and numpad buttons with phone screen",
+                    checked = uiState.rotateButtonsWithOrientation && (uiState.controlScheme != ControlScheme.TV),
                     onCheckedChange = { value ->
                         settingsState.updatePreference(value) { settings, v ->
                             settings.copy(rotateButtonsWithOrientation = v)
                         }
                     },
+                    enabled = uiState.controlScheme != ControlScheme.TV
                 )
 
                 SwitchPreferenceItem(
@@ -563,7 +566,7 @@ fun SetKeyPreferenceItem(
 ) {
     val subtitle =
         if (currentKeyCode == OverlaySettings.KEY_NONE) {
-            "Cursor is not mapped internally"
+            "Currently not mapped"
         } else {
             "Current: ${KeyEvent.keyCodeToString(currentKeyCode)}"
         }
@@ -583,7 +586,7 @@ fun ClearKeyPreferenceItem(
 ) {
     SimplePreferenceItem(
         title = title,
-        subtitle = "Unmaps $mode mode",
+        subtitle = "Unmaps $mode",
         onClick = onClearKey,
     )
 }

@@ -67,6 +67,10 @@ class SettingsState(
                             cursorAccelerationDuration = settings.cursorAccelerationDuration,
                             gridActivationKey = settings.gridActivationKey,
                             cursorActivationKey = settings.cursorActivationKey,
+                            scrollUpKey = settings.scrollUpKey,
+                            scrollDownKey = settings.scrollDownKey,
+                            scrollLeftKey = settings.scrollLeftKey,
+                            scrollRightKey = settings.scrollRightKey,
                             controlScheme = settings.controlScheme,
                             cursorEdgeBehavior = settings.cursorEdgeBehavior,
                             gestureStyle = settings.gestureStyle,
@@ -167,6 +171,10 @@ class SettingsState(
             cursorAccelerationDuration = _uiState.value.cursorAccelerationDuration,
             gridActivationKey = _uiState.value.gridActivationKey,
             cursorActivationKey = _uiState.value.cursorActivationKey,
+            scrollUpKey = _uiState.value.scrollUpKey,
+            scrollDownKey = _uiState.value.scrollDownKey,
+            scrollLeftKey = _uiState.value.scrollLeftKey,
+            scrollRightKey = _uiState.value.scrollRightKey,
             controlScheme = _uiState.value.controlScheme,
             cursorEdgeBehavior = _uiState.value.cursorEdgeBehavior,
             gestureStyle = _uiState.value.gestureStyle,
@@ -238,6 +246,22 @@ class SettingsState(
         updateSettings { it.copy(cursorActivationKey = keyCode) }
     }
 
+    fun updateScrollUpKey(keyCode: Int) {
+        updateSettings { it.copy(scrollUpKey = keyCode) }
+    }
+
+    fun updateScrollDownKey(keyCode: Int) {
+        updateSettings { it.copy(scrollDownKey = keyCode) }
+    }
+
+    fun updateScrollLeftKey(keyCode: Int) {
+        updateSettings { it.copy(scrollLeftKey = keyCode) }
+    }
+
+    fun updateScrollRightKey(keyCode: Int) {
+        updateSettings { it.copy(scrollRightKey = keyCode) }
+    }
+
     fun requestHideAllOverlays() {
         val serviceInstance = AppAccessibilityService.getInstance()
         serviceInstance?.forceHideAllOverlays(false)
@@ -289,6 +313,10 @@ data class SettingsUiState(
     val cursorAccelerationDuration: Long = Defaults.Settings.CURSOR_ACCELERATION_DURATION,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
+    val scrollUpKey: Int = Defaults.Settings.SCROLL_UP_KEY,
+    val scrollDownKey: Int = Defaults.Settings.SCROLL_DOWN_KEY,
+    val scrollLeftKey: Int = Defaults.Settings.SCROLL_LEFT_KEY,
+    val scrollRightKey: Int = Defaults.Settings.SCROLL_RIGHT_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
     val cursorEdgeBehavior: ScreenEdgeBehavior = Defaults.Settings.CURSOR_EDGE_BEHAVIOR,
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,

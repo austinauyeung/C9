@@ -44,6 +44,7 @@ class CursorSettingsActivity : ComponentActivity() {
                     onNavigateToLocationClickableIcon = { startCustomActivity(this, LocationClickableIconActivity::class.java) },
                     onNavigateToScrollToggleIcon = { startCustomActivity(this, ScrollToggleIconActivity::class.java) },
                     onNavigateToClickableAppsScreen = { startCustomActivity(this, ClickableAppsActivity::class.java) },
+                    onNavigateToAssignScrollScreen = { startCustomActivity(this, AssignScrollActivity::class.java) },
                     onNavigateBack = {
                         finish()
                     },

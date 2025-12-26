@@ -8,4 +8,5 @@ enum class ControlScheme {
     SWAPPED,        // D-pad scrolls, numpad moves cursor
     DPAD_TOGGLE,    // Press activation key to toggle between move and scroll modes on the D-pad
     NUMPAD_TOGGLE,  // Press activation key to toggle between move and scroll modes on the numpad
+    TV,             // D-pad moves cursor, scroll keys are manually assigned
 }

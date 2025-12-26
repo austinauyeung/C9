@@ -152,7 +152,7 @@ class CursorActionHandler(
             // Map keys based on control scheme
             movementKeys =
                 when (settings.controlScheme) {
-                    ControlScheme.STANDARD -> {
+                    ControlScheme.STANDARD, ControlScheme.TV -> {
                         setOf(
                             KeyEvent.KEYCODE_DPAD_UP,
                             KeyEvent.KEYCODE_DPAD_DOWN,
@@ -242,6 +242,15 @@ class CursorActionHandler(
                             emptySet()
                         }
                     }
+
+                    ControlScheme.TV -> {
+                        setOf(
+                            settings.scrollUpKey,
+                            settings.scrollDownKey,
+                            settings.scrollLeftKey,
+                            settings.scrollRightKey
+                        )
+                    }
                 }
 
             actionKeys = setOf(
@@ -295,7 +304,7 @@ class CursorActionHandler(
         val settings = settingsFlow.value
 
         val originalKeyCode = event.keyCode
-        val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
+        val effectiveKeyCode = if (settings.rotateButtonsWithOrientation && (settings.controlScheme != ControlScheme.TV)) {
             val orientation = orientationProvider()
             when {
                 OrientationUtil.isDpadDirection(originalKeyCode) ->
@@ -429,10 +438,10 @@ class CursorActionHandler(
                 cancelContinuousGesture()
 
                 val direction = when (keyCode) {
-                    KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2 -> ScrollDirection.UP
-                    KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_8 -> ScrollDirection.DOWN
-                    KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_4 -> ScrollDirection.LEFT
-                    KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_6 -> ScrollDirection.RIGHT
+                    KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2, settings.scrollUpKey -> ScrollDirection.UP
+                    KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_8, settings.scrollDownKey -> ScrollDirection.DOWN
+                    KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_4, settings.scrollLeftKey -> ScrollDirection.LEFT
+                    KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_6, settings.scrollRightKey -> ScrollDirection.RIGHT
                     else -> null
                 }
 
