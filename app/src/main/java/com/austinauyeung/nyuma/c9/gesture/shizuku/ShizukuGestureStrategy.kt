@@ -12,10 +12,8 @@ import com.austinauyeung.nyuma.c9.core.shizuku.ShizukuConnection
 import com.austinauyeung.nyuma.c9.gesture.api.GestureCompletionListener
 import com.austinauyeung.nyuma.c9.gesture.api.GestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 import java.lang.reflect.Method
@@ -24,7 +22,6 @@ import java.lang.reflect.Method
  * Implements gestures using lower-level input injection via Shizuku.
  */
 class ShizukuGestureStrategy(
-    private val mainScope: CoroutineScope,
     private val settingsFlow: StateFlow<OverlaySettings>
 ) : GestureStrategy {
 
@@ -118,72 +115,70 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to scroll from ($startX, $startY) to ($endX, $endY)")
 
         try {
-            mainScope.launch {
-                val downTime = SystemClock.uptimeMillis()
-                val steps = GestureConstants.calculateSteps(duration)
-                val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
+            val downTime = SystemClock.uptimeMillis()
+            val steps = GestureConstants.calculateSteps(duration)
+            val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
 
-                // Initial touch down event
-                val downEvent =
-                    createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, startX, startY)
-                injectEvent(downEvent)
-                downEvent.recycle()
+            // Initial touch down event
+            val downEvent =
+                createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, startX, startY)
+            injectEvent(downEvent)
+            downEvent.recycle()
 
-                // Linear movement
-                for (i in 1 until steps) {
-                    val fraction = i.toFloat() / steps
-                    val moveEvent = createMotionEvent(
-                        downTime,
-                        downTime + (duration * fraction).toLong(),
-                        MotionEvent.ACTION_MOVE,
-                        startX + (endX - startX) * fraction,
-                        startY + (endY - startY) * fraction
-                    )
-                    injectEvent(moveEvent)
-                    moveEvent.recycle()
-                    delay(duration / steps)
-                }
-
-                // If pausing, move to final coordinates, pause, then lift
-                val upTime: Long
-                if (pausing) {
-                    val moveEvent = createMotionEvent(
-                        downTime,
-                        downTime + duration,
-                        MotionEvent.ACTION_MOVE,
-                        endX,
-                        endY
-                    )
-                    injectEvent(moveEvent)
-                    moveEvent.recycle()
-
-                    val pause = createMotionEvent(
-                        downTime,
-                        downTime + duration + GestureConstants.GESTURE_PAUSE * 9 / 10,
-                        MotionEvent.ACTION_MOVE,
-                        endX,
-                        endY
-                    )
-                    injectEvent(pause)
-                    pause.recycle()
-
-                    upTime = downTime + duration + GestureConstants.GESTURE_PAUSE
-                } else {
-                    upTime = downTime + duration
-                }
-
-                val upEvent = createMotionEvent(
+            // Linear movement
+            for (i in 1 until steps) {
+                val fraction = i.toFloat() / steps
+                val moveEvent = createMotionEvent(
                     downTime,
-                    upTime,
-                    MotionEvent.ACTION_UP,
+                    downTime + (duration * fraction).toLong(),
+                    MotionEvent.ACTION_MOVE,
+                    startX + (endX - startX) * fraction,
+                    startY + (endY - startY) * fraction
+                )
+                injectEvent(moveEvent)
+                moveEvent.recycle()
+                delay(duration / steps)
+            }
+
+            // If pausing, move to final coordinates, pause, then lift
+            val upTime: Long
+            if (pausing) {
+                val moveEvent = createMotionEvent(
+                    downTime,
+                    downTime + duration,
+                    MotionEvent.ACTION_MOVE,
                     endX,
                     endY
                 )
-                injectEvent(upEvent)
-                upEvent.recycle()
+                injectEvent(moveEvent)
+                moveEvent.recycle()
 
-                completionListener?.onGestureCompleted(true)
+                val pause = createMotionEvent(
+                    downTime,
+                    downTime + duration + GestureConstants.GESTURE_PAUSE * 9 / 10,
+                    MotionEvent.ACTION_MOVE,
+                    endX,
+                    endY
+                )
+                injectEvent(pause)
+                pause.recycle()
+
+                upTime = downTime + duration + GestureConstants.GESTURE_PAUSE
+            } else {
+                upTime = downTime + duration
             }
+
+            val upEvent = createMotionEvent(
+                downTime,
+                upTime,
+                MotionEvent.ACTION_UP,
+                endX,
+                endY
+            )
+            injectEvent(upEvent)
+            upEvent.recycle()
+
+            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {
@@ -207,149 +202,148 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to perform zoom gesture, isZoomIn: $isZoomIn")
 
         try {
-            mainScope.launch {
-                val downTime = SystemClock.uptimeMillis()
-                val duration = settingsFlow.value.zoomDuration
-                val steps = GestureConstants.calculateSteps(duration)
-                val stepDuration = duration / steps
-                val interEventDelayMs = 20L
-                val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
+            val downTime = SystemClock.uptimeMillis()
+            val duration = settingsFlow.value.zoomDuration
+            val steps = GestureConstants.calculateSteps(duration)
+            val stepDuration = duration / steps
+            val interEventDelayMs = 20L
+            val pausing = settingsFlow.value.gestureStyle != GestureStyle.INERTIA || forceFixedGesture
 
-                val firstFingerEvent = createMotionEvent(
-                    downTime, downTime,
-                    MotionEvent.ACTION_DOWN,
-                    1,
-                    intArrayOf(0),
-                    floatArrayOf(startX1),
-                    floatArrayOf(startY1)
-                )
+            val firstFingerEvent = createMotionEvent(
+                downTime, downTime,
+                MotionEvent.ACTION_DOWN,
+                1,
+                intArrayOf(0),
+                floatArrayOf(startX1),
+                floatArrayOf(startY1)
+            )
 
-                if (!injectEvent(firstFingerEvent)) {
-                    firstFingerEvent.recycle()
-                    Logger.e("Failed to inject first finger down event")
-                }
+            if (!injectEvent(firstFingerEvent)) {
                 firstFingerEvent.recycle()
+                Logger.e("Failed to inject first finger down event")
+            }
+            firstFingerEvent.recycle()
 
-                delay(interEventDelayMs)
+            delay(interEventDelayMs)
 
-                // Pointer of both fingers
-                val pointerDownEvent = createMotionEvent(
-                    downTime, downTime + interEventDelayMs,
-                    MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+            // Pointer of both fingers
+            val pointerDownEvent = createMotionEvent(
+                downTime, downTime + interEventDelayMs,
+                MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+                2,
+                intArrayOf(0, 1),
+                floatArrayOf(startX1, startX2),
+                floatArrayOf(startY1, startY2)
+            )
+
+            if (!injectEvent(pointerDownEvent)) {
+                pointerDownEvent.recycle()
+                Logger.e("Failed to inject second finger down event")
+            }
+            pointerDownEvent.recycle()
+
+            var allMoveEventsSucceeded = true
+
+            // Linear movement
+            for (i in 1 until steps) {
+                val fraction = i.toFloat() / steps
+                val currentTime = downTime + interEventDelayMs + (i * stepDuration)
+
+                val currentX1 = (startX1 + fraction * (endX1 - startX1))
+                val currentY1 = (startY1 + fraction * (endY1 - startY1))
+                val currentX2 = (startX2 + fraction * (endX2 - startX2))
+                val currentY2 = (startY2 + fraction * (endY2 - startY2))
+
+                val moveEvent = createMotionEvent(
+                    downTime, currentTime,
+                    MotionEvent.ACTION_MOVE,
                     2,
                     intArrayOf(0, 1),
-                    floatArrayOf(startX1, startX2),
-                    floatArrayOf(startY1, startY2)
+                    floatArrayOf(currentX1, currentX2),
+                    floatArrayOf(currentY1, currentY2)
                 )
 
-                if (!injectEvent(pointerDownEvent)) {
-                    pointerDownEvent.recycle()
-                    Logger.e("Failed to inject second finger down event")
-                }
-                pointerDownEvent.recycle()
+                val moveResult = injectEvent(moveEvent)
+                moveEvent.recycle()
 
-                var allMoveEventsSucceeded = true
-
-                // Linear movement
-                for (i in 1 until steps) {
-                    val fraction = i.toFloat() / steps
-                    val currentTime = downTime + interEventDelayMs + (i * stepDuration)
-
-                    val currentX1 = (startX1 + fraction * (endX1 - startX1))
-                    val currentY1 = (startY1 + fraction * (endY1 - startY1))
-                    val currentX2 = (startX2 + fraction * (endX2 - startX2))
-                    val currentY2 = (startY2 + fraction * (endY2 - startY2))
-
-                    val moveEvent = createMotionEvent(
-                        downTime, currentTime,
-                        MotionEvent.ACTION_MOVE,
-                        2,
-                        intArrayOf(0, 1),
-                        floatArrayOf(currentX1, currentX2),
-                        floatArrayOf(currentY1, currentY2)
-                    )
-
-                    val moveResult = injectEvent(moveEvent)
-                    moveEvent.recycle()
-
-                    if (!moveResult) {
-                        allMoveEventsSucceeded = false
-                        Logger.w("Failed to inject move event at step $i")
-                    }
-
-                    delay(stepDuration)
+                if (!moveResult) {
+                    allMoveEventsSucceeded = false
+                    Logger.w("Failed to inject move event at step $i")
                 }
 
-                if (!allMoveEventsSucceeded) {
-                    Logger.w("Some move events failed during zoom gesture")
-                }
+                delay(stepDuration)
+            }
 
-                val finalTime = downTime + duration + interEventDelayMs
-                val upTime: Long
-                if (pausing) {
-                    val moveEvent = createMotionEvent(
-                        downTime, finalTime,
-                        MotionEvent.ACTION_MOVE,
-                        2,
-                        intArrayOf(0, 1),
-                        floatArrayOf(endX1, endX2),
-                        floatArrayOf(endY1, endY2)
-                    )
+            if (!allMoveEventsSucceeded) {
+                Logger.w("Some move events failed during zoom gesture")
+            }
 
-                    injectEvent(moveEvent)
-                    moveEvent.recycle()
-
-                    val pauseEvent = createMotionEvent(
-                        downTime, finalTime + GestureConstants.GESTURE_PAUSE * 9 / 10,
-                        MotionEvent.ACTION_MOVE,
-                        2,
-                        intArrayOf(0, 1),
-                        floatArrayOf(endX1, endX2),
-                        floatArrayOf(endY1, endY2)
-                    )
-                    injectEvent(pauseEvent)
-                    pauseEvent.recycle()
-
-                    upTime = downTime + interEventDelayMs + duration + GestureConstants.GESTURE_PAUSE
-                } else {
-                    upTime = downTime + interEventDelayMs + duration
-                }
-
-                val pointerUpEvent = createMotionEvent(
-                    downTime, upTime,
-                    MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+            val finalTime = downTime + duration + interEventDelayMs
+            val upTime: Long
+            if (pausing) {
+                val moveEvent = createMotionEvent(
+                    downTime, finalTime,
+                    MotionEvent.ACTION_MOVE,
                     2,
                     intArrayOf(0, 1),
                     floatArrayOf(endX1, endX2),
                     floatArrayOf(endY1, endY2)
                 )
 
-                val pointerUpResult = injectEvent(pointerUpEvent)
-                pointerUpEvent.recycle()
+                injectEvent(moveEvent)
+                moveEvent.recycle()
 
-                if (!pointerUpResult) {
-                    Logger.e("Failed to inject pointer up event")
-                }
-
-                delay(interEventDelayMs)
-                val upEvent = createMotionEvent(
-                    downTime, upTime + interEventDelayMs,
-                    MotionEvent.ACTION_UP,
-                    1,
-                    intArrayOf(0),
-                    floatArrayOf(endX1),
-                    floatArrayOf(endY1)
+                val pauseEvent = createMotionEvent(
+                    downTime, finalTime + GestureConstants.GESTURE_PAUSE * 9 / 10,
+                    MotionEvent.ACTION_MOVE,
+                    2,
+                    intArrayOf(0, 1),
+                    floatArrayOf(endX1, endX2),
+                    floatArrayOf(endY1, endY2)
                 )
+                injectEvent(pauseEvent)
+                pauseEvent.recycle()
 
-                val upResult = injectEvent(upEvent)
-                upEvent.recycle()
-
-                if (!upResult) {
-                    Logger.e("Failed to inject up event")
-                }
-
-                completionListener?.onGestureCompleted(true)
+                upTime = downTime + interEventDelayMs + duration + GestureConstants.GESTURE_PAUSE
+            } else {
+                upTime = downTime + interEventDelayMs + duration
             }
+
+            val pointerUpEvent = createMotionEvent(
+                downTime, upTime,
+                MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+                2,
+                intArrayOf(0, 1),
+                floatArrayOf(endX1, endX2),
+                floatArrayOf(endY1, endY2)
+            )
+
+            val pointerUpResult = injectEvent(pointerUpEvent)
+            pointerUpEvent.recycle()
+
+            if (!pointerUpResult) {
+                Logger.e("Failed to inject pointer up event")
+            }
+
+            delay(interEventDelayMs)
+            val upEvent = createMotionEvent(
+                downTime, upTime + interEventDelayMs,
+                MotionEvent.ACTION_UP,
+                1,
+                intArrayOf(0),
+                floatArrayOf(endX1),
+                floatArrayOf(endY1)
+            )
+
+            val upResult = injectEvent(upEvent)
+            upEvent.recycle()
+
+            if (!upResult) {
+                Logger.e("Failed to inject up event")
+            }
+
+            completionListener?.onGestureCompleted(true)
+
             return true
         } catch (e: Exception) {
             Logger.e("Error performing scroll via Shizuku", e)
@@ -364,20 +358,18 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to start gesture at ($x, $y)")
 
         try {
-            mainScope.launch {
-                val downTime = SystemClock.uptimeMillis()
-                _gestureDownTime = downTime
-                _gestureActive = true
+            val downTime = SystemClock.uptimeMillis()
+            _gestureDownTime = downTime
+            _gestureActive = true
 
-                val downEvent = createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y)
-                val result = injectEvent(downEvent)
-                downEvent.recycle()
+            val downEvent = createMotionEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y)
+            val result = injectEvent(downEvent)
+            downEvent.recycle()
 
-                _currentGestureX = x
-                _currentGestureY = y
+            _currentGestureX = x
+            _currentGestureY = y
 
-                completionListener?.onGestureCompleted(true)
-            }
+            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {
@@ -395,36 +387,34 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to continue gesture from ($fromX, $fromY) to ($toX, $toY)")
 
         try {
-            mainScope.launch {
-                val steps = GestureConstants.calculateSteps(GestureConstants.DRAG_SEGMENT_DURATION)
-                val downTime = _gestureDownTime
-                val startTime = SystemClock.uptimeMillis()
+            val steps = GestureConstants.calculateSteps(GestureConstants.DRAG_SEGMENT_DURATION)
+            val downTime = _gestureDownTime
+            val startTime = SystemClock.uptimeMillis()
 
-                for (i in 1..steps) {
-                    val fraction = i.toFloat() / steps
-                    val currentX = fromX + (toX - fromX) * fraction
-                    val currentY = fromY + (toY - fromY) * fraction
-                    val currentTime =
-                        startTime + (GestureConstants.DRAG_SEGMENT_DURATION * fraction).toLong()
+            for (i in 1..steps) {
+                val fraction = i.toFloat() / steps
+                val currentX = fromX + (toX - fromX) * fraction
+                val currentY = fromY + (toY - fromY) * fraction
+                val currentTime =
+                    startTime + (GestureConstants.DRAG_SEGMENT_DURATION * fraction).toLong()
 
-                    val moveEvent = createMotionEvent(
-                        downTime,
-                        currentTime,
-                        MotionEvent.ACTION_MOVE,
-                        currentX,
-                        currentY
-                    )
-                    injectEvent(moveEvent)
-                    moveEvent.recycle()
+                val moveEvent = createMotionEvent(
+                    downTime,
+                    currentTime,
+                    MotionEvent.ACTION_MOVE,
+                    currentX,
+                    currentY
+                )
+                injectEvent(moveEvent)
+                moveEvent.recycle()
 
-                    delay(GestureConstants.DRAG_SEGMENT_DURATION / steps)
-                }
-
-                _currentGestureX = toX
-                _currentGestureY = toY
-
-                completionListener?.onGestureCompleted(true)
+                delay(GestureConstants.DRAG_SEGMENT_DURATION / steps)
             }
+
+            _currentGestureX = toX
+            _currentGestureY = toY
+
+            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {
@@ -440,35 +430,33 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to end gesture at ($finalX, $finalY)")
 
         try {
-            mainScope.launch {
-                val downTime = _gestureDownTime
-                val upTime = SystemClock.uptimeMillis()
+            val downTime = _gestureDownTime
+            val upTime = SystemClock.uptimeMillis()
 
-                // Inject one more event if cursor moved from its last position
-                if (_currentGestureX != finalX || _currentGestureY != finalY) {
-                    val finalMoveEvent = createMotionEvent(
-                        downTime,
-                        upTime - 5,
-                        MotionEvent.ACTION_MOVE,
-                        finalX,
-                        finalY
-                    )
-                    injectEvent(finalMoveEvent)
-                    finalMoveEvent.recycle()
-                }
-
-                val upEvent =
-                    createMotionEvent(downTime, upTime, MotionEvent.ACTION_UP, finalX, finalY)
-                injectEvent(upEvent)
-                upEvent.recycle()
-
-                _gestureActive = false
-                _gestureDownTime = 0
-                _currentGestureX = 0f
-                _currentGestureY = 0f
-
-                completionListener?.onGestureCompleted(true)
+            // Inject one more event if cursor moved from its last position
+            if (_currentGestureX != finalX || _currentGestureY != finalY) {
+                val finalMoveEvent = createMotionEvent(
+                    downTime,
+                    upTime - 5,
+                    MotionEvent.ACTION_MOVE,
+                    finalX,
+                    finalY
+                )
+                injectEvent(finalMoveEvent)
+                finalMoveEvent.recycle()
             }
+
+            val upEvent =
+                createMotionEvent(downTime, upTime, MotionEvent.ACTION_UP, finalX, finalY)
+            injectEvent(upEvent)
+            upEvent.recycle()
+
+            _gestureActive = false
+            _gestureDownTime = 0
+            _currentGestureX = 0f
+            _currentGestureY = 0f
+
+            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {
@@ -486,32 +474,30 @@ class ShizukuGestureStrategy(
         Logger.d("Using Shizuku to cancel gesture")
 
         try {
-            mainScope.launch {
-                if (_gestureDownTime != 0L) {
-                    val downTime = _gestureDownTime
-                    val cancelTime = SystemClock.uptimeMillis()
+            if (_gestureDownTime != 0L) {
+                val downTime = _gestureDownTime
+                val cancelTime = SystemClock.uptimeMillis()
 
-                    val cancelEvent = createMotionEvent(
-                        downTime,
-                        cancelTime,
-                        MotionEvent.ACTION_CANCEL,
-                        _currentGestureX,
-                        _currentGestureY
-                    )
-                    injectEvent(cancelEvent)
-                    cancelEvent.recycle()
+                val cancelEvent = createMotionEvent(
+                    downTime,
+                    cancelTime,
+                    MotionEvent.ACTION_CANCEL,
+                    _currentGestureX,
+                    _currentGestureY
+                )
+                injectEvent(cancelEvent)
+                cancelEvent.recycle()
 
-                    _gestureActive = false
-                    _gestureDownTime = 0
-                    _currentGestureX = 0f
-                    _currentGestureY = 0f
-                } else {
-                    _gestureActive = false
-                    _gestureDownTime = 0
-                }
-
-                completionListener?.onGestureCompleted(true)
+                _gestureActive = false
+                _gestureDownTime = 0
+                _currentGestureX = 0f
+                _currentGestureY = 0f
+            } else {
+                _gestureActive = false
+                _gestureDownTime = 0
             }
+
+            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {

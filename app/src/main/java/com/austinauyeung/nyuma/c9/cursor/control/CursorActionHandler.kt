@@ -6,6 +6,7 @@ import com.austinauyeung.nyuma.c9.BuildConfig
 import com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
 import com.austinauyeung.nyuma.c9.core.constants.CursorConstants
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
+import com.austinauyeung.nyuma.c9.core.control.CoreManager.ChannelMessage
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScreenDimensions
 import com.austinauyeung.nyuma.c9.core.domain.ScreenEdge
@@ -22,6 +23,8 @@ import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGe
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -104,7 +107,13 @@ class CursorActionHandler(
         slowScrollJob?.cancel()
     }
 
-    fun handleKeyEvent(event: KeyEvent?): Boolean {
+    private var movementKeys = emptySet<Int>()
+    private var scrollKeys = emptySet<Int>()
+    private var zoomKeys = emptySet<Int>()
+    private var actionKeys = emptySet<Int>()
+    private var disableKeys = emptySet<Int>()
+
+    fun handleKeyEvent(event: KeyEvent?, channel: Channel<ChannelMessage>): Boolean {
         cursorStateManager.updateClickable(false)
         val settings = settingsFlow.value
 
@@ -141,100 +150,107 @@ class CursorActionHandler(
             if (!cursorStateManager.isCursorVisible()) return false
 
             // Map keys based on control scheme
-            val (movementKeys, scrollKeys) =
+            movementKeys =
                 when (settings.controlScheme) {
                     ControlScheme.STANDARD -> {
-                        val movementKeys = setOf(
+                        setOf(
                             KeyEvent.KEYCODE_DPAD_UP,
                             KeyEvent.KEYCODE_DPAD_DOWN,
                             KeyEvent.KEYCODE_DPAD_LEFT,
                             KeyEvent.KEYCODE_DPAD_RIGHT
                         )
-
-                        val scrollKeys = setOf(
-                            KeyEvent.KEYCODE_2,
-                            KeyEvent.KEYCODE_4,
-                            KeyEvent.KEYCODE_6,
-                            KeyEvent.KEYCODE_8
-                        )
-
-                        Pair(movementKeys, scrollKeys)
                     }
 
                     ControlScheme.SWAPPED -> {
-                        val movementKeys = setOf(
+                        setOf(
                             KeyEvent.KEYCODE_2,
                             KeyEvent.KEYCODE_4,
                             KeyEvent.KEYCODE_6,
                             KeyEvent.KEYCODE_8
                         )
-
-                        val scrollKeys = setOf(
-                            KeyEvent.KEYCODE_DPAD_UP,
-                            KeyEvent.KEYCODE_DPAD_DOWN,
-                            KeyEvent.KEYCODE_DPAD_LEFT,
-                            KeyEvent.KEYCODE_DPAD_RIGHT
-                        )
-
-                        Pair(movementKeys, scrollKeys)
                     }
 
                     ControlScheme.DPAD_TOGGLE -> {
                         if (cursorStateManager.isInScrollMode()) {
-                            Pair(
-                                emptySet(),
-                                setOf(
-                                    KeyEvent.KEYCODE_DPAD_UP,
-                                    KeyEvent.KEYCODE_DPAD_DOWN,
-                                    KeyEvent.KEYCODE_DPAD_LEFT,
-                                    KeyEvent.KEYCODE_DPAD_RIGHT
-                                )
-                            )
+                            emptySet()
                         } else {
-                            Pair(
-                                setOf(
-                                    KeyEvent.KEYCODE_DPAD_UP,
-                                    KeyEvent.KEYCODE_DPAD_DOWN,
-                                    KeyEvent.KEYCODE_DPAD_LEFT,
-                                    KeyEvent.KEYCODE_DPAD_RIGHT
-                                ),
-                                emptySet()
+                            setOf(
+                                KeyEvent.KEYCODE_DPAD_UP,
+                                KeyEvent.KEYCODE_DPAD_DOWN,
+                                KeyEvent.KEYCODE_DPAD_LEFT,
+                                KeyEvent.KEYCODE_DPAD_RIGHT
                             )
                         }
                     }
 
                     ControlScheme.NUMPAD_TOGGLE -> {
                         if (cursorStateManager.isInScrollMode()) {
-                            Pair(
-                                emptySet(),
-                                setOf(
-                                    KeyEvent.KEYCODE_2,
-                                    KeyEvent.KEYCODE_8,
-                                    KeyEvent.KEYCODE_4,
-                                    KeyEvent.KEYCODE_6
-                                )
-                            )
+                            emptySet()
                         } else {
-                            Pair(
-                                setOf(
-                                    KeyEvent.KEYCODE_2,
-                                    KeyEvent.KEYCODE_8,
-                                    KeyEvent.KEYCODE_4,
-                                    KeyEvent.KEYCODE_6
-                                ),
-                                emptySet()
+                            setOf(
+                                KeyEvent.KEYCODE_2,
+                                KeyEvent.KEYCODE_8,
+                                KeyEvent.KEYCODE_4,
+                                KeyEvent.KEYCODE_6
                             )
                         }
                     }
                 }
 
-            val actionKeys = setOf(
+            scrollKeys =
+                when (settings.controlScheme) {
+                    ControlScheme.STANDARD -> {
+                        setOf(
+                            KeyEvent.KEYCODE_2,
+                            KeyEvent.KEYCODE_4,
+                            KeyEvent.KEYCODE_6,
+                            KeyEvent.KEYCODE_8
+                        )
+                    }
+
+                    ControlScheme.SWAPPED -> {
+                        setOf(
+                            KeyEvent.KEYCODE_DPAD_UP,
+                            KeyEvent.KEYCODE_DPAD_DOWN,
+                            KeyEvent.KEYCODE_DPAD_LEFT,
+                            KeyEvent.KEYCODE_DPAD_RIGHT
+                        )
+                    }
+
+                    ControlScheme.DPAD_TOGGLE -> {
+                        if (cursorStateManager.isInScrollMode()) {
+                            setOf(
+                                    KeyEvent.KEYCODE_DPAD_UP,
+                                    KeyEvent.KEYCODE_DPAD_DOWN,
+                                    KeyEvent.KEYCODE_DPAD_LEFT,
+                                    KeyEvent.KEYCODE_DPAD_RIGHT
+                            )
+                        } else {
+                            emptySet()
+                        }
+                    }
+
+                    ControlScheme.NUMPAD_TOGGLE -> {
+                        if (cursorStateManager.isInScrollMode()) {
+                            setOf(
+                                    KeyEvent.KEYCODE_2,
+                                    KeyEvent.KEYCODE_8,
+                                    KeyEvent.KEYCODE_4,
+                                    KeyEvent.KEYCODE_6
+                            )
+                        } else {
+                            emptySet()
+                        }
+                    }
+                }
+
+            actionKeys = setOf(
                 KeyEvent.KEYCODE_DPAD_CENTER,
                 KeyEvent.KEYCODE_ENTER,
                 KeyEvent.KEYCODE_5
             )
 
-            val zoomKeys = buildSet {
+            zoomKeys = buildSet {
                 add(KeyEvent.KEYCODE_1)
                 add(KeyEvent.KEYCODE_3)
 
@@ -244,7 +260,7 @@ class CursorActionHandler(
                 }
             }
 
-            val disableKeys = setOf(
+            disableKeys = setOf(
                 KeyEvent.KEYCODE_7,
                 KeyEvent.KEYCODE_9,
                 KeyEvent.KEYCODE_0,
@@ -252,46 +268,64 @@ class CursorActionHandler(
                 KeyEvent.KEYCODE_STAR
             )
 
-            val originalKeyCode = event.keyCode
-            val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
-                val orientation = orientationProvider()
-                when {
-                    OrientationUtil.isDpadDirection(originalKeyCode) ->
-                        OrientationUtil.mapDPadKey(originalKeyCode, orientation)
-                    OrientationUtil.isNumberKey(originalKeyCode) ->
-                        OrientationUtil.mapNumberKey(originalKeyCode, orientation)
-                    else -> originalKeyCode
-                }
-            } else {
-                originalKeyCode
+            val reservedKeys = movementKeys + scrollKeys + zoomKeys + actionKeys + disableKeys
+            if (event.keyCode !in reservedKeys) {
+                return false
             }
 
-
-            return when (event.keyCode) {
-                in movementKeys -> handleMovementKey(event, effectiveKeyCode)
-
-                in scrollKeys -> {
-                    handleScrollKey(event, effectiveKeyCode)
-                }
-
-                in zoomKeys -> {
-                    handleZoomKey(event)
-                }
-
-                in actionKeys -> {
-                    handleActionKey(event)
-                }
-
-                in disableKeys -> {
-                    true
-                }
-
-                else -> false
+            // Buttons should be consumed at this point
+            backgroundScope.launch {
+                channel.send(
+                    ChannelMessage(
+                        event = event,
+                        handler = ::handleKeyEventInternal
+                    )
+                )
             }
+
+            return true
         } catch (e: Exception) {
             Logger.e("Error processing cursor key event", e)
             cancelContinuousGesture()
             return false
+        }
+    }
+
+    private suspend fun handleKeyEventInternal(event: KeyEvent) = coroutineScope {
+        val settings = settingsFlow.value
+
+        val originalKeyCode = event.keyCode
+        val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
+            val orientation = orientationProvider()
+            when {
+                OrientationUtil.isDpadDirection(originalKeyCode) ->
+                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                OrientationUtil.isNumberKey(originalKeyCode) ->
+                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                else -> originalKeyCode
+            }
+        } else {
+            originalKeyCode
+        }
+
+        when (event.keyCode) {
+            in movementKeys -> launch { handleMovementKey(event, effectiveKeyCode) }
+
+            in scrollKeys -> {
+                launch { handleScrollKey(event, effectiveKeyCode) }
+            }
+
+            in zoomKeys -> {
+                launch { handleZoomKey(event) }
+            }
+
+            in actionKeys -> {
+                launch { handleActionKey(event) }
+            }
+
+            in disableKeys -> {}
+
+            else -> {}
         }
     }
 
@@ -344,9 +378,9 @@ class CursorActionHandler(
                         if (settings.controlScheme == ControlScheme.DPAD_TOGGLE || settings.controlScheme == ControlScheme.NUMPAD_TOGGLE) {
                             cursorStateManager.toggleScrollMode()
 
-                            if (isLongPressing) {
-                                endTap()
-                            }
+//                            if (isLongPressing) {
+//                                endTap()
+//                            }
                         }
                     } else {
                         cursorStateManager.hideCursor()
@@ -360,7 +394,7 @@ class CursorActionHandler(
         }
     }
 
-    private fun handleMovementKey(event: KeyEvent, keyCode: Int): Boolean {
+    private suspend fun handleMovementKey(event: KeyEvent, keyCode: Int): Boolean {
         val direction = when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_2 -> CursorDirection.UP
             KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_8 -> CursorDirection.DOWN
@@ -385,7 +419,7 @@ class CursorActionHandler(
         }
     }
 
-    private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
+    private suspend fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
         val settings = settingsFlow.value
         if (settings.overrideAndroid7) return false
 
@@ -404,9 +438,7 @@ class CursorActionHandler(
 
                 if (direction != null) {
                     currentScrollDirection = direction
-                    backgroundScope.launch {
-                        performScroll(direction)
-                    }
+                    performScroll(direction)
 
                     continuousGestureJob = launchContinuousGesture(
                         backgroundScope = backgroundScope,
@@ -426,7 +458,7 @@ class CursorActionHandler(
         return true
     }
 
-    private fun handleZoomKey(event: KeyEvent): Boolean {
+    private suspend fun handleZoomKey(event: KeyEvent): Boolean {
         val settings = settingsFlow.value
         if (settings.overrideAndroid7) return false
 
@@ -442,9 +474,8 @@ class CursorActionHandler(
                 }
 
                 currentZoomDirection = isZoomIn
-                backgroundScope.launch {
-                    performZoom(isZoomIn)
-                }
+
+                performZoom(isZoomIn)
 
                 continuousGestureJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
@@ -463,7 +494,7 @@ class CursorActionHandler(
         return true
     }
 
-    private fun handleActionKey(event: KeyEvent): Boolean {
+    private suspend fun handleActionKey(event: KeyEvent): Boolean {
         return when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 currentAction = CurrentAction.ACTION
@@ -479,7 +510,7 @@ class CursorActionHandler(
         }
     }
 
-    private fun startMovingCursor(direction: CursorDirection) {
+    private suspend fun startMovingCursor(direction: CursorDirection) {
         activeDirections.add(direction)
         lastMovementTime = System.currentTimeMillis()
 
@@ -508,7 +539,7 @@ class CursorActionHandler(
         cursorStateManager.updateClickable(clickable)
     }
 
-    private fun moveCursor(direction: CursorDirection) {
+    private suspend fun moveCursor(direction: CursorDirection) {
         if (activeDirections.isEmpty()) return
 
         val settings = settingsFlow.value
@@ -636,17 +667,16 @@ class CursorActionHandler(
         return true
     }
 
-    private fun performZoom(isZoomIn: Boolean, forceFixedGesture: Boolean = false): Boolean {
+    private suspend fun performZoom(isZoomIn: Boolean, forceFixedGesture: Boolean = false): Boolean {
         val cursorState = cursorStateManager.cursorState.value ?: return false
         val orientation = orientationProvider()
-        backgroundScope.launch {
-            gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y, orientation, forceFixedGesture = forceFixedGesture)
-        }
+
+        gestureManager.performZoom(isZoomIn, cursorState.position.x, cursorState.position.y, orientation, forceFixedGesture = forceFixedGesture)
 
         return true
     }
 
-    private fun handleActionKeyDown(): Boolean {
+    private suspend fun handleActionKeyDown(): Boolean {
         val settings = settingsFlow.value
 
         actionKeysPressed++
@@ -669,16 +699,14 @@ class CursorActionHandler(
                 isLongPressing = true
                 lastDragPosition = cursorState.position
 
-                backgroundScope.launch {
-                    gestureManager.startTap(cursorState.position.x, cursorState.position.y)
-                }
+                gestureManager.startTap(cursorState.position.x, cursorState.position.y)
             }
         }
 
         return true
     }
 
-    private fun handleActionKeyUp(): Boolean {
+    private suspend fun handleActionKeyUp(): Boolean {
         val settings = settingsFlow.value
         val cursorState = cursorStateManager.cursorState.value
 
@@ -697,27 +725,23 @@ class CursorActionHandler(
         return true
     }
 
-    private fun dragToNewPosition(fromPosition: Offset, toPosition: Offset) {
+    private suspend fun dragToNewPosition(fromPosition: Offset, toPosition: Offset) {
         lastDragPosition = toPosition
-        backgroundScope.launch {
-            gestureManager.dragTap(
-                fromPosition.x,
-                fromPosition.y,
-                toPosition.x,
-                toPosition.y
-            )
-        }
+        gestureManager.dragTap(
+            fromPosition.x,
+            fromPosition.y,
+            toPosition.x,
+            toPosition.y
+        )
     }
 
-    private fun endTap(): Boolean {
+    private suspend fun endTap(): Boolean {
         cursorStateManager.updateHoldState(false)
         isLongPressing = false
         lastDragPosition = null
 
         val cursorState = cursorStateManager.cursorState.value ?: return false
-        backgroundScope.launch {
-            gestureManager.endTap(cursorState.position.x, cursorState.position.y)
-        }
+        gestureManager.endTap(cursorState.position.x, cursorState.position.y)
         return true
     }
 }

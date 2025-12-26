@@ -90,6 +90,7 @@ class SettingsRepositoryImpl(
         private val GRID_CURSOR_NUMBERS_HEX = stringPreferencesKey("grid_cursor_numbers_hex")
         private val GRID_CURSOR_LINE_WIDTH = intPreferencesKey("grid_cursor_line_width")
         private val GRID_CURSOR_FONT_SIZE = intPreferencesKey("grid_cursor_font_size")
+        private val DISABLE_TOUCHSCREEN = booleanPreferencesKey("disable_touchscreen")
     }
 
     private inline fun <reified T : Enum<T>> getEnumPreference(
@@ -308,7 +309,8 @@ class SettingsRepositoryImpl(
                     gridCursorNumbersHex = preferences[GRID_CURSOR_NUMBERS_HEX]
                         ?: OverlaySettings.DEFAULT.gridCursorNumbersHex,
                     gridCursorLineWidth = preferences[GRID_CURSOR_LINE_WIDTH] ?: OverlaySettings.DEFAULT.gridCursorLineWidth,
-                    gridCursorFontSize = preferences[GRID_CURSOR_FONT_SIZE] ?: OverlaySettings.DEFAULT.gridCursorFontSize
+                    gridCursorFontSize = preferences[GRID_CURSOR_FONT_SIZE] ?: OverlaySettings.DEFAULT.gridCursorFontSize,
+                    disableTouchscreen = preferences[DISABLE_TOUCHSCREEN] ?: OverlaySettings.DEFAULT.disableTouchscreen
                 )
 
                 settings
@@ -381,6 +383,7 @@ class SettingsRepositoryImpl(
                 preferences[GRID_CURSOR_NUMBERS_HEX] = settings.gridCursorNumbersHex
                 preferences[GRID_CURSOR_LINE_WIDTH] = settings.gridCursorLineWidth
                 preferences[GRID_CURSOR_FONT_SIZE] = settings.gridCursorFontSize
+                preferences[DISABLE_TOUCHSCREEN] = settings.disableTouchscreen
 
                 if (settings.cursorImagePath != null) {
                     preferences[CURSOR_IMAGE_PATH] = settings.cursorImagePath

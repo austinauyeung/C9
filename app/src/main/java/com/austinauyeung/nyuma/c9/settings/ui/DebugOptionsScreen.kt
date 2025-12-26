@@ -178,6 +178,17 @@ fun DebugOptionsScreen(
 
             PreferenceCategory(title = "Experimental") {
                 SwitchPreferenceItem(
+                    title = "Disable Touchscreen",
+                    subtitle = "Currently disables touchscreen only between button presses",
+                    checked = uiState.disableTouchscreen,
+                    onCheckedChange = { value ->
+                        settingsState.updatePreference(value) { settings, v ->
+                            settings.copy(disableTouchscreen = v)
+                        }
+                    },
+                )
+
+                SwitchPreferenceItem(
                     title = "Ignore Numpad",
                     subtitle = "Bypass all numpad behavior except for activation",
                     checked = uiState.ignoreNumpad,

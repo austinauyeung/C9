@@ -2,6 +2,7 @@ package com.austinauyeung.nyuma.c9.grid.control
 
 import android.view.KeyEvent
 import com.austinauyeung.nyuma.c9.BuildConfig
+import com.austinauyeung.nyuma.c9.core.control.CoreManager.ChannelMessage
 import com.austinauyeung.nyuma.c9.core.control.ModeCoordinator
 import com.austinauyeung.nyuma.c9.core.domain.ScrollDirection
 import com.austinauyeung.nyuma.c9.core.logs.Logger
@@ -13,6 +14,8 @@ import com.austinauyeung.nyuma.c9.gesture.util.GestureUtility.launchContinuousGe
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -71,7 +74,12 @@ class GridActionHandler(
         cancelContinuousGesture()
     }
 
-    fun handleKeyEvent(event: KeyEvent?): Boolean {
+    private var numKeys = emptySet<Int>()
+    private var scrollKeys = emptySet<Int>()
+    private var zoomKeys = emptySet<Int>()
+    private var actionKeys = emptySet<Int>()
+
+    fun handleKeyEvent(event: KeyEvent?, channel: Channel<ChannelMessage>): Boolean {
         val settings = settingsFlow.value
 
         try {
@@ -107,7 +115,7 @@ class GridActionHandler(
             // Can assume grid is not null if not returning
             if (!gridStateManager.isGridVisible()) return false
 
-            val numKeys = setOf(
+            numKeys = setOf(
                 KeyEvent.KEYCODE_1,
                 KeyEvent.KEYCODE_2,
                 KeyEvent.KEYCODE_3,
@@ -119,14 +127,14 @@ class GridActionHandler(
                 KeyEvent.KEYCODE_9
             )
 
-            val scrollKeys = setOf(
+            scrollKeys = setOf(
                 KeyEvent.KEYCODE_DPAD_UP,
                 KeyEvent.KEYCODE_DPAD_DOWN,
                 KeyEvent.KEYCODE_DPAD_LEFT,
                 KeyEvent.KEYCODE_DPAD_RIGHT
             )
 
-            val zoomKeys = buildSet {
+            zoomKeys = buildSet {
                 add(KeyEvent.KEYCODE_STAR)
                 add(KeyEvent.KEYCODE_0)
 
@@ -136,47 +144,70 @@ class GridActionHandler(
                 }
             }
 
-            val actionKeys = setOf(
+            actionKeys = setOf(
                 KeyEvent.KEYCODE_DPAD_CENTER,
                 KeyEvent.KEYCODE_ENTER
             )
 
-            val originalKeyCode = event.keyCode
-            val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
-                val orientation = orientationProvider()
-                when (originalKeyCode) {
-                    in numKeys -> OrientationUtil.mapNumberKey(originalKeyCode, orientation)
-                    in scrollKeys -> OrientationUtil.mapDPadKey(originalKeyCode, orientation)
-                    else -> originalKeyCode
-                }
-            } else {
-                originalKeyCode
+            val reservedKeys = numKeys + scrollKeys + zoomKeys + actionKeys
+            if (event.keyCode !in reservedKeys) {
+                return false
             }
 
-            return when (effectiveKeyCode) {
-                in numKeys -> {
-                    handleNumberKey(event, effectiveKeyCode)
-                }
-
-                in scrollKeys -> {
-                    handleScrollKey(event, effectiveKeyCode)
-                }
-
-                in zoomKeys -> {
-                    handleZoomKey(event)
-                }
-
-                in actionKeys -> {
-                    handleActionKey(event)
-                }
-
-                else -> false
+            // Buttons should be consumed at this point
+            backgroundScope.launch {
+                channel.send(
+                    ChannelMessage(
+                        event = event,
+                        handler = ::handleKeyEventInternal
+                    )
+                )
             }
+
+            return true
         } catch (e: Exception) {
             Logger.e("Error processing grid key event", e)
             heldNumberKeyCode = null
             cancelContinuousGesture()
             return false
+        }
+    }
+
+    private suspend fun handleKeyEventInternal(event: KeyEvent) = coroutineScope {
+        val settings = settingsFlow.value
+
+        val originalKeyCode = event.keyCode
+        val effectiveKeyCode = if (settings.rotateButtonsWithOrientation) {
+            val orientation = orientationProvider()
+            when {
+                OrientationUtil.isDpadDirection(originalKeyCode) ->
+                    OrientationUtil.mapDPadKey(originalKeyCode, orientation)
+                OrientationUtil.isNumberKey(originalKeyCode) ->
+                    OrientationUtil.mapNumberKey(originalKeyCode, orientation)
+                else -> originalKeyCode
+            }
+        } else {
+            originalKeyCode
+        }
+
+        when (event.keyCode) {
+            in numKeys -> {
+                launch { handleNumberKey(event, effectiveKeyCode) }
+            }
+
+            in scrollKeys -> {
+                launch { handleScrollKey(event, effectiveKeyCode) }
+            }
+
+            in zoomKeys -> {
+                launch { handleZoomKey(event) }
+            }
+
+            in actionKeys -> {
+                launch { handleActionKey(event) }
+            }
+
+            else -> {}
         }
     }
 
@@ -237,7 +268,8 @@ class GridActionHandler(
         }
     }
 
-    private fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
+    private suspend fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
+        Logger.d("TEST: handling number")
         // currentAction not set to allow gestures
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
@@ -268,7 +300,7 @@ class GridActionHandler(
         }
     }
 
-    private fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
+    private suspend fun handleScrollKey(event: KeyEvent, keyCode: Int): Boolean {
         val settings = settingsFlow.value
         if (settings.overrideAndroid7) return false
 
@@ -292,9 +324,7 @@ class GridActionHandler(
 
                 if (direction != null) {
                     currentScrollDirection = direction
-                    backgroundScope.launch {
-                        performScroll(direction, startX = x, startY = y)
-                    }
+                    performScroll(direction, startX = x, startY = y)
 
                     continuousGestureJob = launchContinuousGesture(
                         backgroundScope = backgroundScope,
@@ -345,7 +375,7 @@ class GridActionHandler(
         return true
     }
 
-    private fun handleZoomKey(event: KeyEvent): Boolean {
+    private suspend fun handleZoomKey(event: KeyEvent): Boolean {
         val settings = settingsFlow.value
         if (settings.overrideAndroid7) return false
 
@@ -366,9 +396,7 @@ class GridActionHandler(
                 }
 
                 currentZoomDirection = isZoomIn
-                backgroundScope.launch {
-                    performZoom(isZoomIn, x, y)
-                }
+                performZoom(isZoomIn, x, y)
 
                 continuousGestureJob = launchContinuousGesture(
                     backgroundScope = backgroundScope,
@@ -387,41 +415,35 @@ class GridActionHandler(
         return true
     }
 
-    private fun performZoom(isZoomIn: Boolean, x: Float, y: Float, forceFixedGesture: Boolean = false): Boolean {
+    private suspend fun performZoom(isZoomIn: Boolean, x: Float, y: Float, forceFixedGesture: Boolean = false): Boolean {
         val orientation = orientationProvider()
-        backgroundScope.launch {
-            gestureManager.performZoom(isZoomIn, x, y, orientation, forceFixedGesture = forceFixedGesture)
-        }
+        gestureManager.performZoom(isZoomIn, x, y, orientation, forceFixedGesture = forceFixedGesture)
 
         return true
     }
 
-    private fun handleActionKey(event: KeyEvent): Boolean {
+    private suspend fun handleActionKey(event: KeyEvent): Boolean {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 currentAction = CurrentAction.ACTION
-                backgroundScope.launch {
-                    val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
+                val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                    if (heldNumberKey != null) {
-                        gestureDispatchedDuringHold = true
-                    }
-
-                    gestureManager.startTap(x, y)
+                if (heldNumberKey != null) {
+                    gestureDispatchedDuringHold = true
                 }
+
+                gestureManager.startTap(x, y)
             }
 
             KeyEvent.ACTION_UP -> {
                 currentAction = null
-                backgroundScope.launch {
-                    val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
+                val (x, y) = gridStateManager.getCellCoordinates(heldNumberKey)
 
-                    if (heldNumberKey != null) {
-                        gestureDispatchedDuringHold = true
-                    }
-
-                    gestureManager.endTap(x, y)
+                if (heldNumberKey != null) {
+                    gestureDispatchedDuringHold = true
                 }
+
+                gestureManager.endTap(x, y)
             }
         }
 

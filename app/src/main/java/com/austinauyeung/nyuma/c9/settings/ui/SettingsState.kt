@@ -117,7 +117,8 @@ class SettingsState(
                             gridCursorLinesHex = settings.gridCursorLinesHex,
                             gridCursorNumbersHex = settings.gridCursorNumbersHex,
                             gridCursorLineWidth = settings.gridCursorLineWidth,
-                            gridCursorFontSize = settings.gridCursorFontSize
+                            gridCursorFontSize = settings.gridCursorFontSize,
+                            disableTouchscreen = settings.disableTouchscreen
                         )
                     }
                 }
@@ -216,7 +217,8 @@ class SettingsState(
             gridCursorLinesHex = _uiState.value.gridCursorLinesHex,
             gridCursorNumbersHex = _uiState.value.gridCursorNumbersHex,
             gridCursorLineWidth = _uiState.value.gridCursorLineWidth,
-            gridCursorFontSize = _uiState.value.gridCursorFontSize
+            gridCursorFontSize = _uiState.value.gridCursorFontSize,
+            disableTouchscreen = _uiState.value.disableTouchscreen
         )
     }
 
@@ -333,5 +335,6 @@ data class SettingsUiState(
     val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
     val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
     val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
-    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE,
+    val disableTouchscreen: Boolean = Defaults.Settings.DISABLE_TOUCHSCREEN
 )

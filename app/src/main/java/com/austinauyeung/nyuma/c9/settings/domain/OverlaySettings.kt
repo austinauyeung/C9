@@ -79,7 +79,8 @@ data class OverlaySettings(
     val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
     val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
     val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
-    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE,
+    val disableTouchscreen: Boolean = Defaults.Settings.DISABLE_TOUCHSCREEN
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

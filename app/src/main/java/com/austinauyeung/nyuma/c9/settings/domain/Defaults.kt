@@ -88,5 +88,7 @@ object Defaults {
         const val EDGE_SCROLL_MULTIPLIER = GestureConstants.MIN_SCROLL_MULTIPLIER
         const val EDGE_SCROLL_ACCELERATION_START = GestureConstants.DEFAULT_ACCELERATION_START
         const val EDGE_SCROLL_ACCELERATION_DURATION = GestureConstants.DEFAULT_ACCELERATION_DURATION
+
+        const val DISABLE_TOUCHSCREEN = false
     }
 }
