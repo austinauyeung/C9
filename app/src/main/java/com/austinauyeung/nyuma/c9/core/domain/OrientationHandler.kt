@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
+import android.view.Choreographer
 import android.view.Display
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -44,8 +45,10 @@ class OrientationHandler(
         override fun onDisplayRemoved(displayId: Int) {}
 
         override fun onDisplayChanged(displayId: Int) {
-            if (displayId == Display.DEFAULT_DISPLAY) {
-                mainHandler.post {
+            if (displayId != Display.DEFAULT_DISPLAY) return
+
+            mainHandler.post {
+                Choreographer.getInstance().postFrameCallback {
                     updateScreenInfo()
                 }
             }
@@ -71,7 +74,7 @@ class OrientationHandler(
             val orientation = getOrientation()
             _currentOrientation.value = orientation
 
-            Logger.i("Updated screen dimensions to: ${dimensions.width} x ${dimensions.height}")
+            Logger.i("Updated screen dimensions to: ${dimensions.width} x ${dimensions.height}, $orientation")
         } catch (e: Exception) {
             Logger.e("Error updating screen dimensions", e)
         }
