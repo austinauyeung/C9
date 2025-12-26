@@ -247,6 +247,10 @@ class SettingsState(
         updateSettings { it.copy(allowPassthrough = allow) }
     }
 
+    fun updateDisableTouchscreen(disable: Boolean) {
+        updateSettings { it.copy(disableTouchscreen = disable) }
+    }
+
     fun updateEnableShizukuIntegration(integrate: Boolean) {
         updateSettings { it.copy(enableShizukuIntegration = integrate) }
     }

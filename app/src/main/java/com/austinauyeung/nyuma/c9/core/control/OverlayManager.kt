@@ -161,7 +161,7 @@ class OverlayManager(
                     windowManager.updateViewLayout(overlayView, createOverlayLayoutParams(touchEnabled))
                     Choreographer.getInstance().postFrameCallbackDelayed({ _ ->
                         _layoutApplied.tryEmit(Unit)
-                    }, 32)
+                    }, 50)
                 } catch (e: Exception) {
                     Logger.e("Failed to update overlay layout", e)
                 }
