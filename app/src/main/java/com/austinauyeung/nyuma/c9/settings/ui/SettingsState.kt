@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
+import android.view.KeyEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -67,6 +68,10 @@ class SettingsState(
                             cursorAccelerationDuration = settings.cursorAccelerationDuration,
                             gridActivationKey = settings.gridActivationKey,
                             cursorActivationKey = settings.cursorActivationKey,
+                            scrollUpKey = settings.scrollUpKey,
+                            scrollDownKey = settings.scrollDownKey,
+                            scrollLeftKey = settings.scrollLeftKey,
+                            scrollRightKey = settings.scrollRightKey,
                             controlScheme = settings.controlScheme,
                             cursorEdgeBehavior = settings.cursorEdgeBehavior,
                             gestureStyle = settings.gestureStyle,
@@ -117,7 +122,8 @@ class SettingsState(
                             gridCursorLinesHex = settings.gridCursorLinesHex,
                             gridCursorNumbersHex = settings.gridCursorNumbersHex,
                             gridCursorLineWidth = settings.gridCursorLineWidth,
-                            gridCursorFontSize = settings.gridCursorFontSize
+                            gridCursorFontSize = settings.gridCursorFontSize,
+                            disableTouchscreen = settings.disableTouchscreen
                         )
                     }
                 }
@@ -166,6 +172,10 @@ class SettingsState(
             cursorAccelerationDuration = _uiState.value.cursorAccelerationDuration,
             gridActivationKey = _uiState.value.gridActivationKey,
             cursorActivationKey = _uiState.value.cursorActivationKey,
+            scrollUpKey = _uiState.value.scrollUpKey,
+            scrollDownKey = _uiState.value.scrollDownKey,
+            scrollLeftKey = _uiState.value.scrollLeftKey,
+            scrollRightKey = _uiState.value.scrollRightKey,
             controlScheme = _uiState.value.controlScheme,
             cursorEdgeBehavior = _uiState.value.cursorEdgeBehavior,
             gestureStyle = _uiState.value.gestureStyle,
@@ -216,7 +226,8 @@ class SettingsState(
             gridCursorLinesHex = _uiState.value.gridCursorLinesHex,
             gridCursorNumbersHex = _uiState.value.gridCursorNumbersHex,
             gridCursorLineWidth = _uiState.value.gridCursorLineWidth,
-            gridCursorFontSize = _uiState.value.gridCursorFontSize
+            gridCursorFontSize = _uiState.value.gridCursorFontSize,
+            disableTouchscreen = _uiState.value.disableTouchscreen
         )
     }
 
@@ -236,6 +247,31 @@ class SettingsState(
         updateSettings { it.copy(cursorActivationKey = keyCode) }
     }
 
+    fun updateScrollUpKey(keyCode: Int) {
+        updateSettings { it.copy(scrollUpKey = keyCode) }
+    }
+
+    fun updateScrollDownKey(keyCode: Int) {
+        updateSettings { it.copy(scrollDownKey = keyCode) }
+    }
+
+    fun updateScrollLeftKey(keyCode: Int) {
+        updateSettings { it.copy(scrollLeftKey = keyCode) }
+    }
+
+    fun updateScrollRightKey(keyCode: Int) {
+        updateSettings { it.copy(scrollRightKey = keyCode) }
+    }
+
+    fun resetScrollKeys() {
+        updateSettings { it.copy(
+            scrollUpKey = KeyEvent.KEYCODE_2,
+            scrollDownKey = KeyEvent.KEYCODE_8,
+            scrollLeftKey = KeyEvent.KEYCODE_4,
+            scrollRightKey = KeyEvent.KEYCODE_6,
+        ) }
+    }
+
     fun requestHideAllOverlays() {
         val serviceInstance = AppAccessibilityService.getInstance()
         serviceInstance?.forceHideAllOverlays(false)
@@ -243,6 +279,10 @@ class SettingsState(
 
     fun updateAllowPassthrough(allow: Boolean) {
         updateSettings { it.copy(allowPassthrough = allow) }
+    }
+
+    fun updateDisableTouchscreen(disable: Boolean) {
+        updateSettings { it.copy(disableTouchscreen = disable) }
     }
 
     fun updateEnableShizukuIntegration(integrate: Boolean) {
@@ -283,6 +323,10 @@ data class SettingsUiState(
     val cursorAccelerationDuration: Long = Defaults.Settings.CURSOR_ACCELERATION_DURATION,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
+    val scrollUpKey: Int = Defaults.Settings.SCROLL_UP_KEY,
+    val scrollDownKey: Int = Defaults.Settings.SCROLL_DOWN_KEY,
+    val scrollLeftKey: Int = Defaults.Settings.SCROLL_LEFT_KEY,
+    val scrollRightKey: Int = Defaults.Settings.SCROLL_RIGHT_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
     val cursorEdgeBehavior: ScreenEdgeBehavior = Defaults.Settings.CURSOR_EDGE_BEHAVIOR,
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
@@ -333,5 +377,6 @@ data class SettingsUiState(
     val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
     val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
     val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
-    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE,
+    val disableTouchscreen: Boolean = Defaults.Settings.DISABLE_TOUCHSCREEN
 )

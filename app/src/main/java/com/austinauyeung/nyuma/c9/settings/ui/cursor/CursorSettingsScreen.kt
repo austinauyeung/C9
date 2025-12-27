@@ -74,6 +74,7 @@ fun CursorSettingsScreen(
     onNavigateToLocationClickableIcon: () -> Unit,
     onNavigateToScrollToggleIcon: () -> Unit,
     onNavigateToClickableAppsScreen: () -> Unit,
+    onNavigateToAssignScrollScreen: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val uiState by settingsState.uiState.collectAsState()
@@ -174,11 +175,16 @@ fun CursorSettingsScreen(
                     KeyEvent.KEYCODE_DPAD_CENTER to "Cursor select and double tap",
                 )
         }
+
+        ControlScheme.TV -> {
+            reservedKeys = emptyMap()
+        }
     }
 
     val currentKeyDescription =
         if (
             uiState.cursorActivationKey != OverlaySettings.KEY_NONE &&
+            reservedKeys.isNotEmpty() &&
             !reservedKeys[uiState.cursorActivationKey].isNullOrEmpty()
         ) {
             reservedKeys[uiState.cursorActivationKey]
@@ -254,7 +260,8 @@ fun CursorSettingsScreen(
                         ControlScheme.STANDARD -> "D-pad moves, numpad scrolls"
                         ControlScheme.SWAPPED -> "D-pad scrolls, numpad moves"
                         ControlScheme.DPAD_TOGGLE -> "D-pad scrolls and moves"
-                        else -> "Numpad scrolls and moves"
+                        ControlScheme.NUMPAD_TOGGLE -> "Numpad scrolls and moves"
+                        ControlScheme.TV -> "D-pad moves, scroll buttons are manually assigned"
                     },
                     selectedOption = uiState.controlScheme,
                     options =
@@ -262,13 +269,21 @@ fun CursorSettingsScreen(
                         ControlScheme.STANDARD to "Standard",
                         ControlScheme.SWAPPED to "Swapped",
                         ControlScheme.DPAD_TOGGLE to "D-pad",
-                        ControlScheme.NUMPAD_TOGGLE to "Numpad"
+                        ControlScheme.NUMPAD_TOGGLE to "Numpad",
+                        ControlScheme.TV to "TV"
                     ),
                     onOptionSelected = { value ->
                         settingsState.updatePreference(value) { settings, v ->
                             settings.copy(controlScheme = v)
                         }
                     },
+                )
+
+                SimplePreferenceItem(
+                    title = "Assign Scroll Buttons",
+                    subtitle = "The TV control scheme requires manual assignment",
+                    onClick = onNavigateToAssignScrollScreen,
+                    enabled = uiState.controlScheme == ControlScheme.TV
                 )
 
                 DropdownPreferenceItem(

@@ -35,7 +35,8 @@ fun DebugOptionsScreen(
 ) {
     val uiState by settingsState.uiState.collectAsState()
     var showShizukuDialog by remember { mutableStateOf(false) }
-    var showExperimentalDialog by remember { mutableStateOf(false) }
+    var showPassthroughDialog by remember { mutableStateOf(false) }
+    var showTouchscreenDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -178,6 +179,19 @@ fun DebugOptionsScreen(
 
             PreferenceCategory(title = "Experimental") {
                 SwitchPreferenceItem(
+                    title = "Disable Touchscreen",
+                    subtitle = "Disables the touchscreen except during button presses",
+                    checked = uiState.disableTouchscreen,
+                    onCheckedChange = { newValue ->
+                        if (newValue && !uiState.disableTouchscreen) {
+                            showTouchscreenDialog = true
+                        } else {
+                            settingsState.updateDisableTouchscreen(newValue)
+                        }
+                    },
+                )
+
+                SwitchPreferenceItem(
                     title = "Ignore Numpad",
                     subtitle = "Bypass all numpad behavior except for activation",
                     checked = uiState.ignoreNumpad,
@@ -194,7 +208,7 @@ fun DebugOptionsScreen(
                     checked = uiState.allowPassthrough,
                     onCheckedChange = { newValue ->
                         if (newValue && !uiState.allowPassthrough) {
-                            showExperimentalDialog = true
+                            showPassthroughDialog = true
                         } else {
                             settingsState.updateAllowPassthrough(newValue)
                         }
@@ -202,9 +216,9 @@ fun DebugOptionsScreen(
                 )
             }
 
-            if (showExperimentalDialog) {
+            if (showPassthroughDialog) {
                 AlertDialog(
-                    onDismissRequest = { showExperimentalDialog = false },
+                    onDismissRequest = { showPassthroughDialog = false },
                     title = { Text("Allow Passthrough") },
                     text = {
                         Text("All button presses will be forwarded to the underlying app. This may fix numpad backlight issues but cause unintended behavior with the underlying application.")
@@ -213,7 +227,7 @@ fun DebugOptionsScreen(
                         TextButton(
                             onClick = {
                                 settingsState.updateAllowPassthrough(true)
-                                showExperimentalDialog = false
+                                showPassthroughDialog = false
                             }
                         ) {
                             Text("Enable")
@@ -221,7 +235,34 @@ fun DebugOptionsScreen(
                     },
                     dismissButton = {
                         TextButton(
-                            onClick = { showExperimentalDialog = false }
+                            onClick = { showPassthroughDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
+            if (showTouchscreenDialog) {
+                AlertDialog(
+                    onDismissRequest = { showTouchscreenDialog = false },
+                    title = { Text("Disable Touchscreen") },
+                    text = {
+                        Text("While the cursor is activated, the touchscreen will be disabled except during button presses to allow the cursor to dispatch gestures. Also, this may introduce a small amount of input lag.")
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                settingsState.updateDisableTouchscreen(true)
+                                showTouchscreenDialog = false
+                            }
+                        ) {
+                            Text("Disable")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showTouchscreenDialog = false }
                         ) {
                             Text("Cancel")
                         }

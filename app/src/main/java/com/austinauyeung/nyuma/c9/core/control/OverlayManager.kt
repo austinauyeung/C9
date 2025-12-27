@@ -6,6 +6,7 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Build
 import android.os.Looper
+import android.view.Choreographer
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import com.austinauyeung.nyuma.c9.gesture.ui.GestureVisualization
 import com.austinauyeung.nyuma.c9.grid.ui.GridOverlay
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -45,7 +47,9 @@ class OverlayManager(
     private val orientationHandler: OrientationHandler,
     private val coreManager: CoreManager,
     private val lifecycleOwner: LifecycleOwner,
-    private val savedStateRegistryOwner: SavedStateRegistryOwner
+    private val savedStateRegistryOwner: SavedStateRegistryOwner,
+    private val keysPressed: StateFlow<Int>,
+    private val _layoutApplied: MutableSharedFlow<Unit>
 ) {
     private var overlayView: ComposeView? = null
     private var currentPaths: Int? = null
@@ -72,7 +76,7 @@ class OverlayManager(
 
         coreManager.cursorStateManager.cursorState
             .onEach { cursor ->
-                Logger.d("Cursor state changed: ${cursor != null}")
+//                Logger.d("Cursor state changed: ${cursor != null}")
                 mainScope.launch {
                     updateOverlayUI()
                 }
@@ -96,13 +100,31 @@ class OverlayManager(
                 Logger.d("Settings changed")
                 coreManager.updateGestureVisualization(settings.showGestureVisualization)
                 mainScope.launch {
-                    updateOverlayUI()
+                    updateOverlayUI(touchChanged = !settings.disableTouchscreen)
+                }
+            }
+            .launchIn(backgroundScope)
+
+        keysPressed
+            .onEach { num ->
+                val settings = settingsFlow.value
+
+                if (settings.disableTouchscreen) {
+                    when (num) {
+                        0 -> mainScope.launch {
+                            updateOverlayUI(touchEnabled = false)
+                        }
+
+                        1 -> mainScope.launch {
+                            updateOverlayUI(touchEnabled = true)
+                        }
+                    }
                 }
             }
             .launchIn(backgroundScope)
     }
 
-    fun updateOverlayUI() {
+    fun updateOverlayUI(touchEnabled: Boolean? = null, touchChanged: Boolean? = null) {
         try {
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 Logger.e("updateOverlayUI was called from a non-main thread")
@@ -124,16 +146,31 @@ class OverlayManager(
                     cursor != null ||
                     (gesturePaths.isNotEmpty() && settings.showGestureVisualization)
 
-            if (!shouldShowOverlay) {
+            if (!shouldShowOverlay && overlayView != null) {
                 removeOverlayView()
                 return
             }
 
             if (overlayView == null) {
                 createOverlayView()
-            } else {
+            }
+
+            // Notify cursor of touchscreen changes due to key presses
+            if (touchEnabled != null) {
                 try {
-                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams())
+                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams(touchEnabled))
+                    Choreographer.getInstance().postFrameCallbackDelayed({ _ ->
+                        _layoutApplied.tryEmit(Unit)
+                    }, 50)
+                } catch (e: Exception) {
+                    Logger.e("Failed to update overlay layout", e)
+                }
+            }
+
+            // Immediately update layout depending on setting
+            if (touchChanged != null) {
+                try {
+                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams(touchChanged))
                 } catch (e: Exception) {
                     Logger.e("Failed to update overlay layout", e)
                 }
@@ -204,6 +241,7 @@ class OverlayManager(
                 mainScope.launch { createOverlayView() }
                 return
             }
+            val settings = settingsFlow.value
 
             val composeView = ComposeView(context)
             composeView.setViewTreeLifecycleOwner(lifecycleOwner)
@@ -224,7 +262,7 @@ class OverlayManager(
 
             overlayView = composeView
 
-            windowManager.addView(overlayView, createOverlayLayoutParams())
+            windowManager.addView(overlayView, createOverlayLayoutParams(touchEnabled = !settings.disableTouchscreen))
             Logger.d("Overlay view created and added to window manager")
         } catch (e: Exception) {
             Logger.e("Failed to add overlay view", e)
@@ -270,7 +308,7 @@ class OverlayManager(
         }
     }
 
-    private fun createOverlayLayoutParams(): WindowManager.LayoutParams {
+    private fun createOverlayLayoutParams(touchEnabled: Boolean? = null): WindowManager.LayoutParams {
         val settings = settingsFlow.value
         val insets = if (!settings.usePhysicalSize) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -286,10 +324,15 @@ class OverlayManager(
             type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
             flags = (
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                            or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                             or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                             or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                     )
+
+            if (touchEnabled != null && touchEnabled) {
+                // Overlay does not absorb touches and will let gestures pass through
+                flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            }
+
             format = PixelFormat.TRANSLUCENT
             gravity = Gravity.TOP or Gravity.START
 

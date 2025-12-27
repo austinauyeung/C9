@@ -6,12 +6,10 @@ import com.austinauyeung.nyuma.c9.core.logs.Logger
 import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import com.austinauyeung.nyuma.c9.grid.domain.Grid
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 /**
  * Manages grid state including visibility, grid hierarchy, and state transitions.
@@ -20,7 +18,6 @@ class GridStateManager(
     private val gestureManager: GestureManager,
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val dimensionsFlow: StateFlow<ScreenDimensions>,
-    private val backgroundScope: CoroutineScope
 ) {
     private val _gridState = MutableStateFlow<Grid?>(null)
     val gridState: StateFlow<Grid?> = _gridState.asStateFlow()
@@ -28,7 +25,7 @@ class GridStateManager(
 
     fun isGridVisible(): Boolean = _gridState.value != null
 
-    fun handleNumberKey(number: Int): Boolean {
+    suspend fun handleNumberKey(number: Int): Boolean {
         val settings = settingsFlow.value
         keySequence.add(number)
         Logger.d("Current grid sequence: $keySequence")
@@ -64,20 +61,18 @@ class GridStateManager(
     }
 
     // Performs the final action when a cell is selected in the deepest grid level
-    private fun performClick(number: Int) {
+    private suspend fun performClick(number: Int) {
         val settings = settingsFlow.value
         val grid = _gridState.value
         if (grid != null) {
             val coordinates = grid.getCellCenter(number)
             val (x, y) = coordinates
 
-            backgroundScope.launch {
-                gestureManager.startTap(x, y)
-                while (!gestureManager.getGestureReady()) {
-                    delay(CursorConstants.POLLING_DURATION_MS.toLong())
-                }
-                gestureManager.endTap(x, y)
+            gestureManager.startTap(x, y)
+            while (!gestureManager.getGestureReady()) {
+                delay(CursorConstants.POLLING_DURATION_MS.toLong())
             }
+            gestureManager.endTap(x, y)
         }
 
         if (!settings.persistOverlay) {

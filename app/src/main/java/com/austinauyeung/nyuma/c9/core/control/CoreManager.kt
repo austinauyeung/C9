@@ -18,9 +18,16 @@ import com.austinauyeung.nyuma.c9.grid.control.GridActionHandler
 import com.austinauyeung.nyuma.c9.grid.control.GridStateManager
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * Manages grid cursor and standard cursor modes.
@@ -30,7 +37,8 @@ class CoreManager(
     private val settingsFlow: StateFlow<OverlaySettings>,
     private val orientationHandler: OrientationHandler,
     private val backgroundScope: CoroutineScope,
-    private val mainScope: CoroutineScope
+    private val keysPressed: MutableStateFlow<Int>,
+    private val layoutApplied: SharedFlow<Unit>
 ) {
     private lateinit var gestureManager: GestureManager
     lateinit var cursorStateManager: CursorStateManager
@@ -42,6 +50,39 @@ class CoreManager(
 
     private val screenDimensionsFlow = orientationHandler.screenDimensions
 
+    data class ChannelMessage(
+        val event: KeyEvent,
+        val handler: suspend (KeyEvent) -> Unit
+    )
+
+    private val channel = Channel<ChannelMessage>(Channel.UNLIMITED)
+    init {
+        backgroundScope.launch(Dispatchers.Default) {
+            for (msg in channel) {
+                processMessage(msg)
+            }
+        }
+    }
+    private suspend fun processMessage(msg: ChannelMessage) = coroutineScope {
+        val settings = settingsFlow.value
+
+        if (msg.event.action == KeyEvent.ACTION_DOWN) {
+            keysPressed.value += 1
+            if (keysPressed.value == 1 && settings.disableTouchscreen) {
+                layoutApplied.first()
+            }
+        }
+
+        msg.handler(msg.event)
+
+        if (msg.event.action == KeyEvent.ACTION_UP) {
+            keysPressed.value -= 1
+            if (keysPressed.value == 0 && settings.disableTouchscreen) {
+                layoutApplied.first()
+            }
+        }
+    }
+
     fun initialize() {
         try {
             Logger.i("Initializing CoreManager")
@@ -51,7 +92,6 @@ class CoreManager(
 
             val defaultStrategy = DefaultGestureStrategy(service, settingsFlow)
             val shizukuStrategy = ShizukuGestureStrategy(
-                mainScope = mainScope,
                 settingsFlow = settingsFlow
             )
             C9.getInstance().setShizukuGestureStrategy(shizukuStrategy)
@@ -68,8 +108,7 @@ class CoreManager(
             gridStateManager = GridStateManager(
                 gestureManager,
                 settingsFlow,
-                screenDimensionsFlow,
-                backgroundScope
+                screenDimensionsFlow
             )
             gridActionHandler = GridActionHandler(
                 gridStateManager,
@@ -199,8 +238,8 @@ class CoreManager(
 
         try {
             // Check grid mode first
-            val gridHandled = gridActionHandler.handleKeyEvent(event)
-            val cursorHandled = if (!gridHandled) cursorActionHandler.handleKeyEvent(event) else false
+            val gridHandled = gridActionHandler.handleKeyEvent(event, channel)
+            val cursorHandled = if (!gridHandled) cursorActionHandler.handleKeyEvent(event, channel) else false
             val eventHandled = gridHandled || cursorHandled
 
             if (settings.allowPassthrough) {

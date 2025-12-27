@@ -29,6 +29,10 @@ data class OverlaySettings(
     val cursorAccelerationDuration: Long = Defaults.Settings.CURSOR_ACCELERATION_DURATION,
     val gridActivationKey: Int = Defaults.Settings.GRID_ACTIVATION_KEY,
     val cursorActivationKey: Int = Defaults.Settings.CURSOR_ACTIVATION_KEY,
+    val scrollUpKey: Int = Defaults.Settings.SCROLL_UP_KEY,
+    val scrollDownKey: Int = Defaults.Settings.SCROLL_DOWN_KEY,
+    val scrollLeftKey: Int = Defaults.Settings.SCROLL_LEFT_KEY,
+    val scrollRightKey: Int = Defaults.Settings.SCROLL_RIGHT_KEY,
     val controlScheme: ControlScheme = Defaults.Settings.CONTROL_SCHEME,
     val cursorEdgeBehavior: ScreenEdgeBehavior = Defaults.Settings.CURSOR_EDGE_BEHAVIOR,
     val gestureStyle: GestureStyle = Defaults.Settings.GESTURE_STYLE,
@@ -79,7 +83,8 @@ data class OverlaySettings(
     val gridCursorLinesHex: String = Defaults.Settings.GRID_CURSOR_LINES_HEX,
     val gridCursorNumbersHex: String = Defaults.Settings.GRID_CURSOR_NUMBERS_HEX,
     val gridCursorLineWidth: Int = Defaults.Settings.GRID_CURSOR_LINE_WIDTH,
-    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE
+    val gridCursorFontSize: Int = Defaults.Settings.GRID_CURSOR_FONT_SIZE,
+    val disableTouchscreen: Boolean = Defaults.Settings.DISABLE_TOUCHSCREEN
 ) {
     companion object {
         val DEFAULT = OverlaySettings()

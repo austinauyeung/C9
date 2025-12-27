@@ -36,6 +36,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -66,7 +71,14 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
 
     private var lastOverlayType: ModeCoordinator.OverlayMode = ModeCoordinator.OverlayMode.OFF
 
-    private val keysPressed: MutableSet<Int> = mutableSetOf()
+    private val _keysPressed = MutableStateFlow<Int>(0)
+    private val keysPressed: StateFlow<Int> = _keysPressed.asStateFlow()
+    private val _layoutApplied = MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+
+    val layoutApplied = _layoutApplied.asSharedFlow()
 
     private var lastKeyboardState = false
     private var lastLockScreenState = false
@@ -212,7 +224,8 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 settingsFlow = settingsFlow,
                 orientationHandler = orientationHandler,
                 backgroundScope = backgroundScope,
-                mainScope = mainScope,
+                keysPressed = _keysPressed,
+                layoutApplied = layoutApplied
             )
             coreManager.initialize()
 
@@ -225,7 +238,9 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
                 orientationHandler = orientationHandler,
                 coreManager = coreManager,
                 lifecycleOwner = this,
-                savedStateRegistryOwner = this
+                savedStateRegistryOwner = this,
+                keysPressed = keysPressed,
+                _layoutApplied = _layoutApplied
             )
             overlayManager.initialize()
 
@@ -434,13 +449,6 @@ class AppAccessibilityService : AccessibilityService(), LifecycleOwner,
     override fun onInterrupt() {}
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
-        if (event?.action == KeyEvent.ACTION_DOWN) {
-            keysPressed.add(event.keyCode)
-        } else if (event?.action == KeyEvent.ACTION_UP) {
-            keysPressed.remove(event.keyCode)
-        }
-        Logger.d("Current key presses: $keysPressed")
-
         return try {
             coreManager.handleKeyEvent(event)
         } catch (e: Exception) {

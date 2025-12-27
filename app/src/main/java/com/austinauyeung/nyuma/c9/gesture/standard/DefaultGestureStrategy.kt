@@ -4,6 +4,8 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import com.austinauyeung.nyuma.c9.core.constants.GestureConstants
 import com.austinauyeung.nyuma.c9.core.domain.GestureStyle
@@ -12,6 +14,8 @@ import com.austinauyeung.nyuma.c9.gesture.api.GestureCompletionListener
 import com.austinauyeung.nyuma.c9.gesture.api.GestureStrategy
 import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * Implements gestures using the AccessibilityService API.
@@ -24,6 +28,32 @@ class DefaultGestureStrategy(
     private val scrollPath = Path()
     private val tapPath = Path()
     private var activeStroke: GestureDescription.StrokeDescription? = null
+
+    private suspend fun AccessibilityService.dispatchGestureAwait(
+        gesture: GestureDescription,
+        _onCompleted: (() -> Unit)? = null,
+        _onCancelled: (() -> Unit)? = null
+    ): Boolean =
+        suspendCancellableCoroutine { cont ->
+            val handler = Handler(Looper.getMainLooper())
+            dispatchGesture(gesture, object : AccessibilityService.GestureResultCallback() {
+                override fun onCompleted(gestureDescription: GestureDescription?) {
+                    _onCompleted?.invoke()
+                    cont.resume(true)
+                }
+
+                override fun onCancelled(gestureDescription: GestureDescription?) {
+                    _onCancelled?.invoke()
+                    cont.resume(false)
+                }
+            }, handler)
+
+            cont.invokeOnCancellation {
+                // Optional: cancel gesture if coroutine is cancelled
+                // Not all versions support cancelling gestures, but can try:
+                // dispatchGesture(gesture, null, handler) ?
+            }
+        }
 
     // Callbacks to pause for fixed gesture style
     private fun completeGestureCallback(completionListener: GestureCompletionListener?): AccessibilityService.GestureResultCallback {
@@ -460,20 +490,16 @@ class DefaultGestureStrategy(
                 .addStroke(activeStroke!!)
                 .build()
 
-            service.dispatchGesture(
+            service.dispatchGestureAwait(
                 gesture,
-                object : AccessibilityService.GestureResultCallback() {
-                    override fun onCompleted(gestureDescription: GestureDescription?) {
-                        Logger.d("DefaultGestureStrategy: start tap completed successfully")
-                        completionListener?.onGestureCompleted(true)
-                    }
-
-                    override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("DefaultGestureStrategy: start tap was cancelled")
-                        completionListener?.onGestureCompleted(true)
-                    }
+                {
+                    Logger.d("DefaultGestureStrategy: start tap completed successfully")
+                    completionListener?.onGestureCompleted(true)
                 },
-                null
+                {
+                    Logger.d("DefaultGestureStrategy: start tap was cancelled")
+                    completionListener?.onGestureCompleted(true)
+                }
             )
 
             return true
@@ -513,20 +539,16 @@ class DefaultGestureStrategy(
                 .addStroke(continuedStroke)
                 .build()
 
-            service.dispatchGesture(
+            service.dispatchGestureAwait(
                 gesture,
-                object : AccessibilityService.GestureResultCallback() {
-                    override fun onCompleted(gestureDescription: GestureDescription?) {
-                        Logger.d("DefaultGestureStrategy: drag completed successfully")
-                        completionListener?.onGestureCompleted(true)
-                    }
-
-                    override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("DefaultGestureStrategy: drag was cancelled")
-                        cancelTap(completionListener)
-                    }
+                {
+                    Logger.d("DefaultGestureStrategy: drag completed successfully")
+                    completionListener?.onGestureCompleted(true)
                 },
-                null
+                {
+                    Logger.d("DefaultGestureStrategy: drag was cancelled")
+                    completionListener?.onGestureCompleted(true)
+                }
             )
 
             return true
@@ -563,21 +585,16 @@ class DefaultGestureStrategy(
                 .addStroke(finalStroke)
                 .build()
 
-            service.dispatchGesture(
+            service.dispatchGestureAwait(
                 gesture,
-                object : AccessibilityService.GestureResultCallback() {
-                    override fun onCompleted(gestureDescription: GestureDescription?) {
-                        activeStroke = null
-                        Logger.d("DefaultGestureStrategy: end tap completed successfully")
-                        completionListener?.onGestureCompleted(true)
-                    }
-
-                    override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Logger.d("DefaultGestureStrategy: end tap was cancelled")
-                        cancelTap(completionListener)
-                    }
+                {
+                    Logger.d("DefaultGestureStrategy: end tap completed successfully")
+                    completionListener?.onGestureCompleted(true)
                 },
-                null
+                {
+                    Logger.d("DefaultGestureStrategy: end tap was cancelled")
+                    completionListener?.onGestureCompleted(true)
+                }
             )
 
             return true
