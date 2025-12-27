@@ -96,7 +96,7 @@ fun KeyCaptureOverlay(
                         if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
                             when (val keyCode = keyEvent.nativeKeyEvent.keyCode) {
                                 in restrictedKeys -> showToast(
-                                    "Invalid activation key: ${
+                                    "Invalid key: ${
                                         KeyEvent.keyCodeToString(
                                             keyCode
                                         )
@@ -110,7 +110,7 @@ fun KeyCaptureOverlay(
 
                                 else -> {
                                     onKeySelected(keyCode)
-                                    showToast("Activation key set")
+                                    showToast("Key set")
                                 }
                             }
 

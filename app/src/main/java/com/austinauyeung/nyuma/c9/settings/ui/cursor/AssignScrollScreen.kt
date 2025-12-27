@@ -1,6 +1,7 @@
 package com.austinauyeung.nyuma.c9.settings.ui.cursor
 
 import KeyCaptureOverlay
+import android.view.KeyEvent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -63,12 +64,10 @@ fun AssignScrollScreen(
         ) {
             PreferenceCategory(title = "Reset") {
                 ClearKeyPreferenceItem(
+                    title = "Reset Scroll Buttons",
                     mode = "scroll buttons",
                     onClearKey = {
-                        settingsState.updateScrollUpKey(OverlaySettings.KEY_NONE)
-                        settingsState.updateScrollDownKey(OverlaySettings.KEY_NONE)
-                        settingsState.updateScrollLeftKey(OverlaySettings.KEY_NONE)
-                        settingsState.updateScrollRightKey(OverlaySettings.KEY_NONE)
+                        settingsState.resetScrollKeys()
                     },
                 )
             }

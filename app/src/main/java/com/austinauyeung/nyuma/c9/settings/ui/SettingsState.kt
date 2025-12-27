@@ -1,5 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui
 
+import android.view.KeyEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -260,6 +261,15 @@ class SettingsState(
 
     fun updateScrollRightKey(keyCode: Int) {
         updateSettings { it.copy(scrollRightKey = keyCode) }
+    }
+
+    fun resetScrollKeys() {
+        updateSettings { it.copy(
+            scrollUpKey = KeyEvent.KEYCODE_2,
+            scrollDownKey = KeyEvent.KEYCODE_8,
+            scrollLeftKey = KeyEvent.KEYCODE_4,
+            scrollRightKey = KeyEvent.KEYCODE_6,
+        ) }
     }
 
     fun requestHideAllOverlays() {
