@@ -151,7 +151,7 @@ class OverlayManager(
                 return
             }
 
-            if (overlayView == null) {
+            if (shouldShowOverlay && overlayView == null) {
                 createOverlayView()
             }
 
@@ -248,12 +248,7 @@ class OverlayManager(
             composeView.setViewTreeSavedStateRegistryOwner(savedStateRegistryOwner)
             composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                composeView.setOnApplyWindowInsetsListener { _, insets ->
-                    mainScope.launch { updateOverlayUI() }
-                    insets
-                }
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 composeView.setOnApplyWindowInsetsListener { _, insets ->
                     mainScope.launch { updateOverlayUI() }
                     insets

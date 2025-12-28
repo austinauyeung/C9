@@ -1,7 +1,6 @@
 package com.austinauyeung.nyuma.c9.settings.ui.cursor
 
 import KeyCaptureOverlay
-import android.view.KeyEvent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.austinauyeung.nyuma.c9.settings.domain.OverlaySettings
 import com.austinauyeung.nyuma.c9.settings.ui.ClearKeyPreferenceItem
 import com.austinauyeung.nyuma.c9.settings.ui.PreferenceCategory
 import com.austinauyeung.nyuma.c9.settings.ui.SetKeyPreferenceItem

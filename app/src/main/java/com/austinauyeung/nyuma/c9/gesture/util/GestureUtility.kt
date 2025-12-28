@@ -4,6 +4,7 @@ import com.austinauyeung.nyuma.c9.gesture.api.GestureManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 object GestureUtility {
@@ -17,11 +18,8 @@ object GestureUtility {
         return backgroundScope.launch {
             delay(initialDelay)
             while (condition()) {
-                gestureManager.isReady.collect { isReady ->
-                    if (isReady) {
-                        action()
-                    }
-                }
+                gestureManager.isReady.first { it }
+                action()
             }
         }
     }

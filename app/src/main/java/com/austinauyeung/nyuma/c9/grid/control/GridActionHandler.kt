@@ -269,7 +269,6 @@ class GridActionHandler(
     }
 
     private suspend fun handleNumberKey(event: KeyEvent, keyCode: Int): Boolean {
-        Logger.d("TEST: handling number")
         // currentAction not set to allow gestures
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
