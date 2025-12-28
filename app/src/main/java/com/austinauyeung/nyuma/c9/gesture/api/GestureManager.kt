@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -42,19 +41,17 @@ class GestureManager(
     private var currentStrategy: GestureStrategy = defaultStrategy
     private var shizukuObserverJob: Job? = null
 
-    private val gestureReady = AtomicBoolean(true)
     private val _isReady = MutableStateFlow(true)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
     private var gestureTimeoutJob: Job? = null
     private var currentTapVisual: String = ""
 
     fun setGestureReady(ready: Boolean) {
-        gestureReady.set(ready)
         _isReady.value = ready
     }
 
     fun getGestureReady(): Boolean {
-        return gestureReady.get()
+        return _isReady.value
     }
 
     init {
