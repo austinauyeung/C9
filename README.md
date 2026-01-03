@@ -43,7 +43,7 @@ Install using the standard package installer. Allow the accessibility service us
 Install using adb:
 ```
 >> adb install path/to/apk
->> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.service.AccessibilityService
+>> adb shell settings put secure enabled_accessibility_services com.austinauyeung.nyuma.c9/com.austinauyeung.nyuma.c9.accessibility.AppAccessibilityService
 ```
 
 ### Additional installation for certain Android versions
