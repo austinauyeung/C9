@@ -3,11 +3,13 @@ package com.austinauyeung.nyuma.c9.core.control
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
 import android.os.Looper
 import android.view.Choreographer
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -158,7 +160,7 @@ class OverlayManager(
             // Notify cursor of touchscreen changes due to key presses
             if (touchEnabled != null) {
                 try {
-                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams(touchEnabled))
+                    updateOverlayLayoutParams(touchEnabled)
                     Choreographer.getInstance().postFrameCallbackDelayed({ _ ->
                         _layoutApplied.tryEmit(Unit)
                     }, 50)
@@ -170,7 +172,7 @@ class OverlayManager(
             // Immediately update layout depending on setting
             if (touchChanged != null) {
                 try {
-                    windowManager.updateViewLayout(overlayView, createOverlayLayoutParams(touchChanged))
+                    updateOverlayLayoutParams(touchChanged)
                 } catch (e: Exception) {
                     Logger.e("Failed to update overlay layout", e)
                 }
@@ -233,6 +235,44 @@ class OverlayManager(
         }
     }
 
+    @Suppress("DEPRECATION")
+    private fun fitToPhysicalScreen(view: View) {
+        val display = view.display ?: return
+        val params =
+            view.layoutParams as? WindowManager.LayoutParams ?: return
+
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+
+        val size = Point()
+        display.getRealSize(size)
+
+        val newX = params.x - location[0]
+        val newY = params.y - location[1]
+        val newWidth = size.x
+        val newHeight = size.y
+
+        if (
+            params.x == newX &&
+            params.y == newY &&
+            params.width == newWidth &&
+            params.height == newHeight
+        ) {
+            return
+        }
+
+        params.x = newX
+        params.y = newY
+        params.width = newWidth
+        params.height = newHeight
+
+        try {
+            windowManager.updateViewLayout(view, params)
+        } catch (e: Exception) {
+            // View may have been removed
+        }
+    }
+
     @SuppressLint("ObsoleteSdkInt")
     private fun createOverlayView() {
         try {
@@ -257,7 +297,15 @@ class OverlayManager(
 
             overlayView = composeView
 
-            windowManager.addView(overlayView, createOverlayLayoutParams(touchEnabled = !settings.disableTouchscreen))
+            windowManager.addView(overlayView, createOverlayLayoutParams())
+            composeView.post {
+                fitToPhysicalScreen(composeView)
+            }
+            composeView.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+                view.post {
+                    fitToPhysicalScreen(view)
+                }
+            }
             Logger.d("Overlay view created and added to window manager")
         } catch (e: Exception) {
             Logger.e("Failed to add overlay view", e)
@@ -303,7 +351,7 @@ class OverlayManager(
         }
     }
 
-    private fun createOverlayLayoutParams(touchEnabled: Boolean? = null): WindowManager.LayoutParams {
+    private fun createOverlayLayoutParams(): WindowManager.LayoutParams {
         val settings = settingsFlow.value
         val insets = if (!settings.usePhysicalSize) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -323,7 +371,7 @@ class OverlayManager(
                             or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                     )
 
-            if (touchEnabled != null && touchEnabled) {
+            if (!settings.disableTouchscreen) {
                 // Overlay does not absorb touches and will let gestures pass through
                 flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             }
@@ -336,6 +384,17 @@ class OverlayManager(
             width = WindowManager.LayoutParams.MATCH_PARENT
             height = WindowManager.LayoutParams.MATCH_PARENT
         }
+    }
+
+    private fun updateOverlayLayoutParams(touchEnabled: Boolean) {
+        val view = overlayView ?: return
+        val params = view.layoutParams as? WindowManager.LayoutParams ?: return
+        params.flags = if (touchEnabled) {
+            params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        } else {
+            params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        }
+        windowManager.updateViewLayout(view, params)
     }
 
     fun cleanup() {
