@@ -70,7 +70,9 @@ As the [package name](#option-2) would suggest, this application is dedicated to
 ## Overview
 The majority of modern applications are touch-oriented. The goal of C9 is to mimic the touchscreen gestures required of these applications as closely as possible by adapting button presses in each of the two cursor modes.
 
-While both modes can be **enabled** simultaneously (by mapping their activation key or shortcut), only one cursor can be **active** at a time. As a final note, <ins>all buttons in the numpad and D-pad are generally reserved/intercepted while the cursor is active</ins>.
+Both modes can be enabled simultaneously (by mapping their activation key or shortcut), but only one cursor can be active at a time. Note that while a cursor is active, all numpad and D-pad buttons are intercepted by the application.
+
+For more instructions on using each cursor, see the [wiki](https://github.com/austinauyeung/C9/wiki).
 
 ### Grid Cursor
 <br />
@@ -119,9 +121,6 @@ If you are unable to deactivate the cursor, clear the internal activation key, w
 ## FAQs
 ### Where can I make feature suggestions or report bugs?
 You can use the [issues](https://github.com/austinauyeung/C9/issues) tab for both.
-
-### How do I configure C9?
-The [wiki](https://github.com/austinauyeung/C9/wiki) has descriptions of each setting and instructions for each cursor.
 
 ### What is Shizuku?
 Shizuku allows applications in general to perform actions that require elevated privileges. In C9, it is required to dispatch gestures on Android 7 and 11 using [InputManager](https://developer.android.com/reference/android/hardware/input/InputManager) instead of the standard dispatch using [AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService).
