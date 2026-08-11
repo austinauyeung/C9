@@ -47,10 +47,12 @@ class GestureManager(
     private var currentTapVisual: String = ""
 
     fun setGestureReady(ready: Boolean) {
+        Logger.d("Setting gesture ready: $ready")
         _isReady.value = ready
     }
 
     fun getGestureReady(): Boolean {
+        Logger.d("Getting gesture ready: ${_isReady.value}")
         return _isReady.value
     }
 
@@ -264,16 +266,17 @@ class GestureManager(
 
     suspend fun startTap(x: Float, y: Float): Boolean {
         try {
-            Logger.d("Starting tap gesture at ($x, $y)")
-            if (!getGestureReady()) return false
-            setGestureReady(false)
             if (shouldShowGestures) {
                 visualizeTap(x, y)
             }
 
-            if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+            if (VersionUtil.belowVersion(Build.VERSION_CODES.O) && !shouldUseShizuku()) {
                 return defaultStrategy.immediateTap(x, y)
             }
+
+            if (!getGestureReady()) return false
+            Logger.d("Starting tap gesture at ($x, $y)")
+            setGestureReady(false)
 
             return currentStrategy.startTap(x, y, completionListener)
         } catch (e: Exception) {
@@ -289,9 +292,10 @@ class GestureManager(
     }
 
     suspend fun dragTap(fromX: Float, fromY: Float, toX: Float, toY: Float): Boolean {
-        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O) && !shouldUseShizuku()) {
             return true
         }
+
         if (shouldShowGestures) {
             // Need to fix visualization lag; remove drag visualization for now
             endVisualizeTap()
@@ -315,14 +319,16 @@ class GestureManager(
     }
 
     suspend fun endTap(x: Float, y: Float): Boolean {
-        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
-            return true
-        }
-        if (!getGestureReady()) return false
-        setGestureReady(false)
         if (shouldShowGestures) {
             endVisualizeTap()
         }
+
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O) && !shouldUseShizuku()) {
+            return true
+        }
+
+        if (!getGestureReady()) return false
+        setGestureReady(false)
 
         try {
             Logger.d("Ending tap at ($x, $y)")
@@ -335,7 +341,7 @@ class GestureManager(
     }
 
     private fun cancelTap(): Boolean {
-        if (VersionUtil.belowVersion(Build.VERSION_CODES.O)) {
+        if (VersionUtil.belowVersion(Build.VERSION_CODES.O) && !shouldUseShizuku()) {
             return true
         }
 

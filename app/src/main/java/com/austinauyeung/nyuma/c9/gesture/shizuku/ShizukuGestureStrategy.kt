@@ -425,6 +425,8 @@ class ShizukuGestureStrategy(
     }
 
     override suspend fun endTap(finalX: Float, finalY: Float, completionListener: GestureCompletionListener?): Boolean {
+        // Edge case: toggling Android 7 override will end tap that did not start with Shizuku
+        completionListener?.onGestureCompleted(true)
         if (!isAvailable() || !_gestureActive || _gestureDownTime == 0L) return false
 
         Logger.d("Using Shizuku to end gesture at ($finalX, $finalY)")
@@ -455,8 +457,6 @@ class ShizukuGestureStrategy(
             _gestureDownTime = 0
             _currentGestureX = 0f
             _currentGestureY = 0f
-
-            completionListener?.onGestureCompleted(true)
 
             return true
         } catch (e: Exception) {
