@@ -47,16 +47,16 @@ Install using adb:
 ### Additional installation for certain Android versions
 Refer to the following table to determine if you will need to [install Shizuku](https://shizuku.rikka.app/guide/setup/) to use this application:
 
-| Android Version | Shizuku Required | Notes |
-| --- | --- | --- |
-| 7 | Maybe | Shizuku is needed specifically to support features such as long press and drag. This requirement can be overridden, but gestures will be restricted to just clicks. |
-| 8, 9, 10 | Maybe | If you are experiencing poor ("blocky") scroll and zoom performance, first try `C9 > Developer Options > Improve Non-Shizuku Gestures`, which will attempt to dispatch smoother gestures but may stutter. For the most optimal gestures, Shizuku is needed. |
-| 11 | Maybe | Shizuku is needed if the application does not work as-is (i.e. no gestures can be dispatched) and/or you have had trouble in the past with other cursor apps. |
-| 12+ | No | |
+| Android Version | Shizuku Required | Notes                                                                                                                                                                                                                                                       |
+|-----------------| --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 7               | Maybe | Shizuku is needed specifically to support features such as long press and drag. This requirement can be overridden, but gestures will be restricted to just clicks.                                                                                         |
+| 8-10            | Maybe | If you are experiencing poor ("blocky") scroll and zoom performance, first try `C9 > Developer Options > Improve Non-Shizuku Gestures`, which will attempt to dispatch smoother gestures but may stutter. For the most optimal gestures, Shizuku is needed. |
+| 11-12           | Maybe | Shizuku is needed if the application does not work as-is (i.e. no gestures can be dispatched) and/or you have had trouble in the past with other cursor apps. This may happen on Android 11 phones and Android 12 for TV.                                   |
+| 13+             | No |                                                                                                                                                                                                                                                             |
 
 Once installed, navigate to, and enable, `C9 > Developer Options > Enable Shizuku Integration`.
 
-Note that unless your device is rooted, you will need to restart the Shizuku service upon reboot.
+Unless your device is rooted, you will need to manually restart the Shizuku service upon reboot. Alternatively, you can install Shizuku forks, such as [thedjchi/Shizuku](https://github.com/thedjchi/Shizuku) or [thejaustin/ShiuzkuPlus](https://github.com/thejaustin/ShizukuPlus), which automatically start the service on boot.
 
 ## Acknowledgments
 As the [package name](#option-2) would suggest, this application is dedicated to my late cat, [Nyuma](./docs/imgs/IMG_3226.jpg).
