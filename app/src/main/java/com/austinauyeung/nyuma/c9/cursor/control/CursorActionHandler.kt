@@ -255,14 +255,22 @@ class CursorActionHandler(
 
             actionKeys =
                 when (settings.controlScheme) {
-                    ControlScheme.STANDARD, ControlScheme.DPAD_TOGGLE, ControlScheme.TV -> {
+                    ControlScheme.STANDARD, ControlScheme.SWAPPED -> {
+                        setOf(
+                            KeyEvent.KEYCODE_DPAD_CENTER,
+                            KeyEvent.KEYCODE_ENTER,
+                            KeyEvent.KEYCODE_5,
+                        )
+                    }
+
+                    ControlScheme.DPAD_TOGGLE, ControlScheme.TV -> {
                         setOf(
                             KeyEvent.KEYCODE_DPAD_CENTER,
                             KeyEvent.KEYCODE_ENTER,
                         )
                     }
 
-                    ControlScheme.SWAPPED, ControlScheme.NUMPAD_TOGGLE -> {
+                    ControlScheme.NUMPAD_TOGGLE -> {
                         setOf(
                             KeyEvent.KEYCODE_5,
                         )
